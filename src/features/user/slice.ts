@@ -1,12 +1,21 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import { userAuthThunk, userAddThunk } from './thunks';
+import { userAuthThunk, userAddThunk, userLoginThunk, userOTPConfirmThunk } from './thunks';
 import { UserSliceState } from './types';
 
 const initialState: UserSliceState = {
   token: '',
   name: '',
-  email: '',
+  login: {
+    email: '',
+  },
+  profile: {
+    avatar: '',
+    phone: '',
+    language: '',
+    location: '',
+  },
+  roles: [],
   status: '',
   error: '',
 };
@@ -17,27 +26,29 @@ export const userSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     /** BUILDER USER AUTH THUNK */
-    builder.addCase(userAuthThunk.pending, (state) => {
-      state.status = 'loading';
+    builder.addCase(userLoginThunk.pending, (state, action) => {
+      state.status = `loading: ${action.type}`;
     });
-    builder.addCase(userAuthThunk.fulfilled, (state, action) => {
-      state.status = 'succeeded';
+    builder.addCase(userLoginThunk.fulfilled, (state, action) => {
+      state.status = `succeeded: ${action.type}`;
+      state.login.email = action.meta.arg.email;
     });
-    builder.addCase(userAuthThunk.rejected, (state, action) => {
-      state.status = 'failed';
-
+    builder.addCase(userLoginThunk.rejected, (state, action) => {
+      state.status = `failed ${action.type}`;
       state.error = action.error.message || '';
     });
 
-    /** BUILDER USER ADD THUNK */
-    builder.addCase(userAddThunk.pending, (state) => {
-      state.status = 'loading';
+    /** BUILDER USER OTP THUNK */
+    builder.addCase(userOTPConfirmThunk.pending, (state, action) => {
+      state.status = `loading: ${action.type}`;
     });
-    builder.addCase(userAddThunk.fulfilled, (state, action) => {
-      state.status = 'succeeded';
+    builder.addCase(userOTPConfirmThunk.fulfilled, (state, action) => {
+      state.status = `succeeded: ${action.type}`;
+      if (!action.payload.data) return;
+      state.token = action.payload.data.token;
     });
-    builder.addCase(userAddThunk.rejected, (state, action) => {
-      state.status = 'failed';
+    builder.addCase(userOTPConfirmThunk.rejected, (state, action) => {
+      state.status = `failed: ${action.type}`;
       state.error = action.error.message || '';
     });
   },

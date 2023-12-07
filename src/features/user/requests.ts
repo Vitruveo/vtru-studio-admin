@@ -38,6 +38,7 @@ export async function userUpdateReq(data: UserUpdateReq): Promise<UserApiResUpda
   const response = await apiService.put<UserResUpdate>(`/users/${data._id}`, {
     name: data.name,
     login: { email: data.email },
+    roles: data.roles,
   });
   return response;
 }

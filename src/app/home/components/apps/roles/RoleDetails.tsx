@@ -213,15 +213,9 @@ export default function RoleDetails({ roleId, permissions, onDeleteClick, handle
                     <Box pt={1}>
                       <form onSubmit={handleSubmit}>
                         <Box p={3}>
-                          <Avatar
-                            alt=""
-                            src=""
-                            sx={{
-                              width: '72px',
-                              height: '72px',
-                            }}>
-                            {values.name.slice(0, 2).toUpperCase()}
-                          </Avatar>
+                          <Typography variant="h6" mb={0.5}>
+                            Editing role
+                          </Typography>
                           <Box>
                             <CustomFormLabel htmlFor="name">Name</CustomFormLabel>
                             <CustomTextField

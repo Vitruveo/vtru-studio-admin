@@ -11,7 +11,7 @@ import { useTheme } from '@mui/material/styles';
 import { IconStar, IconTrash } from '@tabler/icons-react';
 import { UserType } from '@/mock/users';
 
-interface Props extends UserType {
+interface Props extends Omit<UserType, 'login' | 'roles'> {
   onUserClick: (event: React.MouseEvent<HTMLElement>) => void;
   onStarredClick: React.MouseEventHandler<SVGElement>;
   onDeleteClick: React.MouseEventHandler<SVGElement>;
@@ -20,24 +20,6 @@ interface Props extends UserType {
 }
 
 export default function UserListItem({ onUserClick, onStarredClick, onDeleteClick, name, image, active }: Props) {
-  const customizer = {
-    activeDir: 'ltr',
-    activeMode: 'light', // This can be light or dark
-    activeTheme: 'BLUE_THEME', // BLUE_THEME, GREEN_THEME, BLACK_THEME, PURPLE_THEME, ORANGE_THEME
-    SidebarWidth: 270,
-    MiniSidebarWidth: 87,
-    TopbarHeight: 70,
-    isLayout: 'full', // This can be full or boxed
-    isCollapse: false, // to make sidebar Mini by default
-    isSidebarHover: false,
-    isMobileSidebar: false,
-    isHorizontal: false,
-    isLanguage: 'en',
-    isCardShadow: true,
-    borderRadius: 7,
-  };
-  const br = `${customizer.borderRadius}px`;
-
   const theme = useTheme();
   const warningColor = theme.palette.warning.main;
 

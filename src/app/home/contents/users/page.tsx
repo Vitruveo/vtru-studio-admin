@@ -18,6 +18,7 @@ import UserAdd from '../../components/apps/users/UserAdd';
 import { userDeleteThunk } from '@/features/user';
 import { UserDialogDelete } from '../../components/apps/users/UserDialogDelete';
 import { useDispatch } from '@/store/hooks';
+import { RoleType } from '@/mock/roles';
 
 const drawerWidth = 240;
 const secdrawerWidth = 320;
@@ -30,7 +31,9 @@ export default function Users() {
   const lgUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('lg'));
   const mdUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
 
-  const [users, setUsers] = useState<UserType[]>([]);
+  const [users, setUsers] = useState<Omit<UserType, 'login' | 'roles'>[]>([]);
+  const [roles, setRoles] = useState<RoleType[]>([]);
+
   const [search, setSearch] = useState('');
   const [userId, setUserId] = useState('');
   const [isOpenDialogDelete, setIsOpenDialogDelete] = useState(false);
@@ -38,6 +41,7 @@ export default function Users() {
 
   useEffect(() => {
     const sseUsers = new EventSource('http://127.0.0.1:5001/users');
+    const sseRoles = new EventSource('http://127.0.0.1:5001/roles');
 
     sseUsers.addEventListener('user_list', (event) => {
       const user = JSON.parse(event.data);
@@ -48,8 +52,18 @@ export default function Users() {
       sseUsers.close();
     });
 
+    sseRoles.addEventListener('role_list', (event) => {
+      const role = JSON.parse(event.data);
+
+      setRoles((prevState) => [...prevState, role]);
+    });
+    sseRoles.addEventListener('close', (event) => {
+      sseRoles.close();
+    });
+
     return () => {
       sseUsers.close();
+      sseRoles.close();
     };
   }, []);
 
@@ -160,7 +174,12 @@ export default function Users() {
               </Button>
             </Box>
           )}
-          <UserDetails userId={userId} onDeleteClick={onDeleteClick} handleUpdateUser={handleUpdateUser} />
+          <UserDetails
+            roles={roles}
+            userId={userId}
+            onDeleteClick={onDeleteClick}
+            handleUpdateUser={handleUpdateUser}
+          />
         </Drawer>
       </AppCard>
 

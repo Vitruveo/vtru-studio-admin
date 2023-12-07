@@ -59,9 +59,9 @@ export const userAddThunk = createAsyncThunk<UserAddApiRes, UserAddReq>(
 
 export const userUpdateThunk = createAsyncThunk<UserApiResUpdate, UserUpdateReq>(
   'user/update',
-  async ({ _id, name, email }, { rejectWithValue }) => {
+  async ({ _id, name, email, roles }, { rejectWithValue }) => {
     try {
-      const response = await userUpdateReq({ _id, name, email });
+      const response = await userUpdateReq({ _id, name, email, roles });
       return response;
     } catch (error) {
       return rejectWithValue(error as string);

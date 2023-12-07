@@ -13,18 +13,19 @@ import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 
 import { useDispatch } from '@/store/hooks';
-import { roleCreateThunk } from '@/features/role';
-import { RoleApiResCreate } from '@/features/role/types';
+import { userAddThunk } from '@/features/user';
+import { UserApiResCreate } from '@/features/user/types';
 
-const roleSchemaValidation = yup.object({
-  name: yup.string().min(3, 'name field needs at least 3 characters').required('field name is required.'),
+const userSchemaValidation = yup.object({
+  name: yup.string().required('field name is required.'),
+  email: yup.string().email('invalid email.').required('field email is required.'),
 });
 
 interface Props {
-  handleAddNewRole(params: { id: string; name: string; description: string }): void;
+  handleAddNewUser(params: { id: string; name: string; email: string }): void;
 }
 
-export default function RoleAdd({ handleAddNewRole }: Props) {
+export default function UserAdd({ handleAddNewUser }: Props) {
   const dispatch = useDispatch();
 
   const [modal, setModal] = React.useState(false);
@@ -32,21 +33,20 @@ export default function RoleAdd({ handleAddNewRole }: Props) {
   const { handleSubmit, handleChange, resetForm, values, errors } = useFormik({
     initialValues: {
       name: '',
-      description: '',
+      email: '',
     },
-    validationSchema: roleSchemaValidation,
+    validationSchema: userSchemaValidation,
     onSubmit: async (payload) => {
       const response = await dispatch(
-        roleCreateThunk({
+        userAddThunk({
           name: payload.name,
-          description: payload.description,
-          permissions: [],
+          login: { email: payload.email },
         }),
       );
-      handleAddNewRole({
-        id: (response.payload as RoleApiResCreate).data?.insertedId || '',
+      handleAddNewUser({
+        id: (response.payload as UserApiResCreate).data?.insertedId || '',
         name: payload.name,
-        description: payload.description,
+        email: payload.email,
       });
       toggle();
       resetForm();
@@ -61,7 +61,7 @@ export default function RoleAdd({ handleAddNewRole }: Props) {
     <>
       <Box p={3} pb={1}>
         <Button color="primary" variant="contained" fullWidth onClick={toggle}>
-          Add New Role
+          Add New User
         </Button>
       </Box>
       <Dialog
@@ -71,11 +71,11 @@ export default function RoleAdd({ handleAddNewRole }: Props) {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description">
         <DialogTitle id="alert-dialog-title" variant="h5">
-          Add New Role
+          Add New User
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Lets add new role for your application. fill the all field and
+            Lets add new user for your application. fill the all field and
             <br /> click on submit button.
           </DialogContentText>
           <Box mt={3}>
@@ -95,16 +95,17 @@ export default function RoleAdd({ handleAddNewRole }: Props) {
                   {errors?.name && <span>{errors.name}</span>}
                 </Grid>
                 <Grid item xs={12} lg={6}>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>Email</FormLabel>
                   <TextField
-                    id="description"
-                    name="description"
+                    id="email"
+                    name="email"
                     size="small"
                     variant="outlined"
                     fullWidth
-                    value={values.description}
+                    value={values.email}
                     onChange={handleChange}
                   />
+                  {errors?.email && <span>{errors.email}</span>}
                 </Grid>
 
                 <Box width="100%" paddingY={3} gap={1} display="flex" justifyContent="flex-end">

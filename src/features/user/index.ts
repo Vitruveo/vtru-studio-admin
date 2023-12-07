@@ -1,3 +1,3 @@
-export { userSlice } from "./slice";
-export { userAuthThunk } from "./thunks";
-export { userSelector } from "./selectors";
+export { userSlice } from './slice';
+export { userAuthThunk, userAddThunk, userUpdateThunk, userDeleteThunk } from './thunks';
+export { userSelector } from './selectors';

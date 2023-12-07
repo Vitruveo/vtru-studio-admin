@@ -1,15 +1,21 @@
 // import { createAppAsyncThunk } from "@/store/asyncThunk";
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { userAuthReq, userAddReq, userLoginReq, userOTPConfimReq } from './requests';
+import { userAuthReq, userAddReq, userLoginReq, userOTPConfimReq, userUpdateReq, userDeleteReq } from './requests';
 import {
   UserAddApiRes,
   UserAddReq,
+  UserAddRes,
+  UserApiResDelete,
+  UserApiResUpdate,
   UserAuthApiRes,
   UserAuthReq,
+  UserDeleteReq,
   UserLoginApiRes,
   UserLoginReq,
   UserOTPConfirmApiRes,
   UserOTPConfirmReq,
+  UserUpdateReq,
+  UserUpdateRes,
 } from './types';
 
 export const userLoginThunk = createAsyncThunk<UserLoginApiRes, UserLoginReq>(
@@ -38,12 +44,24 @@ export const userAuthThunk = createAsyncThunk<UserAuthApiRes, UserAuthReq>(
 
 export const userAddThunk = createAsyncThunk<UserAddApiRes, UserAddReq>(
   'user/add',
-  async ({ name, email }, { rejectWithValue }) => {
+  async ({ name, login: { email } }, { rejectWithValue }) => {
     try {
       const response = await userAddReq({
         name,
-        email,
+        login: { email },
       });
+      return response;
+    } catch (error) {
+      return rejectWithValue(error as string);
+    }
+  },
+);
+
+export const userUpdateThunk = createAsyncThunk<UserApiResUpdate, UserUpdateReq>(
+  'user/update',
+  async ({ _id, name, email }, { rejectWithValue }) => {
+    try {
+      const response = await userUpdateReq({ _id, name, email });
       return response;
     } catch (error) {
       return rejectWithValue(error as string);
@@ -59,6 +77,18 @@ export const userOTPConfirmThunk = createAsyncThunk<UserOTPConfirmApiRes, UserOT
         email,
         code,
       });
+      return response;
+    } catch (error) {
+      return rejectWithValue(error as string);
+    }
+  },
+);
+
+export const userDeleteThunk = createAsyncThunk<UserApiResDelete | undefined, UserDeleteReq>(
+  'user/delete',
+  async ({ _id }, { rejectWithValue, getState }) => {
+    try {
+      const response = await userDeleteReq({ _id });
       return response;
     } catch (error) {
       return rejectWithValue(error as string);

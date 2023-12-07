@@ -1,11 +1,6 @@
 'use client';
 
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -30,41 +25,19 @@ const drawerWidth = 240;
 const secdrawerWidth = 320;
 
 export default function Roles() {
-  const lgUp = useMediaQuery(
-    (theme: Theme) =>
-      theme.breakpoints.up('lg')
-  );
-  const mdUp = useMediaQuery(
-    (theme: Theme) =>
-      theme.breakpoints.up('md')
-  );
+  const lgUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('lg'));
+  const mdUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
   const dispatch = useDispatch();
 
-  const [roles, setRoles] = useState<
-    RoleType[]
-  >([]);
-  const [permissions, setPermissions] =
-    useState<PermissionType[]>([]);
-  const [roleId, setRoleId] =
-    useState('');
-  const [search, setSearch] =
-    useState('');
-  const [category, setCategory] =
-    useState('');
-  const [
-    isOpenDialogDelete,
-    setIsOpenDialogDelete,
-  ] = useState(false);
-  const [roleDelete, setRoleDelete] =
-    useState({ name: '', id: '' });
-  const [
-    isLeftSidebarOpen,
-    setLeftSidebarOpen,
-  ] = useState(false);
-  const [
-    isRightSidebarOpen,
-    setRightSidebarOpen,
-  ] = useState(false);
+  const [roles, setRoles] = useState<RoleType[]>([]);
+  const [permissions, setPermissions] = useState<PermissionType[]>([]);
+  const [roleId, setRoleId] = useState('');
+  const [search, setSearch] = useState('');
+  const [category, setCategory] = useState('');
+  const [isOpenDialogDelete, setIsOpenDialogDelete] = useState(false);
+  const [roleDelete, setRoleDelete] = useState({ name: '', id: '' });
+  const [isLeftSidebarOpen, setLeftSidebarOpen] = useState(false);
+  const [isRightSidebarOpen, setRightSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (!roleId && roles.length >= 1) {
@@ -73,49 +46,24 @@ export default function Roles() {
   }, [roles]);
 
   useEffect(() => {
-    const sseRoles = new EventSource(
-      'http://127.0.0.1:5001/roles'
-    );
-    const ssePermissions =
-      new EventSource(
-        'http://127.0.0.1:5001/permissions'
-      );
+    const sseRoles = new EventSource('http://127.0.0.1:5001/roles');
+    const ssePermissions = new EventSource('http://127.0.0.1:5001/permissions');
 
-    sseRoles.addEventListener(
-      'role_list',
-      (event) => {
-        const role = JSON.parse(
-          event.data
-        );
+    sseRoles.addEventListener('role_list', (event) => {
+      const role = JSON.parse(event.data);
 
-        setRoles((prevState) => [
-          ...prevState,
-          role,
-        ]);
-      }
-    );
-    sseRoles.addEventListener(
-      'close',
-      (event) => {
-        sseRoles.close();
-      }
-    );
+      setRoles((prevState) => [...prevState, role]);
+    });
+    sseRoles.addEventListener('close', (event) => {
+      sseRoles.close();
+    });
 
-    ssePermissions.addEventListener(
-      'permission_list',
-      (event) => {
-        setPermissions((prevState) => [
-          ...prevState,
-          JSON.parse(event.data),
-        ]);
-      }
-    );
-    ssePermissions.addEventListener(
-      'close',
-      (event) => {
-        ssePermissions.close();
-      }
-    );
+    ssePermissions.addEventListener('permission_list', (event) => {
+      setPermissions((prevState) => [...prevState, JSON.parse(event.data)]);
+    });
+    ssePermissions.addEventListener('close', (event) => {
+      ssePermissions.close();
+    });
 
     return () => {
       sseRoles.close();
@@ -124,53 +72,31 @@ export default function Roles() {
   }, []);
 
   const rolesFiltered = useMemo(() => {
-    return search.length > 0
-      ? roles.filter((role) =>
-          role.name.includes(search)
-        )
-      : [];
+    return search.length > 0 ? roles.filter((role) => role.name.includes(search)) : [];
   }, [search, roles]);
 
-  const rolesCategoryFiltered =
-    useMemo(() => {
-      return category.length > 0
-        ? roles.filter((role) => {
-            return role.permissions.some(
-              (permission) => {
-                const [categoryName] =
-                  permission.split(':');
+  const rolesCategoryFiltered = useMemo(() => {
+    return category.length > 0
+      ? roles.filter((role) => {
+          return role.permissions.some((permission) => {
+            const [categoryName] = permission.split(':');
 
-                return (
-                  category ===
-                  categoryName
-                );
-              }
-            );
-          })
-        : [];
-    }, [category, roles]);
+            return category === categoryName;
+          });
+        })
+      : [];
+  }, [category, roles]);
 
   const categories = useMemo(() => {
-    return permissions.reduce(
-      (acc: string[], cur) => {
-        const [categoryName] =
-          cur.key.split(':');
-        if (acc.includes(categoryName))
-          return acc;
+    return permissions.reduce((acc: string[], cur) => {
+      const [categoryName] = cur.key.split(':');
+      if (acc.includes(categoryName)) return acc;
 
-        return [...acc, categoryName];
-      },
-      []
-    );
+      return [...acc, categoryName];
+    }, []);
   }, [permissions]);
 
-  const onDeleteClick = ({
-    id,
-    name,
-  }: {
-    id: string;
-    name: string;
-  }) => {
+  const onDeleteClick = ({ id, name }: { id: string; name: string }) => {
     setIsOpenDialogDelete(true);
     setRoleDelete({ id, name: name });
   };
@@ -178,29 +104,15 @@ export default function Roles() {
   const onDeleteConfirm = () => {
     const { id } = roleDelete;
 
-    dispatch(
-      roleDeleteThunk({ _id: id })
-    );
-    setRoles((prevState) =>
-      prevState.filter(
-        (item) => item._id !== id
-      )
-    );
+    dispatch(roleDeleteThunk({ _id: id }));
+    setRoles((prevState) => prevState.filter((item) => item._id !== id));
     if (id === roleId) setRoleId('');
 
     setIsOpenDialogDelete(false);
   };
 
   const handleAddNewRole = useCallback(
-    ({
-      id,
-      name,
-      description,
-    }: {
-      id: string;
-      name: string;
-      description: string;
-    }) => {
+    ({ id, name, description }: { id: string; name: string; description: string }) => {
       setRoles((prevState) => [
         {
           _id: id,
@@ -213,7 +125,7 @@ export default function Roles() {
 
       setRoleId(id);
     },
-    []
+    [],
   );
 
   const handleUpdateRole = useCallback(
@@ -235,33 +147,24 @@ export default function Roles() {
               ...item,
               name,
               description,
-              permissions:
-                permissionsKeys,
+              permissions: permissionsKeys,
             };
           }
 
           return item;
-        })
+        }),
       );
     },
-    []
+    [],
   );
 
   return (
-    <PageContainer
-      title="Role"
-      description="this is Role"
-    >
-      <Breadcrumb
-        title="Roles Application"
-        subtitle="List Your Roles"
-      />
+    <PageContainer title="Role" description="this is Role">
+      <Breadcrumb title="Roles Application" subtitle="List Your Roles" />
       <AppCard>
         <Drawer
           open={isLeftSidebarOpen}
-          onClose={() =>
-            setLeftSidebarOpen(false)
-          }
+          onClose={() => setLeftSidebarOpen(false)}
           sx={{
             width: drawerWidth,
             [`& .MuiDrawer-paper`]: {
@@ -271,22 +174,9 @@ export default function Roles() {
             },
             flexShrink: 0,
           }}
-          variant={
-            lgUp
-              ? 'permanent'
-              : 'temporary'
-          }
-        >
-          <RoleAdd
-            handleAddNewRole={
-              handleAddNewRole
-            }
-          />
-          <RoleFilter
-            categories={categories}
-            category={category}
-            setCategory={setCategory}
-          />
+          variant={lgUp ? 'permanent' : 'temporary'}>
+          <RoleAdd handleAddNewRole={handleAddNewRole} />
+          <RoleFilter categories={categories} category={category} setCategory={setCategory} />
         </Drawer>
 
         <Box
@@ -298,56 +188,30 @@ export default function Roles() {
               lg: secdrawerWidth,
             },
             flexShrink: 0,
-          }}
-        >
-          <RoleSearch
-            onClick={() =>
-              setLeftSidebarOpen(true)
-            }
-            search={search}
-            setSearch={setSearch}
-          />
+          }}>
+          <RoleSearch onClick={() => setLeftSidebarOpen(true)} search={search} setSearch={setSearch} />
           <RoleList
             roleId={roleId}
-            data={
-              (search.length > 0 &&
-                rolesFiltered) ||
-              (category.length > 0 &&
-                rolesCategoryFiltered) ||
-              roles
-            }
-            onDeleteClick={
-              onDeleteClick
-            }
-            onRoleClick={({ id }) =>
-              setRoleId(id)
-            }
+            data={(search.length > 0 && rolesFiltered) || (category.length > 0 && rolesCategoryFiltered) || roles}
+            onDeleteClick={onDeleteClick}
+            onRoleClick={({ id }) => setRoleId(id)}
           />
         </Box>
 
         <Drawer
           anchor="right"
           open={isRightSidebarOpen}
-          onClose={() =>
-            setRightSidebarOpen(false)
-          }
-          variant={
-            mdUp
-              ? 'permanent'
-              : 'temporary'
-          }
+          onClose={() => setRightSidebarOpen(false)}
+          variant={mdUp ? 'permanent' : 'temporary'}
           sx={{
-            width: mdUp
-              ? secdrawerWidth
-              : '100%',
+            width: mdUp ? secdrawerWidth : '100%',
             zIndex: lgUp ? 0 : 1,
             flex: mdUp ? 'auto' : '',
             [`& .MuiDrawer-paper`]: {
               width: '100%',
               position: 'relative',
             },
-          }}
-        >
+          }}>
           {mdUp ? (
             ''
           ) : (
@@ -356,11 +220,7 @@ export default function Roles() {
                 variant="outlined"
                 color="primary"
                 size="small"
-                onClick={() =>
-                  setRightSidebarOpen(
-                    false
-                  )
-                }
+                onClick={() => setRightSidebarOpen(false)}
                 sx={{
                   mb: 3,
                   display: {
@@ -368,8 +228,7 @@ export default function Roles() {
                     md: 'none',
                     lg: 'none',
                   },
-                }}
-              >
+                }}>
                 Back{' '}
               </Button>
             </Box>
@@ -377,12 +236,8 @@ export default function Roles() {
           <RoleDetails
             roleId={roleId}
             permissions={permissions}
-            onDeleteClick={
-              onDeleteClick
-            }
-            handleUpdateRole={
-              handleUpdateRole
-            }
+            onDeleteClick={onDeleteClick}
+            handleUpdateRole={handleUpdateRole}
           />
         </Drawer>
       </AppCard>
@@ -390,11 +245,7 @@ export default function Roles() {
       <RoleDialogDelete
         roleName={roleDelete.name}
         isOpen={isOpenDialogDelete}
-        handleCancel={() =>
-          setIsOpenDialogDelete(
-            !isOpenDialogDelete
-          )
-        }
+        handleCancel={() => setIsOpenDialogDelete(!isOpenDialogDelete)}
         handleConfirm={onDeleteConfirm}
       />
     </PageContainer>

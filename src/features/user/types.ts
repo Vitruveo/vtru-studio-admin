@@ -13,8 +13,7 @@ interface User {
   };
   roles: Array<string>;
 }
-export interface UserSliceState
-  extends User {
+export interface UserSliceState extends User {
   token: string;
   status: string;
   error: string;
@@ -36,13 +35,29 @@ export interface UserAuthRes {
 
 export interface UserAddReq {
   name: string;
+  login: { email: string };
+}
+
+export interface UserUpdateReq {
+  _id: string;
+  name: string;
   email: string;
+}
+
+export interface UserDeleteReq {
+  _id: string;
 }
 
 export interface UserAddRes {
   id: string;
   name: string;
-  email: string;
+  login: { email: string };
+}
+
+export interface UserUpdateRes {
+  id: string;
+  name: string;
+  login: { email: string };
 }
 
 export interface UserOTPConfirmReq {
@@ -55,11 +70,26 @@ export interface UserOTPConfirmRes {
   token: string;
 }
 
-export type UserAddApiRes =
-  APIResponse<UserAddRes>;
-export type UserAuthApiRes =
-  APIResponse<UserAuthRes>;
-export type UserLoginApiRes =
-  APIResponse<string>;
-export type UserOTPConfirmApiRes =
-  APIResponse<UserOTPConfirmRes>;
+export type UserAddApiRes = APIResponse<UserAddRes>;
+export type UserAuthApiRes = APIResponse<UserAuthRes>;
+export type UserLoginApiRes = APIResponse<string>;
+export type UserOTPConfirmApiRes = APIResponse<UserOTPConfirmRes>;
+
+export interface UserResCreate {
+  acknowledged: boolean;
+  insertedId: string;
+}
+
+export interface UserResUpdate {
+  acknowledged: boolean;
+  insertedId: string;
+}
+
+export interface UserResDelete {
+  acknowledged: boolean;
+  insertedId: string;
+}
+
+export type UserApiResCreate = APIResponse<UserResCreate>;
+export type UserApiResUpdate = APIResponse<UserResUpdate>;
+export type UserApiResDelete = APIResponse<UserResDelete>;

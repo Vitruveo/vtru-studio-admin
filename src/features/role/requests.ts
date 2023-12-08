@@ -1,41 +1,40 @@
 import { apiService } from '@/app/services/api';
 import {
-    RoleApiRes,
-    RoleApiResCreate,
-    RoleApiResDelete,
-    RoleApiResUpdate,
-    RoleReq,
-    RoleRes,
+  Role,
+  RoleApiResCreate,
+  RoleApiResDelete,
+  RoleApiResUpdate,
+  RoleReqCreate,
+  RoleReqUpdate,
+  RoleResCreate,
+  RoleResDelete,
+  RoleResUpdate,
 } from './types';
 
-export async function findManyRoles(): Promise<RoleRes[]> {
-    const response: RoleRes[] = [];
-
-    return response;
+export async function findManyRoles() {
+  const response: Role[] = [];
+  return response;
 }
 
-export function findOneRole(id: string): Promise<RoleRes> {
-    const req: any = {};
-    return req;
+export function findOneRole(id: string) {
+  const response: Role = {} as Role;
+  return response;
 }
 
-export async function createRole(data: RoleReq) {
-    const response = await apiService.post<RoleApiResCreate>('/roles', data);
+export async function createRole(data: RoleReqCreate): Promise<RoleApiResCreate> {
+  const response = await apiService.post<RoleResCreate>('/roles', data);
 
-    return response.data;
+  return response;
 }
 
-export async function updateRole(id: string, data: RoleReq) {
-    const response = await apiService.put<RoleApiResUpdate>(
-        `/roles/${id}`,
-        data
-    );
+export async function updateRole(data: RoleReqUpdate): Promise<RoleApiResUpdate> {
+  const response = await apiService.put<RoleResUpdate>(`/roles/${data._id}`, data);
 
-    return response.data;
+  return response;
 }
 
-export async function deleteRole(id: string) {
-    const response = await apiService.delete<RoleApiResDelete>(`/roles/${id}`);
+export async function deleteRole(id: string): Promise<RoleApiResDelete> {
+  const response = await apiService.delete<RoleResDelete>(`/roles/${id}`);
 
-    return response.data;
+  return response;
 }

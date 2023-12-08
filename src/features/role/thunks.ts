@@ -1,8 +1,15 @@
 import { createAppAsyncThunk } from '@/store/asyncThunk';
 import { createRole, deleteRole, updateRole } from './requests';
-import { RoleApiResCreate, RoleApiResDelete, RoleApiResUpdate, RoleReq, RoleReqDelete, RoleReqUpdate } from './types';
+import {
+  RoleApiResCreate,
+  RoleApiResDelete,
+  RoleApiResUpdate,
+  RoleReqCreate,
+  RoleReqDelete,
+  RoleReqUpdate,
+} from './types';
 
-export const roleCreateThunk = createAppAsyncThunk<RoleApiResCreate | undefined, RoleReq>(
+export const roleCreateThunk = createAppAsyncThunk<RoleApiResCreate | undefined, RoleReqCreate>(
   'roles/create',
   async ({ name, description, permissions }, { rejectWithValue, getState }) => {
     try {
@@ -18,11 +25,12 @@ export const roleCreateThunk = createAppAsyncThunk<RoleApiResCreate | undefined,
   },
 );
 
-export const roleUpdateThunk = createAppAsyncThunk<RoleApiResUpdate | undefined, RoleReqUpdate>(
+export const roleUpdateThunk = createAppAsyncThunk<RoleApiResUpdate, RoleReqUpdate>(
   'roles/update',
   async ({ _id, name, description, permissions }, { rejectWithValue, getState }) => {
     try {
-      const response = await updateRole(_id, {
+      const response = await updateRole({
+        _id,
         name,
         description,
         permissions,
@@ -34,7 +42,7 @@ export const roleUpdateThunk = createAppAsyncThunk<RoleApiResUpdate | undefined,
   },
 );
 
-export const roleDeleteThunk = createAppAsyncThunk<RoleApiResDelete | undefined, RoleReqDelete>(
+export const roleDeleteThunk = createAppAsyncThunk<RoleApiResDelete, RoleReqDelete>(
   'roles/delete',
   async ({ _id }, { rejectWithValue, getState }) => {
     try {

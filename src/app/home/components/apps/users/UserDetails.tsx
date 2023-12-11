@@ -34,7 +34,7 @@ interface Props {
   userId: string;
   roles: RoleType[];
 
-  onDeleteClick(params: { id: string; name: string }): void;
+  onDeleteClick(params: { id: string; email: string }): void;
   handleUpdateUser(params: { id: string; name: string }): void;
 }
 
@@ -144,7 +144,7 @@ export default function UserDetails({ roles, userId, onDeleteClick, handleUpdate
                     onClick={() =>
                       onDeleteClick({
                         id: user._id,
-                        name: user.name,
+                        email: user.login.email,
                       })
                     }>
                     <IconTrash size="18" stroke={1.3} />

@@ -9,7 +9,7 @@ type Props = {
   userId: string;
   data: Omit<UserType, 'roles'>[];
   onUserClick(params: { id: string }): void;
-  onDeleteClick(params: { id: string; name: string }): void;
+  onDeleteClick(params: { id: string; email: string }): void;
 };
 
 export default function UserList({ userId, data, onUserClick, onDeleteClick }: Props) {
@@ -29,7 +29,7 @@ export default function UserList({ userId, data, onUserClick, onDeleteClick }: P
             image=""
             {...user}
             onUserClick={() => onUserClick({ id: user._id })}
-            onDeleteClick={() => onDeleteClick({ id: user._id, name: user.name })}
+            onDeleteClick={() => onDeleteClick({ id: user._id, email: user.login.email })}
             onStarredClick={() => {}}
           />
         ))}

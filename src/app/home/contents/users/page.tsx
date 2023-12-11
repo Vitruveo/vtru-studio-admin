@@ -37,7 +37,7 @@ export default function Users() {
   const [search, setSearch] = useState('');
   const [userId, setUserId] = useState('');
   const [isOpenDialogDelete, setIsOpenDialogDelete] = useState(false);
-  const [userDelete, setUserDelete] = useState({ name: '', id: '' });
+  const [userDelete, setUserDelete] = useState({ email: '', id: '' });
 
   useEffect(() => {
     const sseUsers = new EventSource('http://127.0.0.1:5001/users');
@@ -71,9 +71,9 @@ export default function Users() {
     return search.length > 0 ? users.filter((user) => user.name.includes(search)) : [];
   }, [search, users]);
 
-  const onDeleteClick = ({ id, name }: { id: string; name: string }) => {
+  const onDeleteClick = ({ id, email }: { id: string; email: string }) => {
     setIsOpenDialogDelete(true);
-    setUserDelete({ id, name: name });
+    setUserDelete({ id, email });
   };
 
   const onDeleteConfirm = () => {
@@ -185,7 +185,7 @@ export default function Users() {
       </AppCard>
 
       <UserDialogDelete
-        userName={userDelete.name}
+        userName={userDelete.email}
         isOpen={isOpenDialogDelete}
         handleCancel={() => setIsOpenDialogDelete(!isOpenDialogDelete)}
         handleConfirm={onDeleteConfirm}

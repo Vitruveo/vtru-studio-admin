@@ -1,6 +1,7 @@
 import { APIResponse } from '../common/types';
 
 interface User {
+  _id: string;
   name: string;
   login: {
     email: string;

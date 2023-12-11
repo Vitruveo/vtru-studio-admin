@@ -10,6 +10,8 @@ import ConfirmView from './view';
 import { otpSchemaValidation } from './formSchema';
 import { userSelector } from '@/features/user';
 import CustomizedSnackbar, { CustomizedSnackbarState } from '@/app/common/toastr';
+import { connectWebSocketThunk, loginWebSocketThunk } from '@/features/ws';
+import { UserOTPConfirmApiRes } from '@/features/user/types';
 
 export default function ConfirmContainer() {
   const [toastr, setToastr] = useState<CustomizedSnackbarState>({ type: 'success', open: false, message: '' });
@@ -36,6 +38,9 @@ export default function ConfirmContainer() {
       );
       if (resOTPConfirm.meta.requestStatus === 'fulfilled') {
         setToastr({ open: true, type: 'success', message: 'OTP confirmed!' });
+        const id = (resOTPConfirm.payload as UserOTPConfirmApiRes).data!.user._id;
+        await dispatch(connectWebSocketThunk());
+        await dispatch(loginWebSocketThunk({ _id: id }));
         router.push('/home');
         return;
       }

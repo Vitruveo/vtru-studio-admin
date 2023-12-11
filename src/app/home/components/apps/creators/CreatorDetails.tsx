@@ -17,6 +17,8 @@ import { apiService } from '@/app/services/api';
 import { CreatorType } from '@/mock/creators';
 import { Grid } from '@mui/material';
 import { RoleType } from '@/mock/roles';
+import { websocketSelector } from '@/features/ws';
+import { useSelector } from 'react-redux';
 
 const creatorSchemaValidation = yup.object({
   name: yup.string().required('field name is required.'),
@@ -29,6 +31,8 @@ interface Props {
 }
 
 export default function CreatorDetails({ creatorId, onDeleteClick }: Props) {
+  const { creatorsOnline } = useSelector(websocketSelector(['creatorsOnline']));
+
   const [creator, setCreator] = useState<CreatorType | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [starred, setStarred] = useState(false);
@@ -109,15 +113,26 @@ export default function CreatorDetails({ creatorId, onDeleteClick }: Props) {
           <Box sx={{ overflow: 'auto' }}>
             <Box p={3}>
               <Box display="flex" alignItems="center">
-                <Avatar
-                  alt=""
-                  src=""
-                  sx={{
-                    width: '72px',
-                    height: '72px',
-                  }}>
-                  {(values.name || creator.login.email).slice(0, 2).toUpperCase()}
-                </Avatar>
+                <Box position="relative">
+                  <Avatar
+                    alt=""
+                    src=""
+                    sx={{
+                      width: '72px',
+                      height: '72px',
+                    }}>
+                    {(values.name || creator.login.email).slice(0, 2).toUpperCase()}
+                  </Avatar>
+                  <Box
+                    position="absolute"
+                    width="25px"
+                    height="25px"
+                    borderRadius="50%"
+                    border="2px solid #fff"
+                    bgcolor={creatorsOnline.some((item) => item._id === creatorId) ? '#13DEB9' : '#f3704d'}
+                    bottom={-2}
+                    right={4}></Box>
+                </Box>
                 <Box sx={{ ml: 2 }}>
                   <Typography variant="h6" mb={0.5}>
                     {creator.name}

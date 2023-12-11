@@ -48,7 +48,8 @@ export default function CreatorListItem({
             width="15px"
             height="15px"
             borderRadius="50%"
-            bgcolor={creatorsOnline.some((item) => item._id === _id) ? 'green' : 'red'}
+            border="2px solid #fff"
+            bgcolor={creatorsOnline.some((item) => item._id === _id) ? '#13DEB9' : '#f3704d'}
             bottom={-3}
             right={15}></Box>
         </Box>

@@ -4,6 +4,7 @@ import { userAuthThunk, userAddThunk, userLoginThunk, userOTPConfirmThunk } from
 import { UserSliceState } from './types';
 
 const initialState: UserSliceState = {
+  _id: '',
   token: '',
   name: '',
   login: {
@@ -46,6 +47,8 @@ export const userSlice = createSlice({
       state.status = `succeeded: ${action.type}`;
       if (!action.payload.data) return;
       state.token = action.payload.data.token;
+      state.name = action.payload.data.user.name;
+      state._id = action.payload.data.user._id;
     });
     builder.addCase(userOTPConfirmThunk.rejected, (state, action) => {
       state.status = `failed: ${action.type}`;

@@ -31,7 +31,7 @@ export function CreatorDialogDelete({ creatorName, isOpen, handleCancel, handleC
             autoFocus
             margin="dense"
             id="name"
-            label="Creator name"
+            label="Creator email"
             fullWidth
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)}
           />

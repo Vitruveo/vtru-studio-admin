@@ -37,7 +37,7 @@ export default function Creators() {
   const [creatorId, setCreatorId] = useState('');
   const [isCreatorsOnline, setIsCreatorsOnline] = useState(false);
   const [isOpenDialogDelete, setIsOpenDialogDelete] = useState(false);
-  const [creatorDelete, setCreatorDelete] = useState({ name: '', id: '' });
+  const [creatorDelete, setCreatorDelete] = useState({ email: '', id: '' });
 
   useEffect(() => {
     dispatch(subscribeWebSocketThunk());
@@ -90,9 +90,9 @@ export default function Creators() {
       : [];
   }, [isCreatorsOnline]);
 
-  const onDeleteClick = ({ id, name }: { id: string; name: string }) => {
+  const onDeleteClick = ({ id, email }: { id: string; email: string }) => {
     setIsOpenDialogDelete(true);
-    setCreatorDelete({ id, name: name });
+    setCreatorDelete({ id, email });
   };
 
   const onDeleteConfirm = () => {
@@ -178,7 +178,7 @@ export default function Creators() {
       </AppCard>
 
       <CreatorDialogDelete
-        creatorName={creatorDelete.name}
+        creatorName={creatorDelete.email}
         isOpen={isOpenDialogDelete}
         handleCancel={() => setIsOpenDialogDelete(!isOpenDialogDelete)}
         handleConfirm={onDeleteConfirm}

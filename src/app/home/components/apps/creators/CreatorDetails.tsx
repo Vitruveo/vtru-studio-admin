@@ -25,7 +25,7 @@ const creatorSchemaValidation = yup.object({
 interface Props {
   creatorId: string;
 
-  onDeleteClick(params: { id: string; name: string }): void;
+  onDeleteClick(params: { id: string; email: string }): void;
 }
 
 export default function CreatorDetails({ creatorId, onDeleteClick }: Props) {
@@ -95,7 +95,7 @@ export default function CreatorDetails({ creatorId, onDeleteClick }: Props) {
                     onClick={() =>
                       onDeleteClick({
                         id: creator._id,
-                        name: creator.name,
+                        email: creator.login.email,
                       })
                     }>
                     <IconTrash size="18" stroke={1.3} />

@@ -9,7 +9,7 @@ type Props = {
   creatorId: string;
   data: Omit<CreatorType, 'roles'>[];
   onCreatorClick(params: { id: string }): void;
-  onDeleteClick(params: { id: string; name: string }): void;
+  onDeleteClick(params: { id: string; email: string }): void;
 };
 
 export default function CreatorList({ creatorId, data, onCreatorClick, onDeleteClick }: Props) {
@@ -29,7 +29,7 @@ export default function CreatorList({ creatorId, data, onCreatorClick, onDeleteC
             image=""
             {...creator}
             onCreatorClick={() => onCreatorClick({ id: creator._id })}
-            onDeleteClick={() => onDeleteClick({ id: creator._id, name: creator.name })}
+            onDeleteClick={() => onDeleteClick({ id: creator._id, email: creator.login.email })}
             onStarredClick={() => {}}
           />
         ))}

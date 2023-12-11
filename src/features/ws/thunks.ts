@@ -39,7 +39,12 @@ export const subscribeWebSocketThunk = createAsyncThunk<void, undefined>(
 
     socket.on('monitorCreators', (data) => {
       if (data.event === 'connect') {
-        dispatch(websocketSlice.actions.websocketAddMessage(data.id));
+        dispatch(
+          websocketSlice.actions.websocketAddMessage({
+            _id: data.id,
+            email: data.email,
+          }),
+        );
       } else {
         dispatch(websocketSlice.actions.websocketRemoveMessage(data.id));
       }

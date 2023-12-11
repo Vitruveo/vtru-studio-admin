@@ -4,7 +4,7 @@ import { WebsocketSliceState } from './types';
 
 const initialState: WebsocketSliceState = {
   connection: null,
-  messages: [],
+  creatorsOnline: [],
 };
 
 export const websocketSlice = createSlice({
@@ -15,13 +15,14 @@ export const websocketSlice = createSlice({
       state.connection = action.payload;
     },
     websocketAddMessage: (state, action) => {
-      if (!state.messages.includes(action.payload)) state.messages.push(action.payload);
+      if (!state.creatorsOnline.some((item) => item._id === action.payload._id))
+        state.creatorsOnline.push(action.payload);
     },
     websocketRemoveMessage: (state, action) => {
-      state.messages = state.messages.filter((item) => item !== action.payload);
+      state.creatorsOnline = state.creatorsOnline.filter((item) => item._id !== action.payload);
     },
     websocketClearMessages: (state) => {
-      state.messages = [];
+      state.creatorsOnline = [];
     },
     websocketDisconnected: (state) => {
       state.connection = null;

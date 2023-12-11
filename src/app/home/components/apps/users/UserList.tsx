@@ -7,7 +7,7 @@ import { UserType } from '@/mock/users';
 
 type Props = {
   userId: string;
-  data: Omit<UserType, 'login' | 'roles'>[];
+  data: Omit<UserType, 'roles'>[];
   onUserClick(params: { id: string }): void;
   onDeleteClick(params: { id: string; name: string }): void;
 };

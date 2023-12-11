@@ -166,7 +166,7 @@ export default function UserDetails({ roles, userId, onDeleteClick, handleUpdate
                       width: '72px',
                       height: '72px',
                     }}>
-                    {values.name.slice(0, 2).toUpperCase()}
+                    {(values.name || user.login.email).slice(0, 2).toUpperCase()}
                   </Avatar>
                   <Box sx={{ ml: 2 }}>
                     <Typography variant="h6" mb={0.5}>

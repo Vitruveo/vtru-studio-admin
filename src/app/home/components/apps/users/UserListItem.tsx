@@ -11,7 +11,7 @@ import { useTheme } from '@mui/material/styles';
 import { IconStar, IconTrash } from '@tabler/icons-react';
 import { UserType } from '@/mock/users';
 
-interface Props extends Omit<UserType, 'login' | 'roles'> {
+interface Props extends Omit<UserType, 'roles'> {
   onUserClick: (event: React.MouseEvent<HTMLElement>) => void;
   onStarredClick: React.MouseEventHandler<SVGElement>;
   onDeleteClick: React.MouseEventHandler<SVGElement>;
@@ -19,7 +19,15 @@ interface Props extends Omit<UserType, 'login' | 'roles'> {
   active: any;
 }
 
-export default function UserListItem({ onUserClick, onStarredClick, onDeleteClick, name, image, active }: Props) {
+export default function UserListItem({
+  onUserClick,
+  onStarredClick,
+  onDeleteClick,
+  name,
+  login,
+  image,
+  active,
+}: Props) {
   const theme = useTheme();
   const warningColor = theme.palette.warning.main;
 
@@ -27,14 +35,14 @@ export default function UserListItem({ onUserClick, onStarredClick, onDeleteClic
     <ListItemButton sx={{ mb: 1 }} selected={active}>
       <ListItemAvatar>
         <Avatar alt="" src="" sx={{ fontSize: 14 }}>
-          {name.slice(0, 2).toUpperCase()}
+          {(name || login.email).slice(0, 2).toUpperCase()}
         </Avatar>
       </ListItemAvatar>
       <ListItemText>
         <Stack direction="row" gap="10px" alignItems="center">
           <Box mr="auto" onClick={onUserClick}>
             <Typography variant="subtitle1" noWrap fontWeight={600} sx={{ maxWidth: '150px' }}>
-              {name}
+              {name || login.email}
             </Typography>
           </Box>
           <IconStar onClick={onStarredClick} size="16" stroke={1.5} />

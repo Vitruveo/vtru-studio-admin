@@ -31,7 +31,7 @@ export default function Users() {
   const lgUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('lg'));
   const mdUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
 
-  const [users, setUsers] = useState<Omit<UserType, 'login' | 'roles'>[]>([]);
+  const [users, setUsers] = useState<Omit<UserType, 'roles'>[]>([]);
   const [roles, setRoles] = useState<RoleType[]>([]);
 
   const [search, setSearch] = useState('');
@@ -86,11 +86,12 @@ export default function Users() {
     setIsOpenDialogDelete(false);
   };
 
-  const handleAddNewUser = useCallback(({ id, name }: { id: string; name: string }) => {
+  const handleAddNewUser = useCallback(({ id, name, email }: { id: string; name: string; email: string }) => {
     setUsers((prevState) => [
       {
         _id: id,
         name,
+        login: { email },
       },
       ...prevState,
     ]);

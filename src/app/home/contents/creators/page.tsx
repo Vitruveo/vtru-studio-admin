@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -18,6 +18,7 @@ import { CreatorType } from '@/mock/creators';
 import { CreatorDialogDelete } from '../../components/apps/creators/CreatorDialogDelete';
 import { useDispatch } from '@/store/hooks';
 import { subscribeWebSocketThunk, unsubscribeWebSocketThunk, websocketSelector } from '@/features/ws';
+import { list } from '@/services/apiEventSource';
 
 const drawerWidth = 240;
 const secdrawerWidth = 320;
@@ -60,20 +61,13 @@ export default function Creators() {
   }, [creatorsOnline]);
 
   useEffect(() => {
-    const sseCreators = new EventSource('http://127.0.0.1:5001/creators');
-
-    sseCreators.addEventListener('creator_list', (event) => {
-      const creator = JSON.parse(event.data);
-
-      setCreators((prevState) => ({ ...prevState, [creator._id]: creator }));
-    });
-    sseCreators.addEventListener('close', (event) => {
-      sseCreators.close();
-    });
-
-    return () => {
-      sseCreators.close();
+    const fetchData = async () => {
+      await list<CreatorType>({
+        path: 'creators',
+        callback: (creator) => setCreators((prevState) => ({ ...prevState, [creator._id]: creator })),
+      });
     };
+    fetchData();
   }, []);
 
   const creatorsFiltered = useMemo(() => {

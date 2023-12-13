@@ -121,7 +121,9 @@ export default function CreatorDetails({ creatorId, onDeleteClick }: Props) {
                       width: '72px',
                       height: '72px',
                     }}>
-                    {(values.name || creator.login.email).slice(0, 2).toUpperCase()}
+                    {(values.name || (creator.emails.length > 0 && creator.emails[0].email) || '')
+                      .slice(0, 2)
+                      .toUpperCase()}
                   </Avatar>
                   <Box
                     position="absolute"
@@ -156,7 +158,12 @@ export default function CreatorDetails({ creatorId, onDeleteClick }: Props) {
                     Email address
                   </Typography>
                   <Typography variant="subtitle1" fontWeight={600} mb={0.5}>
-                    {creator.login.email}
+                    {creator.emails.map((item) => (
+                      <span key={item.email}>
+                        {item.email}
+                        <br />
+                      </span>
+                    ))}
                   </Typography>
                 </Grid>
                 <Grid item lg={6} xs={12} mt={4}>

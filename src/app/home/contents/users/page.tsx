@@ -19,6 +19,7 @@ import { userDeleteThunk } from '@/features/user';
 import { UserDialogDelete } from '../../components/apps/users/UserDialogDelete';
 import { useDispatch } from '@/store/hooks';
 import { RoleType } from '@/mock/roles';
+import { list } from '@/services/apiEventSource';
 
 const drawerWidth = 240;
 const secdrawerWidth = 320;
@@ -40,31 +41,19 @@ export default function Users() {
   const [userDelete, setUserDelete] = useState({ email: '', id: '' });
 
   useEffect(() => {
-    const sseUsers = new EventSource('http://127.0.0.1:5001/users');
-    const sseRoles = new EventSource('http://127.0.0.1:5001/roles');
+    const fetchData = async () => {
+      await list<UserType>({
+        path: 'users',
+        callback: (user) => setUsers((prevState) => [...prevState, user]),
+      });
 
-    sseUsers.addEventListener('user_list', (event) => {
-      const user = JSON.parse(event.data);
-
-      setUsers((prevState) => [...prevState, user]);
-    });
-    sseUsers.addEventListener('close', (event) => {
-      sseUsers.close();
-    });
-
-    sseRoles.addEventListener('role_list', (event) => {
-      const role = JSON.parse(event.data);
-
-      setRoles((prevState) => [...prevState, role]);
-    });
-    sseRoles.addEventListener('close', (event) => {
-      sseRoles.close();
-    });
-
-    return () => {
-      sseUsers.close();
-      sseRoles.close();
+      await list<RoleType>({
+        path: 'roles',
+        callback: (role) => setRoles((prevState) => [...prevState, role]),
+      });
     };
+
+    fetchData();
   }, []);
 
   const usersFiltered = useMemo(() => {

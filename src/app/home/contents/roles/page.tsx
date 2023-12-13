@@ -20,6 +20,7 @@ import { useDispatch } from '@/store/hooks';
 import { roleDeleteThunk } from '@/features/role/thunks';
 import RoleAdd from '../../components/apps/roles/RoleAdd';
 import { RoleDialogDelete } from '../../components/apps/roles/RoleDialogDelete';
+import { list } from '@/services/apiEventSource';
 
 const drawerWidth = 240;
 const secdrawerWidth = 320;
@@ -46,29 +47,19 @@ export default function Roles() {
   }, [roles]);
 
   useEffect(() => {
-    const sseRoles = new EventSource('http://127.0.0.1:5001/roles');
-    const ssePermissions = new EventSource('http://127.0.0.1:5001/permissions');
+    const fetchData = async () => {
+      await list<RoleType>({
+        path: 'roles',
+        callback: (role) => setRoles((prevState) => [...prevState, role]),
+      });
 
-    sseRoles.addEventListener('role_list', (event) => {
-      const role = JSON.parse(event.data);
-
-      setRoles((prevState) => [...prevState, role]);
-    });
-    sseRoles.addEventListener('close', (event) => {
-      sseRoles.close();
-    });
-
-    ssePermissions.addEventListener('permission_list', (event) => {
-      setPermissions((prevState) => [...prevState, JSON.parse(event.data)]);
-    });
-    ssePermissions.addEventListener('close', (event) => {
-      ssePermissions.close();
-    });
-
-    return () => {
-      sseRoles.close();
-      ssePermissions.close();
+      await list<PermissionType>({
+        path: 'permissions',
+        callback: (permission) => setPermissions((prevState) => [...prevState, permission]),
+      });
     };
+
+    fetchData();
   }, []);
 
   const rolesFiltered = useMemo(() => {

@@ -53,7 +53,7 @@ export default function Creators() {
     creatorsOnline.forEach((item) => {
       diff[item._id] = {
         _id: item._id,
-        login: { email: item.email },
+        emails: [{ email: item.email }],
       } as CreatorType;
     });
 

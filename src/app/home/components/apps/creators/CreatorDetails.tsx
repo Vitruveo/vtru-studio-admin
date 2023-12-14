@@ -121,7 +121,7 @@ export default function CreatorDetails({ creatorId, onDeleteClick }: Props) {
                       width: '72px',
                       height: '72px',
                     }}>
-                    {(values.name || (creator.emails.length > 0 && creator.emails[0].email) || '')
+                    {(values.name || (creator.emails?.length > 0 && creator.emails[0]?.email) || '')
                       .slice(0, 2)
                       .toUpperCase()}
                   </Avatar>

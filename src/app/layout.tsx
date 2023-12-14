@@ -4,12 +4,7 @@ import { NextAppDirEmotionCacheProvider } from '@/app/common/theme/EmotionCache'
 import { configTheme } from '@/app/common/theme/Theme';
 import '@/utils/i18n';
 import CssBaseline from '@mui/material/CssBaseline';
-import {
-  Direction,
-  Shadows,
-  ThemeProvider,
-  createTheme,
-} from '@mui/material/styles';
+import { Direction, Shadows, ThemeProvider, createTheme } from '@mui/material/styles';
 import { TypographyOptions } from '@mui/material/styles/createTypography';
 import { Inter } from 'next/font/google';
 import { Provider } from 'react-redux';
@@ -19,22 +14,14 @@ const inter = Inter({
   subsets: ['latin'],
 });
 
-const MyApp = ({
-  children,
-}: {
-  children: React.ReactNode;
-}) => {
+const MyApp = ({ children }: { children: React.ReactNode }) => {
   const theme = configTheme();
   return (
     <>
-      <NextAppDirEmotionCacheProvider
-        options={{ key: 'modernize' }}
-      >
+      <NextAppDirEmotionCacheProvider options={{ key: 'modernize' }}>
         <ThemeProvider
           theme={createTheme({
-            direction: theme
-              .defaultTheme
-              .direction as Direction,
+            direction: theme.defaultTheme.direction as Direction,
             palette: {
               primary: {
                 main: '#763EBD',
@@ -85,24 +72,18 @@ const MyApp = ({
                 secondary: '#2A3547',
               },
               action: {
-                disabledBackground:
-                  'rgba(73,82,88,0.12)',
+                disabledBackground: 'rgba(73,82,88,0.12)',
                 hoverOpacity: 0.02,
                 hover: '#f6f9fc',
               },
               divider: '#e5eaef',
             },
-            typography: theme.baseMode
-              .typography as TypographyOptions,
-            shadows: theme.baseMode
-              .shadows as Shadows,
+            typography: theme.baseMode.typography as TypographyOptions,
+            shadows: theme.baseMode.shadows as Shadows,
             shape: {
-              borderRadius:
-                theme.baseMode.shape
-                  .borderRadius,
+              borderRadius: theme.baseMode.shape.borderRadius,
             },
-          })}
-        >
+          })}>
           <CssBaseline />
           {children}
         </ThemeProvider>
@@ -111,13 +92,9 @@ const MyApp = ({
   );
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <Provider store={store}>
           <MyApp>{children}</MyApp>

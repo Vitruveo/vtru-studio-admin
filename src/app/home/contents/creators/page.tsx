@@ -73,7 +73,7 @@ export default function Creators() {
   const creatorsFiltered = useMemo(() => {
     return search.length > 0
       ? Object.values(creators).filter(
-          (creator) => creator.name.includes(search) || creator.login.email.includes(search),
+          (creator) => creator.name.includes(search) || creator.login.email?.includes(search),
         )
       : [];
   }, [search, creators]);

@@ -1,9 +1,10 @@
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { store } from '@/store/index';
 import { APIResponse } from '@/features/common/types';
+import { BASE_URL } from '@/constants/api';
 
 const api = axios.create({
-  baseURL: process.env.BASE_URL || 'http://127.0.0.1:5001',
+  baseURL: BASE_URL,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',

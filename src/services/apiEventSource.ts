@@ -1,5 +1,6 @@
-import store from '@/store';
 import { fetchEventSource } from '@microsoft/fetch-event-source';
+import { BASE_URL } from '@/constants/api';
+import store from '@/store';
 
 interface FetchEventSourceParams<T> {
   path: string;
@@ -10,7 +11,7 @@ export const list = async <T = undefined>({ callback, path }: FetchEventSourcePa
   const state = store.getState();
   const token = state.user.token;
 
-  const url = `${process.env.BASE_URL || 'http://127.0.0.1:5001'}/${path}`;
+  const url = `${BASE_URL}/${path}`;
   const headers = {
     Accept: 'text/event-stream',
     Authorization: `Bearer ${token}`,

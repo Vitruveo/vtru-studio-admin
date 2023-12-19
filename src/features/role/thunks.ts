@@ -1,4 +1,3 @@
-import { createAppAsyncThunk } from '@/store/asyncThunk';
 import { createRole, deleteRole, updateRole } from './requests';
 import {
   RoleApiResCreate,
@@ -8,48 +7,34 @@ import {
   RoleReqDelete,
   RoleReqUpdate,
 } from './types';
+import { ReduxThunkAction } from '@/store';
 
-export const roleCreateThunk = createAppAsyncThunk<RoleApiResCreate | undefined, RoleReqCreate>(
-  'roles/create',
-  async ({ name, description, permissions }, { rejectWithValue, getState }) => {
-    try {
-      const response = await createRole({
-        name,
-        description,
-        permissions,
-      });
-      return response;
-    } catch (error) {
-      return rejectWithValue(error as string);
-    }
-  },
-);
+export function roleCreateThunk(payload: RoleReqCreate): ReduxThunkAction<Promise<RoleApiResCreate | undefined>> {
+  return async function (dispatch, getState) {
+    const response = await createRole({
+      name: payload.name,
+      description: payload.description,
+      permissions: payload.permissions,
+    });
+    return response;
+  };
+}
 
-export const roleUpdateThunk = createAppAsyncThunk<RoleApiResUpdate, RoleReqUpdate>(
-  'roles/update',
-  async ({ _id, name, description, permissions }, { rejectWithValue, getState }) => {
-    try {
-      const response = await updateRole({
-        _id,
-        name,
-        description,
-        permissions,
-      });
-      return response;
-    } catch (error) {
-      return rejectWithValue(error as string);
-    }
-  },
-);
+export function roleUpdateThunk(payload: RoleReqUpdate): ReduxThunkAction<Promise<RoleApiResUpdate>> {
+  return async function (dispatch, getState) {
+    const response = await updateRole({
+      _id: payload._id,
+      name: payload.name,
+      description: payload.description,
+      permissions: payload.permissions,
+    });
+    return response;
+  };
+}
 
-export const roleDeleteThunk = createAppAsyncThunk<RoleApiResDelete, RoleReqDelete>(
-  'roles/delete',
-  async ({ _id }, { rejectWithValue, getState }) => {
-    try {
-      const response = await deleteRole(_id);
-      return response;
-    } catch (error) {
-      return rejectWithValue(error as string);
-    }
-  },
-);
+export function roleDeleteThunk(payload: RoleReqDelete): ReduxThunkAction<Promise<RoleApiResDelete>> {
+  return async function (dispatch, getState) {
+    const response = await deleteRole(payload._id);
+    return response;
+  };
+}

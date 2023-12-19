@@ -1,4 +1,3 @@
-// websocketSlice.js
 import { createSlice } from '@reduxjs/toolkit';
 import { WebsocketSliceState } from './types';
 

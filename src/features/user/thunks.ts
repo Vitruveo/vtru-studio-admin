@@ -1,97 +1,60 @@
-// import { createAppAsyncThunk } from "@/store/asyncThunk";
-import { createAsyncThunk } from '@reduxjs/toolkit';
-import { userAuthReq, userAddReq, userLoginReq, userOTPConfimReq, userUpdateReq, userDeleteReq } from './requests';
+import { userAddReq, userLoginReq, userOTPConfimReq, userUpdateReq, userDeleteReq } from './requests';
 import {
   UserAddApiRes,
   UserAddReq,
-  UserAddRes,
   UserApiResDelete,
   UserApiResUpdate,
-  UserAuthApiRes,
-  UserAuthReq,
   UserDeleteReq,
   UserLoginApiRes,
   UserLoginReq,
   UserOTPConfirmApiRes,
   UserOTPConfirmReq,
   UserUpdateReq,
-  UserUpdateRes,
 } from './types';
+import { ReduxThunkAction } from '@/store';
+import { userActionsCreators } from './slice';
 
-export const userLoginThunk = createAsyncThunk<UserLoginApiRes, UserLoginReq>(
-  'user/login',
-  async ({ email }, { rejectWithValue, getState }) => {
-    try {
-      const response = await userLoginReq({ email });
-      return response;
-    } catch (error) {
-      return rejectWithValue(error as string);
-    }
-  },
-);
+export function userLoginThunk(payload: UserLoginReq): ReduxThunkAction<Promise<UserLoginApiRes>> {
+  return async function (dispatch, getState) {
+    const response = await userLoginReq({ email: payload.email });
 
-export const userAuthThunk = createAsyncThunk<UserAuthApiRes, UserAuthReq>(
-  'user/auth',
-  async ({ email }, { rejectWithValue, getState }) => {
-    try {
-      const response = await userAuthReq({ email });
-      return response;
-    } catch (error) {
-      return rejectWithValue(error as string);
-    }
-  },
-);
+    dispatch(userActionsCreators.login({ email: payload.email }));
 
-export const userAddThunk = createAsyncThunk<UserAddApiRes, UserAddReq>(
-  'user/add',
-  async ({ name, login: { email } }, { rejectWithValue }) => {
-    try {
-      const response = await userAddReq({
-        name,
-        login: { email },
-      });
-      return response;
-    } catch (error) {
-      return rejectWithValue(error as string);
-    }
-  },
-);
+    return response;
+  };
+}
 
-export const userUpdateThunk = createAsyncThunk<UserApiResUpdate, UserUpdateReq>(
-  'user/update',
-  async ({ _id, name, email, roles }, { rejectWithValue }) => {
-    try {
-      const response = await userUpdateReq({ _id, name, email, roles });
-      return response;
-    } catch (error) {
-      return rejectWithValue(error as string);
-    }
-  },
-);
+export function userAddThunk(payload: UserAddReq): ReduxThunkAction<Promise<UserAddApiRes>> {
+  return async function (dispatch, getState) {
+    const response = await userAddReq({ name: payload.name, login: { email: payload.login.email } });
+    return response;
+  };
+}
 
-export const userOTPConfirmThunk = createAsyncThunk<UserOTPConfirmApiRes, UserOTPConfirmReq>(
-  'user/otpConfirm',
-  async ({ email, code }, { rejectWithValue }) => {
-    try {
-      const response = await userOTPConfimReq({
-        email,
-        code,
-      });
-      return response;
-    } catch (error) {
-      return rejectWithValue(error as string);
-    }
-  },
-);
+export function userUpdateThunk(payload: UserUpdateReq): ReduxThunkAction<Promise<UserApiResUpdate>> {
+  return async function (dispatch, getState) {
+    const response = await userUpdateReq({
+      _id: payload._id,
+      name: payload.name,
+      email: payload.email,
+      roles: payload.roles,
+    });
+    return response;
+  };
+}
 
-export const userDeleteThunk = createAsyncThunk<UserApiResDelete | undefined, UserDeleteReq>(
-  'user/delete',
-  async ({ _id }, { rejectWithValue, getState }) => {
-    try {
-      const response = await userDeleteReq({ _id });
-      return response;
-    } catch (error) {
-      return rejectWithValue(error as string);
-    }
-  },
-);
+export function userOTPConfirmThunk(payload: UserOTPConfirmReq): ReduxThunkAction<Promise<UserOTPConfirmApiRes>> {
+  return async function (dispatch, getState) {
+    const response = await userOTPConfimReq({ email: payload.email, code: payload.code });
+    dispatch(userActionsCreators.otpConfirm(response));
+
+    return response;
+  };
+}
+
+export function userDeleteThunk(payload: UserDeleteReq): ReduxThunkAction<Promise<UserApiResDelete | undefined>> {
+  return async function (dispatch, getState) {
+    const response = await userDeleteReq({ _id: payload._id });
+    return response;
+  };
+}

@@ -5,8 +5,6 @@ import {
   UserAddRes,
   UserApiResDelete,
   UserApiResUpdate,
-  UserAuthApiRes,
-  UserAuthReq,
   UserDeleteReq,
   UserLoginApiRes,
   UserLoginReq,
@@ -22,11 +20,6 @@ import {
 export async function userLoginReq(data: UserLoginReq): Promise<UserLoginApiRes> {
   const res = await apiService.post<string>(`/users/login`, data);
   return res;
-}
-
-export function userAuthReq({ email }: UserAuthReq): Promise<UserAuthApiRes> {
-  const req: any = {};
-  return req;
 }
 
 export async function userAddReq(data: UserAddReq): Promise<UserAddApiRes> {

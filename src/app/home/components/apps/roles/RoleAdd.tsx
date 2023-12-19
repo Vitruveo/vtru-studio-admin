@@ -17,110 +17,111 @@ import { roleCreateThunk } from '@/features/role';
 import { RoleApiResCreate } from '@/features/role/types';
 
 const roleSchemaValidation = yup.object({
-  name: yup.string().min(3, 'name field needs at least 3 characters').required('field name is required.'),
+    name: yup.string().min(3, 'name field needs at least 3 characters').required('field name is required.'),
 });
 
 interface Props {
-  handleAddNewRole(params: { id: string; name: string; description: string }): void;
+    handleAddNewRole(params: { id: string; name: string; description: string }): void;
 }
 
 export default function RoleAdd({ handleAddNewRole }: Props) {
-  const dispatch = useDispatch();
+    const dispatch = useDispatch();
 
-  const [modal, setModal] = React.useState(false);
+    const [modal, setModal] = React.useState(false);
 
-  const { handleSubmit, handleChange, resetForm, values, errors } = useFormik({
-    initialValues: {
-      name: '',
-      description: '',
-    },
-    validationSchema: roleSchemaValidation,
-    onSubmit: async (payload) => {
-      const response = await dispatch(
-        roleCreateThunk({
-          name: payload.name,
-          description: payload.description,
-          permissions: [],
-        }),
-      );
+    const { handleSubmit, handleChange, resetForm, values, errors } = useFormik({
+        initialValues: {
+            name: '',
+            description: '',
+        },
+        validationSchema: roleSchemaValidation,
+        onSubmit: async (payload) => {
+            const response = await dispatch(
+                roleCreateThunk({
+                    name: payload.name,
+                    description: payload.description,
+                    permissions: [],
+                })
+            );
 
-      handleAddNewRole({
-        id: (response.payload as RoleApiResCreate).data?.insertedId || '',
-        name: payload.name,
-        description: payload.description,
-      });
-      toggle();
-      resetForm();
-    },
-  });
+            handleAddNewRole({
+                id: response?.data?.insertedId || '',
+                name: payload.name,
+                description: payload.description,
+            });
+            toggle();
+            resetForm();
+        },
+    });
 
-  const toggle = () => {
-    setModal(!modal);
-  };
+    const toggle = () => {
+        setModal(!modal);
+    };
 
-  return (
-    <>
-      <Box p={3} pb={1}>
-        <Button color="primary" variant="contained" fullWidth onClick={toggle}>
-          Add New Role
-        </Button>
-      </Box>
-      <Dialog
-        open={modal}
-        onClose={toggle}
-        maxWidth="sm"
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description">
-        <DialogTitle id="alert-dialog-title" variant="h5">
-          Add New Role
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Lets add new role for your application. fill the all field and
-            <br /> click on submit button.
-          </DialogContentText>
-          <Box mt={3}>
-            <form onSubmit={handleSubmit}>
-              <Grid spacing={3} container>
-                <Grid item xs={12} lg={6}>
-                  <FormLabel>Name</FormLabel>
-                  <TextField
-                    id="name"
-                    name="name"
-                    size="small"
-                    variant="outlined"
-                    fullWidth
-                    value={values.name}
-                    onChange={handleChange}
-                  />
-                  {errors?.name && <span>{errors.name}</span>}
-                </Grid>
-                <Grid item xs={12} lg={6}>
-                  <FormLabel>Description</FormLabel>
-                  <TextField
-                    id="description"
-                    name="description"
-                    size="small"
-                    variant="outlined"
-                    fullWidth
-                    value={values.description}
-                    onChange={handleChange}
-                  />
-                </Grid>
+    return (
+        <>
+            <Box p={3} pb={1}>
+                <Button color="primary" variant="contained" fullWidth onClick={toggle}>
+                    Add New Role
+                </Button>
+            </Box>
+            <Dialog
+                open={modal}
+                onClose={toggle}
+                maxWidth="sm"
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title" variant="h5">
+                    Add New Role
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        Lets add new role for your application. fill the all field and
+                        <br /> click on submit button.
+                    </DialogContentText>
+                    <Box mt={3}>
+                        <form onSubmit={handleSubmit}>
+                            <Grid spacing={3} container>
+                                <Grid item xs={12} lg={6}>
+                                    <FormLabel>Name</FormLabel>
+                                    <TextField
+                                        id="name"
+                                        name="name"
+                                        size="small"
+                                        variant="outlined"
+                                        fullWidth
+                                        value={values.name}
+                                        onChange={handleChange}
+                                    />
+                                    {errors?.name && <span>{errors.name}</span>}
+                                </Grid>
+                                <Grid item xs={12} lg={6}>
+                                    <FormLabel>Description</FormLabel>
+                                    <TextField
+                                        id="description"
+                                        name="description"
+                                        size="small"
+                                        variant="outlined"
+                                        fullWidth
+                                        value={values.description}
+                                        onChange={handleChange}
+                                    />
+                                </Grid>
 
-                <Box width="100%" paddingY={3} gap={1} display="flex" justifyContent="flex-end">
-                  <Button variant="outlined" color="error" onClick={toggle}>
-                    Cancel
-                  </Button>
-                  <Button variant="contained" color="primary" type="submit">
-                    Submit
-                  </Button>
-                </Box>
-              </Grid>
-            </form>
-          </Box>
-        </DialogContent>
-      </Dialog>
-    </>
-  );
+                                <Box width="100%" paddingY={3} gap={1} display="flex" justifyContent="flex-end">
+                                    <Button variant="outlined" color="error" onClick={toggle}>
+                                        Cancel
+                                    </Button>
+                                    <Button variant="contained" color="primary" type="submit">
+                                        Submit
+                                    </Button>
+                                </Box>
+                            </Grid>
+                        </form>
+                    </Box>
+                </DialogContent>
+            </Dialog>
+        </>
+    );
 }

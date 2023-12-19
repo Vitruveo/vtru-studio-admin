@@ -1,4 +1,4 @@
-import { apiService } from '@/app/services/api';
+import { apiService } from '@/services/api';
 import {
   Role,
   RoleApiResCreate,

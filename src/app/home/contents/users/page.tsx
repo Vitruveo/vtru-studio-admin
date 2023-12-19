@@ -60,7 +60,13 @@ export default function Users() {
     }, []);
 
     const usersFiltered = useMemo(() => {
-        return search.length > 0 ? users.filter((user) => user.name.includes(search)) : [];
+        return search.length > 0
+            ? users.filter(
+                  (user) =>
+                      user.name.toLowerCase().includes(search.toLowerCase()) ||
+                      user.login.email.toLowerCase().includes(search.toLowerCase())
+              )
+            : [];
     }, [search, users]);
 
     const onDeleteClick = ({ id, email }: { id: string; email: string }) => {

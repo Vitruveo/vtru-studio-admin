@@ -63,9 +63,7 @@ export default function Roles() {
   }, []);
 
   const rolesFiltered = useMemo(() => {
-    return search.length > 0
-      ? roles.filter((role) => role.name.toLocaleLowerCase().includes(search.toLocaleLowerCase()))
-      : [];
+    return search.length > 0 ? roles.filter((role) => role.name.toLowerCase().includes(search.toLowerCase())) : [];
   }, [search, roles]);
 
   const rolesCategoryFiltered = useMemo(() => {
@@ -74,7 +72,7 @@ export default function Roles() {
           return role.permissions.some((permission) => {
             const [categoryName] = permission.split(':');
 
-            return category.toLocaleLowerCase() === categoryName.toLocaleLowerCase();
+            return category.toLowerCase() === categoryName.toLowerCase();
           });
         })
       : [];

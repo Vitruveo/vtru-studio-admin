@@ -29,7 +29,7 @@ export default function CreatorList({ creatorId, data, onCreatorClick, onDeleteC
             image=""
             {...creator}
             onCreatorClick={() => onCreatorClick({ id: creator._id })}
-            onDeleteClick={() => onDeleteClick({ id: creator._id, email: creator.login.email })}
+            onDeleteClick={() => onDeleteClick({ id: creator._id, email: creator.emails[0].email })}
             onStarredClick={() => {}}
           />
         ))}

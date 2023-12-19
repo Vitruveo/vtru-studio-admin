@@ -99,7 +99,7 @@ export default function CreatorDetails({ creatorId, onDeleteClick }: Props) {
                     onClick={() =>
                       onDeleteClick({
                         id: creator._id,
-                        email: creator.login.email,
+                        email: creator.emails[0].email,
                       })
                     }>
                     <IconTrash size="18" stroke={1.3} />

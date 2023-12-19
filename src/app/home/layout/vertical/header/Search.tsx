@@ -35,9 +35,7 @@ const Search = () => {
 
   const filterRoutes = (rotr: any, cSearch: string) => {
     if (rotr.length > 1)
-      return rotr.filter((t: any) =>
-        t.title ? t.href.toLocaleLowerCase().includes(cSearch.toLocaleLowerCase()) : '',
-      );
+      return rotr.filter((t: any) => (t.title ? t.href.toLocaleLowerCase().includes(cSearch.toLocaleLowerCase()) : ''));
 
     return rotr;
   };
@@ -51,8 +49,7 @@ const Search = () => {
         aria-controls="search-menu"
         aria-haspopup="true"
         onClick={() => setShowDrawer2(true)}
-        size="large"
-      >
+        size="large">
         <IconSearch size="16" />
       </IconButton>
       <Dialog
@@ -62,8 +59,7 @@ const Search = () => {
         maxWidth={'sm'}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
-        PaperProps={{ sx: { position: 'fixed', top: 30, m: 0 } }}
-      >
+        PaperProps={{ sx: { position: 'fixed', top: 30, m: 0 } }}>
         <DialogContent className="testdialog">
           <Stack direction="row" spacing={2} alignItems="center">
             <TextField
@@ -90,11 +86,7 @@ const Search = () => {
                   <Box key={menu.title ? menu.id : menu.subheader}>
                     {menu.title && !menu.children ? (
                       <ListItemButton sx={{ py: 0.5, px: 1 }} href={menu?.href} component={Link}>
-                        <ListItemText
-                          primary={menu.title}
-                          secondary={menu?.href}
-                          sx={{ my: 0, py: 0.5 }}
-                        />
+                        <ListItemText primary={menu.title} secondary={menu?.href} sx={{ my: 0, py: 0.5 }} />
                       </ListItemButton>
                     ) : (
                       ''
@@ -107,13 +99,8 @@ const Search = () => {
                               sx={{ py: 0.5, px: 1 }}
                               href={child.href}
                               component={Link}
-                              key={child.title ? child.id : menu.subheader}
-                            >
-                              <ListItemText
-                                primary={child.title}
-                                secondary={child.href}
-                                sx={{ my: 0, py: 0.5 }}
-                              />
+                              key={child.title ? child.id : menu.subheader}>
+                              <ListItemText primary={child.title} secondary={child.href} sx={{ my: 0, py: 0.5 }} />
                             </ListItemButton>
                           );
                         })}

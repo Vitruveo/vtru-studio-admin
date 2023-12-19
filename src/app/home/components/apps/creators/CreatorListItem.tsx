@@ -40,7 +40,7 @@ export default function CreatorListItem({
       <ListItemAvatar>
         <Box position="relative">
           <Avatar alt="" src="" sx={{ fontSize: 14 }}>
-            {(name || (emails.length > 0 && emails[0].email) || '').slice(0, 2).toUpperCase()}
+            {(name || (emails?.length > 0 && emails[0].email) || '').slice(0, 2).toUpperCase()}
           </Avatar>
           <Box
             position="absolute"
@@ -57,7 +57,7 @@ export default function CreatorListItem({
         <Stack direction="row" gap="10px" alignItems="center">
           <Box mr="auto" onClick={onCreatorClick}>
             <Typography variant="subtitle1" noWrap fontWeight={600} sx={{ maxWidth: '150px' }}>
-              {name || (emails.length > 0 && emails[0].email) || ''}
+              {name || (emails?.length > 0 && emails[0].email) || ''}
             </Typography>
           </Box>
           <IconStar onClick={onStarredClick} size="16" stroke={1.5} />

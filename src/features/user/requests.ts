@@ -30,8 +30,9 @@ export async function userAddReq(data: UserAddReq): Promise<UserAddApiRes> {
 export async function userUpdateReq(data: UserUpdateReq): Promise<UserApiResUpdate> {
   const response = await apiService.put<UserResUpdate>(`/users/${data._id}`, {
     name: data.name,
-    login: { email: data.email },
+    profile: data.profile,
     roles: data.roles,
+    framework: data.framework,
   });
   return response;
 }

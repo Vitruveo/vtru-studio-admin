@@ -36,8 +36,9 @@ export function userUpdateThunk(payload: UserUpdateReq): ReduxThunkAction<Promis
     const response = await userUpdateReq({
       _id: payload._id,
       name: payload.name,
-      email: payload.email,
+      profile: payload.profile,
       roles: payload.roles,
+      framework: payload.framework,
     });
     return response;
   };

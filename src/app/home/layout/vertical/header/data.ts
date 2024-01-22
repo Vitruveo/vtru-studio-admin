@@ -8,7 +8,7 @@ interface notificationType {
 
 const notifications: notificationType[] = [
     {
-        avatar: '/images/profile/user-1.jpg',
+        avatar: '/images/profile/user-1.png',
         title: 'Roman Joined the Team!',
         subtitle: 'Congratulate him',
     },
@@ -28,7 +28,7 @@ const notifications: notificationType[] = [
         subtitle: 'Assign her new tasks',
     },
     {
-        avatar: '/images/profile/user-1.jpg',
+        avatar: '/images/profile/user-1.png',
         title: 'Roman Joined the Team!',
         subtitle: 'Congratulate him',
     },

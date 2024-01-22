@@ -70,10 +70,7 @@ export default function ProfileSettings() {
     };
 
     return (
-        <PageContainer
-            title="Profile Settings"
-            description="this is Account Settings"
-        >
+        <PageContainer title="Profile Settings" description="this is Account Settings">
             <Breadcrumb title="Profile Settings" items={BCrumb} />
             <Grid container spacing={3}>
                 {/* Change Profile */}
@@ -86,14 +83,10 @@ export default function ProfileSettings() {
                             <Typography color="textSecondary" mb={3}>
                                 Change your profile picture from here
                             </Typography>
-                            <Box
-                                textAlign="center"
-                                display="flex"
-                                justifyContent="center"
-                            >
+                            <Box textAlign="center" display="flex" justifyContent="center">
                                 <Box>
                                     <Avatar
-                                        src={'/images/profile/user-1.jpg'}
+                                        src={'/images/profile/user-1.png'}
                                         alt={'user1'}
                                         sx={{
                                             width: 120,
@@ -101,39 +94,17 @@ export default function ProfileSettings() {
                                             margin: '0 auto',
                                         }}
                                     />
-                                    <Stack
-                                        direction="row"
-                                        justifyContent="center"
-                                        spacing={2}
-                                        my={3}
-                                    >
-                                        <Button
-                                            variant="contained"
-                                            color="primary"
-                                            component="label"
-                                        >
+                                    <Stack direction="row" justifyContent="center" spacing={2} my={3}>
+                                        <Button variant="contained" color="primary" component="label">
                                             Upload
-                                            <input
-                                                hidden
-                                                accept="image/*"
-                                                multiple
-                                                type="file"
-                                            />
+                                            <input hidden accept="image/*" multiple type="file" />
                                         </Button>
-                                        <Button
-                                            variant="outlined"
-                                            color="error"
-                                        >
+                                        <Button variant="outlined" color="error">
                                             Reset
                                         </Button>
                                     </Stack>
-                                    <Typography
-                                        variant="subtitle1"
-                                        color="textSecondary"
-                                        mb={4}
-                                    >
-                                        Allowed JPG, GIF or PNG. Max size of
-                                        800K
+                                    <Typography variant="subtitle1" color="textSecondary" mb={4}>
+                                        Allowed JPG, GIF or PNG. Max size of 800K
                                     </Typography>
                                 </Box>
                             </Box>
@@ -149,8 +120,7 @@ export default function ProfileSettings() {
                                 Regional
                             </Typography>
                             <Typography color="textSecondary" mb={3}>
-                                To change your personal detail, edit and save
-                                from here
+                                To change your personal detail, edit and save from here
                             </Typography>
                             <form>
                                 <Grid container spacing={3}>
@@ -205,10 +175,7 @@ export default function ProfileSettings() {
                                             onChange={handleChange1}
                                         >
                                             {locations.map((option) => (
-                                                <MenuItem
-                                                    key={option.value}
-                                                    value={option.value}
-                                                >
+                                                <MenuItem key={option.value} value={option.value}>
                                                     {option.label}
                                                 </MenuItem>
                                             ))}
@@ -232,10 +199,7 @@ export default function ProfileSettings() {
                                             onChange={handleChange2}
                                         >
                                             {languages.map((option) => (
-                                                <MenuItem
-                                                    key={option.value}
-                                                    value={option.value}
-                                                >
+                                                <MenuItem key={option.value} value={option.value}>
                                                     {option.label}
                                                 </MenuItem>
                                             ))}
@@ -279,17 +243,8 @@ export default function ProfileSettings() {
                             </form>
                         </CardContent>
                     </BlankCard>
-                    <Stack
-                        direction="row"
-                        spacing={2}
-                        sx={{ justifyContent: 'end' }}
-                        mt={3}
-                    >
-                        <Button
-                            size="large"
-                            variant="contained"
-                            color="primary"
-                        >
+                    <Stack direction="row" spacing={2} sx={{ justifyContent: 'end' }} mt={3}>
+                        <Button size="large" variant="contained" color="primary">
                             Save
                         </Button>
                         <Button size="large" variant="text" color="error">

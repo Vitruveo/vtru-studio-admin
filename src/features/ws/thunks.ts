@@ -29,7 +29,7 @@ export function subscribeWebSocketThunk(): ReduxThunkAction {
     return async function (dispatch, getState) {
         const socket = getState().websocket.connection!;
 
-        socket.on('monitorCreators', (data) => {
+        socket?.on('monitorCreators', (data) => {
             if (data.event === 'connect') {
                 dispatch(
                     websocketSlice.actions.websocketAddMessage({
@@ -41,7 +41,7 @@ export function subscribeWebSocketThunk(): ReduxThunkAction {
                 dispatch(websocketSlice.actions.websocketRemoveMessage(data.id));
             }
         });
-        socket.emit('subscribeCreatorsOnline');
+        socket?.emit('subscribeCreatorsOnline');
     };
 }
 
@@ -49,7 +49,7 @@ export function unsubscribeWebSocketThunk(): ReduxThunkAction {
     return async function (dispatch, getState) {
         const socket = getState().websocket.connection!;
 
-        socket.emit('unsubscribeCreatorsOnline');
+        socket?.emit('unsubscribeCreatorsOnline');
         dispatch(websocketSlice.actions.websocketClearMessages());
     };
 }

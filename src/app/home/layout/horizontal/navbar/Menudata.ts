@@ -17,28 +17,6 @@ import { uniqueId } from 'lodash';
 const Menuitems = [
     {
         id: uniqueId(),
-        title: 'Dashboard',
-        icon: IconHome,
-        href: '/dashboards/',
-        children: [
-            {
-                id: uniqueId(),
-                title: 'Modern',
-                icon: IconPoint,
-                href: '/',
-                chip: 'New',
-                chipColor: 'secondary',
-            },
-            {
-                id: uniqueId(),
-                title: 'eCommerce',
-                icon: IconPoint,
-                href: '/dashboards/ecommerce',
-            },
-        ],
-    },
-    {
-        id: uniqueId(),
         title: 'Apps',
         icon: IconApps,
         href: '/apps/',

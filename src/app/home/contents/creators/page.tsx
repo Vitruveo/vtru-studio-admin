@@ -24,161 +24,165 @@ const drawerWidth = 240;
 const secdrawerWidth = 320;
 
 export default function Creators() {
-  const dispatch = useDispatch();
+    const dispatch = useDispatch();
 
-  const [isLeftSidebarOpen, setLeftSidebarOpen] = useState(false);
-  const [isRightSidebarOpen, setRightSidebarOpen] = useState(false);
-  const lgUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('lg'));
-  const mdUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
+    const [isLeftSidebarOpen, setLeftSidebarOpen] = useState(false);
+    const [isRightSidebarOpen, setRightSidebarOpen] = useState(false);
+    const lgUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('lg'));
+    const mdUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
 
-  const { creatorsOnline } = useSelector(websocketSelector(['creatorsOnline']));
+    const { creatorsOnline } = useSelector(websocketSelector(['creatorsOnline']));
 
-  const [creators, setCreators] = useState<{ [key: string]: CreatorType }>({});
-  const [search, setSearch] = useState('');
-  const [creatorId, setCreatorId] = useState('');
-  const [isCreatorsOnline, setIsCreatorsOnline] = useState(false);
-  const [isOpenDialogDelete, setIsOpenDialogDelete] = useState(false);
-  const [creatorDelete, setCreatorDelete] = useState({ email: '', id: '' });
+    const [creators, setCreators] = useState<{ [key: string]: CreatorType }>({});
+    const [search, setSearch] = useState('');
+    const [creatorId, setCreatorId] = useState('');
+    const [isCreatorsOnline, setIsCreatorsOnline] = useState(false);
+    const [isOpenDialogDelete, setIsOpenDialogDelete] = useState(false);
+    const [creatorDelete, setCreatorDelete] = useState({ email: '', id: '' });
 
-  useEffect(() => {
-    dispatch(subscribeWebSocketThunk());
+    useEffect(() => {
+        dispatch(subscribeWebSocketThunk());
 
-    return () => {
-      dispatch(unsubscribeWebSocketThunk());
+        return () => {
+            dispatch(unsubscribeWebSocketThunk());
+        };
+    }, []);
+
+    useEffect(() => {
+        const diff: { [key: string]: CreatorType } = {};
+        creatorsOnline?.forEach((item) => {
+            diff[item._id] = {
+                _id: item._id,
+                emails: [{ email: item.email }],
+            } as CreatorType;
+        });
+
+        setCreators((prevState) => ({ ...diff, ...prevState }));
+    }, [creatorsOnline]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            await list<CreatorType>({
+                path: 'creators',
+                callback: (creator) => setCreators((prevState) => ({ ...prevState, [creator._id]: creator })),
+            });
+        };
+        fetchData();
+    }, []);
+
+    const creatorsFiltered = useMemo(() => {
+        return search.length > 0
+            ? Object.values(creators).filter(
+                  (creator) =>
+                      creator.name.toLowerCase().includes(search.toLowerCase()) ||
+                      creator.emails.some((item) => item.email.toLowerCase().includes(search.toLowerCase()))
+              )
+            : [];
+    }, [search, creators]);
+
+    const creatorsOnlineFiltered = useMemo(() => {
+        return isCreatorsOnline
+            ? Object.values(creators).filter((creator) => creatorsOnline.some((item) => creator._id === item._id))
+            : [];
+    }, [isCreatorsOnline]);
+
+    const onDeleteClick = ({ id, email }: { id: string; email: string }) => {
+        setIsOpenDialogDelete(true);
+        setCreatorDelete({ id, email });
     };
-  }, []);
 
-  useEffect(() => {
-    const diff: { [key: string]: CreatorType } = {};
-    creatorsOnline.forEach((item) => {
-      diff[item._id] = {
-        _id: item._id,
-        emails: [{ email: item.email }],
-      } as CreatorType;
-    });
+    const onDeleteConfirm = () => {
+        const { id } = creatorDelete;
 
-    setCreators((prevState) => ({ ...diff, ...prevState }));
-  }, [creatorsOnline]);
+        // dispatch(creatorDeleteThunk({ _id: id }));
+        setCreators((prevState) => {
+            delete prevState[id];
 
-  useEffect(() => {
-    const fetchData = async () => {
-      await list<CreatorType>({
-        path: 'creators',
-        callback: (creator) => setCreators((prevState) => ({ ...prevState, [creator._id]: creator })),
-      });
+            return prevState;
+        });
+        if (id === creatorId) setCreatorId('');
+
+        setIsOpenDialogDelete(false);
     };
-    fetchData();
-  }, []);
 
-  const creatorsFiltered = useMemo(() => {
-    return search.length > 0
-      ? Object.values(creators).filter(
-          (creator) =>
-            creator.name.toLowerCase().includes(search.toLowerCase()) ||
-            creator.emails.some((item) => item.email.toLowerCase().includes(search.toLowerCase())),
-        )
-      : [];
-  }, [search, creators]);
+    return (
+        <PageContainer title="Creator" description="this is Creators">
+            <Breadcrumb title="Creators Application" subtitle="List Your Creators" />
+            <AppCard>
+                <Drawer
+                    open={isLeftSidebarOpen}
+                    onClose={() => setLeftSidebarOpen(false)}
+                    sx={{
+                        width: drawerWidth,
+                        [`& .MuiDrawer-paper`]: {
+                            width: drawerWidth,
+                            position: 'relative',
+                            zIndex: 2,
+                        },
+                        flexShrink: 0,
+                    }}
+                    variant={lgUp ? 'permanent' : 'temporary'}
+                >
+                    <CreatorFilter handleToggleOnline={() => setIsCreatorsOnline(!isCreatorsOnline)} />
+                </Drawer>
 
-  const creatorsOnlineFiltered = useMemo(() => {
-    return isCreatorsOnline
-      ? Object.values(creators).filter((creator) => creatorsOnline.some((item) => creator._id === item._id))
-      : [];
-  }, [isCreatorsOnline]);
+                <Box
+                    sx={{
+                        minWidth: secdrawerWidth,
+                        width: { xs: '100%', md: secdrawerWidth, lg: secdrawerWidth },
+                        flexShrink: 0,
+                    }}
+                >
+                    <CreatorSearch onClick={() => setLeftSidebarOpen(true)} search={search} setSearch={setSearch} />
+                    <CreatorList
+                        creatorId={creatorId}
+                        data={
+                            (search.length > 0 && creatorsFiltered) ||
+                            (isCreatorsOnline && creatorsOnlineFiltered) ||
+                            Object.values(creators)
+                        }
+                        onDeleteClick={onDeleteClick}
+                        onCreatorClick={({ id }) => setCreatorId(id)}
+                    />
+                </Box>
 
-  const onDeleteClick = ({ id, email }: { id: string; email: string }) => {
-    setIsOpenDialogDelete(true);
-    setCreatorDelete({ id, email });
-  };
+                <Drawer
+                    anchor="right"
+                    open={isRightSidebarOpen}
+                    onClose={() => setRightSidebarOpen(false)}
+                    variant={mdUp ? 'permanent' : 'temporary'}
+                    sx={{
+                        width: mdUp ? secdrawerWidth : '100%',
+                        zIndex: lgUp ? 0 : 1,
+                        flex: mdUp ? 'auto' : '',
+                        [`& .MuiDrawer-paper`]: { width: '100%', position: 'relative' },
+                    }}
+                >
+                    {mdUp ? (
+                        ''
+                    ) : (
+                        <Box sx={{ p: 3 }}>
+                            <Button
+                                variant="outlined"
+                                color="primary"
+                                size="small"
+                                onClick={() => setRightSidebarOpen(false)}
+                                sx={{ mb: 3, display: { xs: 'block', md: 'none', lg: 'none' } }}
+                            >
+                                Back{' '}
+                            </Button>
+                        </Box>
+                    )}
+                    <CreatorDetails creatorId={creatorId} onDeleteClick={onDeleteClick} />
+                </Drawer>
+            </AppCard>
 
-  const onDeleteConfirm = () => {
-    const { id } = creatorDelete;
-
-    // dispatch(creatorDeleteThunk({ _id: id }));
-    setCreators((prevState) => {
-      delete prevState[id];
-
-      return prevState;
-    });
-    if (id === creatorId) setCreatorId('');
-
-    setIsOpenDialogDelete(false);
-  };
-
-  return (
-    <PageContainer title="Creator" description="this is Creators">
-      <Breadcrumb title="Creators Application" subtitle="List Your Creators" />
-      <AppCard>
-        <Drawer
-          open={isLeftSidebarOpen}
-          onClose={() => setLeftSidebarOpen(false)}
-          sx={{
-            width: drawerWidth,
-            [`& .MuiDrawer-paper`]: {
-              width: drawerWidth,
-              position: 'relative',
-              zIndex: 2,
-            },
-            flexShrink: 0,
-          }}
-          variant={lgUp ? 'permanent' : 'temporary'}>
-          <CreatorFilter handleToggleOnline={() => setIsCreatorsOnline(!isCreatorsOnline)} />
-        </Drawer>
-
-        <Box
-          sx={{
-            minWidth: secdrawerWidth,
-            width: { xs: '100%', md: secdrawerWidth, lg: secdrawerWidth },
-            flexShrink: 0,
-          }}>
-          <CreatorSearch onClick={() => setLeftSidebarOpen(true)} search={search} setSearch={setSearch} />
-          <CreatorList
-            creatorId={creatorId}
-            data={
-              (search.length > 0 && creatorsFiltered) ||
-              (isCreatorsOnline && creatorsOnlineFiltered) ||
-              Object.values(creators)
-            }
-            onDeleteClick={onDeleteClick}
-            onCreatorClick={({ id }) => setCreatorId(id)}
-          />
-        </Box>
-
-        <Drawer
-          anchor="right"
-          open={isRightSidebarOpen}
-          onClose={() => setRightSidebarOpen(false)}
-          variant={mdUp ? 'permanent' : 'temporary'}
-          sx={{
-            width: mdUp ? secdrawerWidth : '100%',
-            zIndex: lgUp ? 0 : 1,
-            flex: mdUp ? 'auto' : '',
-            [`& .MuiDrawer-paper`]: { width: '100%', position: 'relative' },
-          }}>
-          {mdUp ? (
-            ''
-          ) : (
-            <Box sx={{ p: 3 }}>
-              <Button
-                variant="outlined"
-                color="primary"
-                size="small"
-                onClick={() => setRightSidebarOpen(false)}
-                sx={{ mb: 3, display: { xs: 'block', md: 'none', lg: 'none' } }}>
-                Back{' '}
-              </Button>
-            </Box>
-          )}
-          <CreatorDetails creatorId={creatorId} onDeleteClick={onDeleteClick} />
-        </Drawer>
-      </AppCard>
-
-      <CreatorDialogDelete
-        creatorName={creatorDelete.email}
-        isOpen={isOpenDialogDelete}
-        handleCancel={() => setIsOpenDialogDelete(!isOpenDialogDelete)}
-        handleConfirm={onDeleteConfirm}
-      />
-    </PageContainer>
-  );
+            <CreatorDialogDelete
+                creatorName={creatorDelete.email}
+                isOpen={isOpenDialogDelete}
+                handleCancel={() => setIsOpenDialogDelete(!isOpenDialogDelete)}
+                handleConfirm={onDeleteConfirm}
+            />
+        </PageContainer>
+    );
 }

@@ -82,14 +82,10 @@ const AccountTab = () => {
                         <Typography color="textSecondary" mb={3}>
                             Change your profile picture from here
                         </Typography>
-                        <Box
-                            textAlign="center"
-                            display="flex"
-                            justifyContent="center"
-                        >
+                        <Box textAlign="center" display="flex" justifyContent="center">
                             <Box>
                                 <Avatar
-                                    src={'/images/profile/user-1.jpg'}
+                                    src={'/images/profile/user-1.png'}
                                     alt={'user1'}
                                     sx={{
                                         width: 120,
@@ -97,34 +93,16 @@ const AccountTab = () => {
                                         margin: '0 auto',
                                     }}
                                 />
-                                <Stack
-                                    direction="row"
-                                    justifyContent="center"
-                                    spacing={2}
-                                    my={3}
-                                >
-                                    <Button
-                                        variant="contained"
-                                        color="primary"
-                                        component="label"
-                                    >
+                                <Stack direction="row" justifyContent="center" spacing={2} my={3}>
+                                    <Button variant="contained" color="primary" component="label">
                                         Upload
-                                        <input
-                                            hidden
-                                            accept="image/*"
-                                            multiple
-                                            type="file"
-                                        />
+                                        <input hidden accept="image/*" multiple type="file" />
                                     </Button>
                                     <Button variant="outlined" color="error">
                                         Reset
                                     </Button>
                                 </Stack>
-                                <Typography
-                                    variant="subtitle1"
-                                    color="textSecondary"
-                                    mb={4}
-                                >
+                                <Typography variant="subtitle1" color="textSecondary" mb={4}>
                                     Allowed JPG, GIF or PNG. Max size of 800K
                                 </Typography>
                             </Box>
@@ -159,9 +137,7 @@ const AccountTab = () => {
                                 type="password"
                             />
                             {/* 2 */}
-                            <CustomFormLabel htmlFor="text-npwd">
-                                New Password
-                            </CustomFormLabel>
+                            <CustomFormLabel htmlFor="text-npwd">New Password</CustomFormLabel>
                             <CustomTextField
                                 id="text-npwd"
                                 value="MathewAnderson"
@@ -170,9 +146,7 @@ const AccountTab = () => {
                                 type="password"
                             />
                             {/* 3 */}
-                            <CustomFormLabel htmlFor="text-conpwd">
-                                Confirm Password
-                            </CustomFormLabel>
+                            <CustomFormLabel htmlFor="text-conpwd">Confirm Password</CustomFormLabel>
                             <CustomTextField
                                 id="text-conpwd"
                                 value="MathewAnderson"
@@ -192,8 +166,7 @@ const AccountTab = () => {
                             Personal Details
                         </Typography>
                         <Typography color="textSecondary" mb={3}>
-                            To change your personal detail , edit and save from
-                            here
+                            To change your personal detail , edit and save from here
                         </Typography>
                         <form>
                             <Grid container spacing={3}>
@@ -248,10 +221,7 @@ const AccountTab = () => {
                                         onChange={handleChange1}
                                     >
                                         {locations.map((option) => (
-                                            <MenuItem
-                                                key={option.value}
-                                                value={option.value}
-                                            >
+                                            <MenuItem key={option.value} value={option.value}>
                                                 {option.label}
                                             </MenuItem>
                                         ))}
@@ -275,10 +245,7 @@ const AccountTab = () => {
                                         onChange={handleChange2}
                                     >
                                         {currencies.map((option) => (
-                                            <MenuItem
-                                                key={option.value}
-                                                value={option.value}
-                                            >
+                                            <MenuItem key={option.value} value={option.value}>
                                                 {option.label}
                                             </MenuItem>
                                         ))}
@@ -339,12 +306,7 @@ const AccountTab = () => {
                         </form>
                     </CardContent>
                 </BlankCard>
-                <Stack
-                    direction="row"
-                    spacing={2}
-                    sx={{ justifyContent: 'end' }}
-                    mt={3}
-                >
+                <Stack direction="row" spacing={2} sx={{ justifyContent: 'end' }} mt={3}>
                     <Button size="large" variant="contained" color="primary">
                         Save
                     </Button>

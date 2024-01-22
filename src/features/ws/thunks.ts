@@ -2,7 +2,7 @@ import { io } from 'socket.io-client';
 
 import { websocketSlice } from '.';
 
-import { WS_SERVER_URL } from '@/constants/ws';
+import { TOKEN_ADMINS, WS_SERVER_URL } from '@/constants/ws';
 import { ReduxThunkAction } from '@/store';
 
 export function connectWebSocketThunk(): ReduxThunkAction {
@@ -20,7 +20,7 @@ export function loginWebSocketThunk(): ReduxThunkAction {
 
         socket.emit('login', {
             id: user._id,
-            token: 'admin',
+            token: TOKEN_ADMINS,
         });
     };
 }

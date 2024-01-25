@@ -104,7 +104,7 @@ export default function Details({ activeEmail, setActiveEmail, handleUpdateEmail
                                                 {activeEmail.attemptDates?.length && (
                                                     <Box marginTop={2} gap={1} alignItems="center">
                                                         <Typography variant="h6" mb={0.5}>
-                                                            Login attemps dates
+                                                            Login attempt dates
                                                         </Typography>
                                                         <Box overflow="auto" maxHeight="120px">
                                                             {activeEmail.attemptDates?.map((v, i) => (

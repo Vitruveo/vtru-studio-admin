@@ -176,7 +176,7 @@ export default function UserDetails({ roles, userId, onDeleteClick, handleUpdate
                                         <Typography variant="h6" mb={0.5}>
                                             {user.name}
                                         </Typography>
-                                        {user.roles.join('; ')}
+                                        {user.roles?.join('; ')}
                                         <Typography variant="body2" color="text.secondary" mb={0.5}></Typography>
                                     </Box>
                                 </Box>

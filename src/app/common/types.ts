@@ -1,9 +1,9 @@
 export interface FormikDefaultProps {
-  handleSubmit: (e?: React.FormEvent<HTMLFormElement> | undefined) => void;
-  handleChange: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> | undefined;
+    handleSubmit: (e?: React.FormEvent<HTMLFormElement>) => void;
+    handleChange: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>;
 }
 
 export interface ShowModalProps {
-  showModal: boolean;
-  handleChangeModal: () => void;
+    showModal: boolean;
+    handleChangeModal: () => void;
 }

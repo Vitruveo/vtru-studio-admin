@@ -71,7 +71,6 @@ export default function AddList({ handleAddNewEmails }: Props) {
             } else if (file.name.endsWith('.xml')) {
                 const parser = new xml2js.Parser();
                 const result = await parser.parseStringPromise(text);
-                // Ajuste o caminho para o campo de email de acordo com a estrutura do seu XML
                 emails = result.root.user.map((user: any) => user.email[0]);
             }
 
@@ -80,6 +79,11 @@ export default function AddList({ handleAddNewEmails }: Props) {
         };
 
         reader.readAsText(file);
+    };
+
+    const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        event.target.value = event.target.value.toLowerCase();
+        handleChange(event);
     };
 
     return (
@@ -163,7 +167,7 @@ export default function AddList({ handleAddNewEmails }: Props) {
                                             variant="outlined"
                                             fullWidth
                                             value={values.email}
-                                            onChange={handleChange}
+                                            onChange={handleEmailChange}
                                         />
                                         {errors?.email && <span>{errors.email}</span>}
                                     </Box>

@@ -10,6 +10,7 @@ import { codesVtruApi } from '@/services/codes';
 
 import ConfirmView from './view';
 import { otpSchemaValidation } from './formSchema';
+import { AxiosError } from 'axios';
 
 export default function ConfirmContainer() {
     const [toastr, setToastr] = useState<CustomizedSnackbarState>({ type: 'success', open: false, message: '' });
@@ -26,19 +27,26 @@ export default function ConfirmContainer() {
         },
         validationSchema: otpSchemaValidation,
         onSubmit: async (formValues) => {
-            const resOTPConfirm = await dispatch(
-                userOTPConfirmThunk({
-                    code: formValues.code,
-                    email: login?.email,
-                })
-            );
-            if (codesVtruApi.success.login.includes(resOTPConfirm.code)) {
-                await dispatch(connectWebSocketThunk());
-                await dispatch(loginWebSocketThunk());
-                setToastr({ open: true, type: 'success', message: 'OTP confirmed!' });
-                router.push('/home');
-                return;
-            } else {
+            try {
+                const resOTPConfirm = await dispatch(
+                    userOTPConfirmThunk({
+                        code: formValues.code,
+                        email: login?.email,
+                    })
+                );
+
+                if (codesVtruApi.success.login.includes(resOTPConfirm.code)) {
+                    await dispatch(connectWebSocketThunk());
+                    await dispatch(loginWebSocketThunk());
+                    setToastr({ open: true, type: 'success', message: 'OTP confirmed!' });
+                    router.push('/home');
+                    return;
+                } else {
+                    setToastr({ open: true, type: 'error', message: 'Login failed: invalid code' });
+                }
+            } catch (error) {
+                const axiosError = error as AxiosError;
+                console.log(axiosError);
                 setToastr({ open: true, type: 'error', message: 'Login failed: invalid code' });
             }
         },

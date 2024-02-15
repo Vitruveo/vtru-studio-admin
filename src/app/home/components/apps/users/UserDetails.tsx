@@ -274,7 +274,7 @@ export default function UserDetails({ roles, userId, onDeleteClick, handleUpdate
                                                         roles={(inputFilter.length > 0 && rolesFiltered) || roles}
                                                         activeRoles={values.roles}
                                                         handleChangeRole={(roleId) => {
-                                                            if (values.roles.includes(roleId)) {
+                                                            if (values.roles?.includes(roleId)) {
                                                                 setFieldValue(
                                                                     'roles',
                                                                     values.roles.filter((item) => item !== roleId)
@@ -282,7 +282,7 @@ export default function UserDetails({ roles, userId, onDeleteClick, handleUpdate
 
                                                                 return;
                                                             }
-                                                            setFieldValue('roles', [...values.roles, roleId]);
+                                                            setFieldValue('roles', [...(values?.roles || []), roleId]);
                                                         }}
                                                     />
                                                 </Box>

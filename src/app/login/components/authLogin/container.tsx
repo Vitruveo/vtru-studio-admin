@@ -11,6 +11,7 @@ import CustomizedSnackbar, { CustomizedSnackbarState } from '@/app/common/toastr
 
 import LoginView from './view';
 import { loginSchemaValidation } from './formSchema';
+import { AxiosError } from 'axios';
 
 const LoginContainer = () => {
     const [toastr, setToastr] = useState<CustomizedSnackbarState>({
@@ -28,16 +29,25 @@ const LoginContainer = () => {
         },
         validationSchema: loginSchemaValidation,
         onSubmit: async (formValues) => {
-            const resUserLogin = await dispatch(
-                userLoginThunk({
-                    email: formValues.email,
-                })
-            );
-            if (codesVtruApi.success.login.includes(resUserLogin.code)) {
-                router.push('/login/oneTimePassword');
-                return;
-            } else {
-                setToastr({ open: true, type: 'error', message: 'Something went wrong! Try again later.' });
+            try {
+                const resUserLogin = await dispatch(
+                    userLoginThunk({
+                        email: formValues.email,
+                    })
+                );
+
+                if (codesVtruApi.success.login.includes(resUserLogin.code)) {
+                    router.push('/login/oneTimePassword');
+                    return;
+                } else {
+                    setToastr({ open: true, type: 'error', message: 'Something went wrong! Try again later.' });
+                }
+            } catch (error) {
+                const axiosError = error as AxiosError;
+                if (axiosError.response?.status === 404) {
+                    setToastr({ open: true, type: 'error', message: 'User not found!' });
+                    return;
+                }
             }
         },
     });

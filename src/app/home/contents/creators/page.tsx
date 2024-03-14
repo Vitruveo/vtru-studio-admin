@@ -94,7 +94,6 @@ export default function Creators() {
     const onDeleteConfirm = () => {
         const { id } = creatorDelete;
 
-        // dispatch(creatorDeleteThunk({ _id: id }));
         setCreators((prevState) => {
             delete prevState[id];
 

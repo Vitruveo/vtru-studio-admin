@@ -46,7 +46,6 @@ export default function ConfirmContainer() {
                 }
             } catch (error) {
                 const axiosError = error as AxiosError;
-                console.log(axiosError);
                 setToastr({ open: true, type: 'error', message: 'Login failed: invalid code' });
             }
         },

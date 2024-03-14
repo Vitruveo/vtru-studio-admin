@@ -66,13 +66,15 @@ export default function AddList({ handleAddNewEmails }: Props) {
 
             if (file.name.endsWith('.csv')) {
                 const results = Papa.parse(text, { header: true });
-
-                emails = results.data.map((row: any) => row.email);
+                console.log({ results });
+                emails = results.data.map((row: any) => row.email || Object.values(row)?.[0]);
             } else if (file.name.endsWith('.xml')) {
                 const parser = new xml2js.Parser();
                 const result = await parser.parseStringPromise(text);
                 emails = result.root.user.map((user: any) => user.email[0]);
             }
+
+            console.log({ emails });
 
             setFieldValue('emails', emails);
             event.target.value = '';

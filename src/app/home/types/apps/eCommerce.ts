@@ -1,5 +1,5 @@
 
-export interface ProductType {
+export interface AssetType {
   title: string;
   price: number;
   discount: number;
@@ -17,7 +17,7 @@ export interface ProductType {
   description: string;
 }
 
-export interface ProductFiterType {
+export interface AssetFiterType {
   id: number;
   filterbyTitle?: string;
   name?: string;
@@ -26,7 +26,7 @@ export interface ProductFiterType {
   devider?: boolean;
 }
 
-export interface ProductCardProps {
+export interface AssetCardProps {
   id?: string | number;
   color?: string;
   like: string;

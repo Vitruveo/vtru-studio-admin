@@ -12,16 +12,18 @@ import { IconMenu2 } from '@tabler/icons-react';
 import AlertCart from '../asset-cart/AlertCart';
 import emptyCart from 'public/images/products/empty-shopping-cart.svg';
 import { AssetType } from '@/app/home/types/apps/asset';
-import { AssetCard } from '@/app/home/components/apps/assets/assetCard/assetCard';
-import { ASSET_STORAGE_URL } from '@/constants/asset';
+import { AssetCard } from '@/app/home/components/apps/assets/asset-card/assetCard';
 import AssetSearch from './AssetSearch';
+import { buildAssetSource } from '@/utils/assets';
 
 interface Props {
     onClick: (event: React.SyntheticEvent | Event) => void;
     assets: AssetType[];
+    onSearchChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    isLoading?: boolean;
 }
 
-const AssetList = ({ onClick, assets }: Props) => {
+const AssetList = ({ onClick, assets, onSearchChange, isLoading = false }: Props) => {
     const lgUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('lg'));
 
     const [cartalert, setCartalert] = React.useState(false);
@@ -33,22 +35,8 @@ const AssetList = ({ onClick, assets }: Props) => {
         setCartalert(false);
     };
 
-    // skeleton
-    const [isLoading, setLoading] = React.useState(true);
-
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setLoading(false);
-        }, 1000);
-
-        return () => clearTimeout(timer);
-    }, []);
-
     return (
         <Box>
-            {/* ------------------------------------------- */}
-            {/* Header Detail page */}
-            {/* ------------------------------------------- */}
             <Stack direction="row" justifyContent="space-between" pb={3}>
                 {lgUp ? (
                     <Typography variant="h5">Assets</Typography>
@@ -58,25 +46,29 @@ const AssetList = ({ onClick, assets }: Props) => {
                     </Fab>
                 )}
                 <Box>
-                    <AssetSearch />
+                    <AssetSearch onChange={onSearchChange} />
                 </Box>
             </Stack>
 
-            {/* ------------------------------------------- */}
-            {/* Page Listing Asset */}
-            {/* ------------------------------------------- */}
             <Grid container spacing={3}>
                 {assets.length > 0 ? (
                     <>
                         {assets.map((asset) => (
-                            <Grid item xs={12} lg={4} md={4} sm={6} display="flex" alignItems="stretch" key={asset._id}>
+                            <Grid
+                                item
+                                xs={12}
+                                sm={6}
+                                md={4}
+                                lg={4}
+                                xl={3}
+                                display="flex"
+                                alignItems="stretch"
+                                key={asset._id}
+                            >
                                 <AssetCard
                                     isLoading={isLoading}
-                                    title={asset.formats?.preview?.name ?? 'Asset without name'}
-                                    media={
-                                        asset.formats?.preview?.path &&
-                                        `${ASSET_STORAGE_URL}/${asset.formats?.preview?.path}`
-                                    }
+                                    title={asset.assetMetadata?.context?.formData?.title ?? 'Untitled'}
+                                    media={buildAssetSource(asset.formats?.preview?.path)}
                                 />
                                 <AlertCart handleClose={handleClose} openCartAlert={cartalert} />
                             </Grid>

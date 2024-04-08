@@ -4,66 +4,73 @@ import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Breadcrumb from '@/app/home/layout/shared/breadcrumb/Breadcrumb';
 import PageContainer from '@/app/home/components/container/PageContainer';
-import ProductList from '@/app/home/components/apps/ecommerce/asset-grid/AssetList';
-import ProductSidebar from '@/app/home/components/apps/ecommerce/asset-grid/AssetSidebar';
+import AssetList from '@/app/home/components/apps/ecommerce/asset-grid/AssetList';
+import AssetSidebar from '@/app/home/components/apps/ecommerce/asset-grid/AssetSidebar';
 import AppCard from '@/app/home/components/shared/AppCard';
 import { Pagination } from '@mui/material';
 import { UsePaginationProps } from '@mui/lab';
-import { productsData } from '@/mock/assets';
 import { list } from '@/services/apiEventSource';
 import { AssetType } from '../../types/apps/asset';
+import { debounce } from 'lodash';
 
-const BCrumb = [
-    {
-        to: '/',
-        title: 'Home',
-    },
-    {
-        title: 'Assets',
-    },
-];
+const BCrumb = [{ title: 'Home' }, { title: 'Contents' }, { title: 'Assets' }];
 
-const Ecommerce = () => {
+const AssetsPage = () => {
     const [isMobileSidebarOpen, setMobileSidebarOpen] = React.useState(true);
     const [currentPage, setCurrentPage] = React.useState(1);
     const [assets, setAssets] = useState<AssetType[]>([]);
 
+    const fetchData = async (query?: string) => {
+        await list<AssetType>({
+            path: 'assets',
+            callback: (asset) => setAssets((prevState) => [...prevState, asset]),
+            filter: { query },
+        });
+    };
+
     useEffect(() => {
-      const fetchData = async () => {
-          await list<AssetType>({
-              path: 'assets',
-              callback: (asset) => setAssets((prevState) => [...prevState, asset]),
-          });
-      };
-      fetchData();
-  }, []);
+        (async () => await fetchData())();
+    }, []);
+
+    const debouncedSearch = debounce(async (query: string) => {
+        setAssets([]);
+        setCurrentPage(1);
+        await fetchData(query);
+    }, 1000);
 
     const onPaginationChange: UsePaginationProps['onChange'] = (event, page) => {
         setCurrentPage(page);
     };
 
-    const itemsPerPage = 10;
+    const onFabClick = () => {
+        setMobileSidebarOpen(!isMobileSidebarOpen);
+    };
+
+    const onSidebarClose = () => {
+        setMobileSidebarOpen(false);
+    };
+
+    const onSearchChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        debouncedSearch(event.target.value);
+    };
+
+    const itemsPerPage = 12;
     const totalPages = Math.ceil(assets.length / itemsPerPage);
     const getAssets = assets.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
     return (
-        <PageContainer title="Shop" description="this is Shop">
-            {/* breadcrumb */}
-            <Breadcrumb title="Assets" subtitle="List all assets" />
+        <PageContainer title="Assets" description="List all assets">
+            <Breadcrumb title="Assets" subtitle="List all assets" items={BCrumb} />
             <AppCard>
-                {/* ------------------------------------------- */}
-                {/* Left part */}
-                {/* ------------------------------------------- */}
-                <ProductSidebar
-                    isMobileSidebarOpen={isMobileSidebarOpen}
-                    onSidebarClose={() => setMobileSidebarOpen(false)}
-                />
-                {/* ------------------------------------------- */}
-                {/* Right part */}
-                {/* ------------------------------------------- */}
+                <AssetSidebar isMobileSidebarOpen={isMobileSidebarOpen} onSidebarClose={onSidebarClose} />
+
                 <Box p={3} flexGrow={1} display="flex" flexDirection="column" justifyContent="space-between">
-                    <ProductList assets={getAssets} onClick={() => setMobileSidebarOpen(!isMobileSidebarOpen)} />
-                    <Box mt={8}>
+                    <AssetList
+                        assets={getAssets}
+                        onClick={onFabClick}
+                        onSearchChange={onSearchChange}
+                    />
+                    <Box mt={8} mx='auto'>
                         <Pagination
                             count={totalPages}
                             page={currentPage}
@@ -77,4 +84,4 @@ const Ecommerce = () => {
     );
 };
 
-export default Ecommerce;
+export default AssetsPage;

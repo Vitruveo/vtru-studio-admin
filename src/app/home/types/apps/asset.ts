@@ -9,6 +9,7 @@ export interface AssetType {
     notMintedOtherBlockchain: boolean;
     licenses: Licenses;
     status: string;
+    assetMetadata: AssetMetadata;
 }
 
 export interface Formats {
@@ -41,10 +42,10 @@ export interface Framework {
 }
 
 export interface MediaAuxiliary {
-    formats: Formats2;
+    formats: MediaAuxiliaryFormats;
 }
 
-export interface Formats2 {
+export interface MediaAuxiliaryFormats {
     arImage: any;
     arVideo: any;
     btsImage: any;
@@ -99,4 +100,65 @@ export interface Remix {
     version: string;
     added: boolean;
     unitPrice: number;
+}
+
+export interface AssetMetadata {
+    isCompleted: boolean;
+    context?: Context;
+    taxonomy: Taxonomy;
+    creators: Creators;
+    provenance: Provenance;
+}
+
+export interface Context {
+    formData: ContextFormData;
+}
+
+export interface ContextFormData {
+    title: string;
+    description: string;
+    culture: string;
+    mood: string[];
+    colors: string[];
+    orientation: string;
+}
+
+export interface Taxonomy {
+    formData: TaxonomyFormData;
+}
+
+export interface TaxonomyFormData {
+    objectType: string;
+    category: string;
+    tags: string[];
+    collections: string[];
+    medium: string[];
+    style: string[];
+    subject: string[];
+    aiGeneration: string;
+    arenabled: string;
+    nudity: string;
+}
+
+export interface Creators {
+    formData: CreatorsFormData[];
+}
+
+export interface CreatorsFormData {
+    name: string;
+    roles: string[];
+    bio: string;
+    nationality: string;
+    residence: string;
+    profileUrl: string;
+}
+
+export interface Provenance {
+    formData: ProvenanceFormData;
+}
+
+export interface ProvenanceFormData {
+    blockchain: string;
+    exhibitions: any[];
+    awards: any[];
 }

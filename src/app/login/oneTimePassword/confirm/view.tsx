@@ -11,6 +11,7 @@ export default function ConfirmView({
   handleSubmit,
   handleChange,
   handleResendCode,
+  isLoading
 }: OTPConfirmViewProps) {
   return (
     <>
@@ -35,7 +36,7 @@ export default function ConfirmView({
           </Box>
         </Stack>
         <Box my={2} mt={3}>
-          <Button color="primary" variant="contained" size="large" fullWidth href="" type="submit">
+          <Button color="primary" variant="contained" size="large" fullWidth href="" type="submit" disabled={isLoading}>
             Verify
           </Button>
         </Box>

@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { AxiosError } from 'axios';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import { Grid } from '@mui/material';
+import { CircularProgress, Grid, Switch } from '@mui/material';
 import Avatar from '@mui/material/Avatar';
 import Image from 'next/image';
 import Box from '@mui/material/Box';
@@ -14,11 +15,13 @@ import Typography from '@mui/material/Typography';
 import { IconPencil, IconStar, IconTrash } from '@tabler/icons-react';
 
 import emailIcon from 'public/images/breadcrumb/emailSv.png';
-
+import CustomizedSnackbar, { CustomizedSnackbarState } from '@/app/common/toastr';
+import { useDispatch } from '@/store/hooks';
 import { apiService } from '@/services/api';
 import { CreatorType } from '@/mock/creators';
 import { RoleType } from '@/mock/roles';
 import { websocketSelector } from '@/features/ws';
+import { getAssetStatusByCreatorIdThunk, updateAssetStatusByCreatorByIdThunk } from '@/features/assets/thunks';
 
 const creatorSchemaValidation = yup.object({
     name: yup.string().required('field name is required.'),
@@ -31,11 +34,20 @@ interface Props {
 }
 
 export default function CreatorDetails({ creatorId, onDeleteClick }: Props) {
-    const { creatorsOnline } = useSelector(websocketSelector(['creatorsOnline']));
+    const dispatch = useDispatch();
+
+    const { creatorsOnline = [] } = useSelector(websocketSelector(['creatorsOnline']));
 
     const [creator, setCreator] = useState<CreatorType | null>(null);
     const [isEditing, setIsEditing] = useState(false);
     const [starred, setStarred] = useState(false);
+    const [isLoadingStatus, setIsLoadingStatus] = useState(false);
+    const [status, setStatus] = useState<string | undefined>('active');
+    const [toastr, setToastr] = useState<CustomizedSnackbarState>({
+        type: 'success',
+        open: false,
+        message: '',
+    });
 
     useEffect(() => {
         if (creatorId) {
@@ -64,8 +76,53 @@ export default function CreatorDetails({ creatorId, onDeleteClick }: Props) {
         if (creator) {
             setFieldValue('name', creator.name);
             setFieldValue('roles', creator.roles);
+            setStatus('');
+            setIsLoadingStatus(true);
+            dispatch(getAssetStatusByCreatorIdThunk({ creatorId: creator._id }))
+                .then((response) => {
+                    setStatus(response.data);
+                    setIsLoadingStatus(false);
+                })
+                .catch(() => {
+                    setIsLoadingStatus(false);
+                    setStatus(undefined);
+                });
         }
     }, [creator]);
+
+    const handleUpdateStatusAssetCreator = async ({ checked }: { checked: boolean }) => {
+        if (!creator) return;
+
+        setIsLoadingStatus(true);
+
+        const statusChanged = checked ? 'locked' : 'active';
+        dispatch(
+            updateAssetStatusByCreatorByIdThunk({
+                creatorId: creator._id,
+                status: statusChanged,
+            })
+        )
+            .then(() => {
+                setToastr({
+                    open: true,
+                    type: 'success',
+                    message: 'Status updated successfully.',
+                });
+                setStatus(statusChanged);
+                setIsLoadingStatus(false);
+            })
+            .catch((err) => {
+                if (err instanceof AxiosError && err?.response?.status === 404) {
+                    setToastr({
+                        open: true,
+                        type: 'error',
+                        message: 'Asset not found from creator.',
+                    });
+                }
+                setStatus(statusChanged);
+                setIsLoadingStatus(false);
+            });
+    };
 
     const warningColor = '#FFAE1F';
 
@@ -152,6 +209,25 @@ export default function CreatorDetails({ creatorId, onDeleteClick }: Props) {
                             </Box>
 
                             <Grid container>
+                                <Grid item lg={4} xs={12} mt={4}>
+                                    <Typography variant="body2" color="text.secondary">
+                                        Status Consign Artwork
+                                    </Typography>
+                                    <Box display="flex" alignItems="center" gap={2}>
+                                        <Switch
+                                            checked={status === 'locked'}
+                                            disabled={isLoadingStatus}
+                                            onChange={(event) =>
+                                                handleUpdateStatusAssetCreator({ checked: event.target.checked })
+                                            }
+                                        />
+                                        <p>{status === 'locked' ? 'Locked' : 'Unlocked'}</p>
+                                        {isLoadingStatus && <CircularProgress size={20} />}
+                                    </Box>
+                                </Grid>
+                            </Grid>
+
+                            <Grid container>
                                 <Grid item lg={6} xs={12} mt={4}>
                                     <Typography variant="body2" color="text.secondary">
                                         Phone Number
@@ -202,6 +278,13 @@ export default function CreatorDetails({ creatorId, onDeleteClick }: Props) {
                     </Box>
                 </Box>
             )}
+
+            <CustomizedSnackbar
+                type={toastr.type}
+                open={toastr.open}
+                message={toastr.message}
+                setOpentate={setToastr}
+            />
         </>
     );
 }

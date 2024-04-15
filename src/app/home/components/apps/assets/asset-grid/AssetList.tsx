@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import Image from 'next/image';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -9,31 +9,22 @@ import { Theme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { IconMenu2 } from '@tabler/icons-react';
-import AlertCart from '../asset-cart/AlertCart';
 import emptyCart from 'public/images/products/empty-shopping-cart.svg';
 import { AssetType } from '@/app/home/types/apps/asset';
 import { AssetCard } from '@/app/home/components/apps/assets/asset-card/assetCard';
 import AssetSearch from './AssetSearch';
 import { buildAssetSource } from '@/utils/assets';
+import { useSelector } from '@/store/hooks';
 
 interface Props {
     onClick: (event: React.SyntheticEvent | Event) => void;
+    onChangeSearch: (value: string) => void;
     assets: AssetType[];
-    onSearchChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
     isLoading?: boolean;
 }
 
-const AssetList = ({ onClick, assets, onSearchChange, isLoading = false }: Props) => {
+const AssetList = ({ onClick, onChangeSearch, assets, isLoading = false }: Props) => {
     const lgUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('lg'));
-
-    const [cartalert, setCartalert] = React.useState(false);
-
-    const handleClose = (reason: string) => {
-        if (reason === 'clickaway') {
-            return;
-        }
-        setCartalert(false);
-    };
 
     return (
         <Box>
@@ -46,7 +37,7 @@ const AssetList = ({ onClick, assets, onSearchChange, isLoading = false }: Props
                     </Fab>
                 )}
                 <Box>
-                    <AssetSearch onChange={onSearchChange} />
+                    <AssetSearch onChange={(event) => onChangeSearch(event.target.value)} />
                 </Box>
             </Stack>
 
@@ -66,11 +57,12 @@ const AssetList = ({ onClick, assets, onSearchChange, isLoading = false }: Props
                                 key={asset._id}
                             >
                                 <AssetCard
+                                    id={asset._id}
                                     isLoading={isLoading}
                                     title={asset.assetMetadata?.context?.formData?.title ?? 'Untitled'}
                                     media={buildAssetSource(asset.formats?.preview?.path)}
+                                    isBlocked={asset?.consignArtwork?.status === 'blocked'}
                                 />
-                                <AlertCart handleClose={handleClose} openCartAlert={cartalert} />
                             </Grid>
                         ))}
                     </>

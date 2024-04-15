@@ -1,12 +1,6 @@
 import { apiService } from '@/services/api';
-import type { GetAssetStatusByCreatorIdParams, UpdateAssetStatusByCreatorIdParams } from './types';
+import type { UpdateAssetStatusByIdParams } from './types';
 
-export async function updateAssetStatusByCreatorId({ creatorId, status }: UpdateAssetStatusByCreatorIdParams) {
-    return apiService.put(`/assets/${creatorId}/status`, {
-        status,
-    });
-}
-
-export async function getAssetStatusByCreatorId({ creatorId }: GetAssetStatusByCreatorIdParams) {
-    return apiService.get<string>(`/assets/${creatorId}/status`);
+export async function updateAssetStatusById({ id, status }: UpdateAssetStatusByIdParams) {
+    return apiService.put(`/assets/${id}/status`, { status });
 }

@@ -4,8 +4,10 @@ import { userSlice } from '../features/user';
 import { customizerSlice } from '../features/customizer';
 import { roleSlice } from '../features/role';
 import { websocketSlice } from '../features/ws';
+import { assetSlice } from '@/features/assets/slice';
 
 interface RootState {
+    asset: ReturnType<typeof assetSlice.reducer>;
     user: ReturnType<typeof userSlice.reducer>;
     customizer: ReturnType<typeof customizerSlice.reducer>;
     role: ReturnType<typeof roleSlice.reducer>;
@@ -13,6 +15,7 @@ interface RootState {
 }
 
 export const appReducer = combineReducers({
+    asset: assetSlice.reducer,
     user: userSlice.reducer,
     customizer: customizerSlice.reducer,
     role: roleSlice.reducer,

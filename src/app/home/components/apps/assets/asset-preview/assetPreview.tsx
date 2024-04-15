@@ -31,7 +31,7 @@ const ImageAsset = ({ media }: Required<AssetPreviewProps>) => {
             src={media ?? fallback}
             alt="asset"
             onError={onError}
-            style={{ width: '100%', objectFit: 'cover', height: 250 }}
+            style={{ width: '100%', objectFit: 'cover', height: 250, borderRadius: 10 }}
         />
     );
 };

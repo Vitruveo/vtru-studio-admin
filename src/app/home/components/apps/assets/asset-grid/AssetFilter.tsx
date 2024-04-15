@@ -1,18 +1,19 @@
 import React from 'react';
-import { useDispatch } from '@/store/hooks';
+import { useDispatch, useSelector } from '@/store/hooks';
 import Divider from '@mui/material/Divider';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
-import { IconHanger, IconCircles, IconNotebook, IconMoodSmile, IconDeviceLaptop } from '@tabler/icons-react';
+import { IconCircles, IconLock } from '@tabler/icons-react';
 import { AssetFiterType } from '../../../../types/apps/eCommerce';
 import { customizer } from '@/app/common/customizer';
+import { changeFilterThunk } from '@/features/assets/thunks';
 
 const AssetFilter = () => {
     const dispatch = useDispatch();
-    const active: any = {};
+    const active = useSelector((state) => state.asset.filter);
 
     const br = `${customizer.borderRadius}px`;
 
@@ -24,36 +25,16 @@ const AssetFilter = () => {
         {
             id: 2,
             name: 'All',
-            sort: 'All',
+            sort: 'all',
             icon: IconCircles,
+            onClick: () => dispatch(changeFilterThunk('all')),
         },
         {
             id: 3,
-            name: 'Fashion',
-            sort: 'fashion',
-            icon: IconHanger,
-        },
-        {
-            id: 9,
-            name: 'Books',
-            sort: 'books',
-            icon: IconNotebook,
-        },
-        {
-            id: 10,
-            name: 'Toys',
-            sort: 'toys',
-            icon: IconMoodSmile,
-        },
-        {
-            id: 11,
-            name: 'Electronics',
-            sort: 'electronics',
-            icon: IconDeviceLaptop,
-        },
-        {
-            id: 6,
-            devider: true,
+            name: 'Blocked',
+            sort: 'blocked',
+            icon: IconLock,
+            onClick: () => dispatch(changeFilterThunk('blocked')),
         },
     ];
 
@@ -74,14 +55,16 @@ const AssetFilter = () => {
                     return (
                         <ListItemButton
                             sx={{ mb: 1, mx: 3, borderRadius: br }}
-                            selected={active.category === `${filter.sort}`}
-                            onClick={() => {}}
+                            selected={active === filter.sort}
+                            onClick={filter.onClick}
                             key={filter.id}
                         >
                             <ListItemIcon sx={{ minWidth: '30px' }}>
                                 <filter.icon stroke="1.5" size="19" />
                             </ListItemIcon>
-                            <ListItemText>{filter.name}</ListItemText>
+                            <ListItemText style={{ color: active === filter.sort ? '' : '' }}>
+                                {filter.name}
+                            </ListItemText>
                         </ListItemButton>
                     );
                 })}

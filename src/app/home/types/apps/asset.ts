@@ -10,6 +10,9 @@ export interface AssetType {
     licenses: Licenses;
     status: string;
     assetMetadata: AssetMetadata;
+    consignArtwork: {
+        status: string;
+    };
 }
 
 export interface Formats {

@@ -6,6 +6,7 @@ import type { ChangeFilterParams, UpdateAssetStatusByIdParams } from './types';
 import { APIResponse } from '../common/types';
 import { assetActionsCreators } from './slice';
 import { BASE_URL_API } from '@/constants/api';
+import { AssetType } from '@/app/home/types/apps/asset';
 
 export function getAssetsThunk(): ReduxThunkAction {
     return async function (dispatch, getState) {
@@ -24,7 +25,7 @@ export function getAssetsThunk(): ReduxThunkAction {
             method: 'GET',
             headers,
             onmessage(event) {
-                const parsed = JSON.parse(event.data);
+                const parsed = JSON.parse(event.data) as AssetType;
 
                 if (!state.asset.allIds.includes(parsed._id)) {
                     dispatch(assetActionsCreators.setAllIds(parsed._id));

@@ -24,7 +24,7 @@ import { useSelector, useDispatch } from '@/store/hooks';
 import CustomCheckbox from '../../../forms/theme-elements/CustomCheckbox';
 import CustomSwitch from '../../../forms/theme-elements/CustomSwitch';
 import { IconDotsVertical, IconFilter, IconSearch, IconTrash } from '@tabler/icons-react';
-import { ProductType } from '../../../../types/apps/eCommerce';
+import { AssetType } from '../../../../types/apps/eCommerce';
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -222,7 +222,7 @@ const ProductTableList = () => {
 
   const dispatch = useDispatch();
 
-  const getProducts: ProductType[] = [];
+  const getProducts: AssetType[] = [];
 
   const [rows, setRows] = React.useState<any>(getProducts);
   const [search, setSearch] = React.useState('');
@@ -232,7 +232,7 @@ const ProductTableList = () => {
   }, [getProducts]);
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const filteredRows: ProductType[] = getProducts.filter((row) => {
+    const filteredRows: AssetType[] = getProducts.filter((row) => {
       return row.title.toLowerCase().includes(event.target.value);
     });
     setSearch(event.target.value);

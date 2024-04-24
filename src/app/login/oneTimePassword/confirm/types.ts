@@ -12,4 +12,5 @@ export interface OTPConfirmViewProps extends FormikDefaultProps {
   values: OTPConfirmFormValues;
   errors: OTPConfirmFormErros;
   handleResendCode: () => void;
+  isLoading?: boolean;
 }

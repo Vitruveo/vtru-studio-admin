@@ -11,9 +11,11 @@ import { codesVtruApi } from '@/services/codes';
 import ConfirmView from './view';
 import { otpSchemaValidation } from './formSchema';
 import { AxiosError } from 'axios';
+import { useLoader } from '@/app/hooks/use-loader';
 
 export default function ConfirmContainer() {
     const [toastr, setToastr] = useState<CustomizedSnackbarState>({ type: 'success', open: false, message: '' });
+    const loader = useLoader();
 
     const dispatch = useDispatch();
 
@@ -21,12 +23,13 @@ export default function ConfirmContainer() {
 
     const router = useRouter();
 
-    const { handleSubmit, handleChange, values, errors, submitForm, validateForm } = useFormik({
+    const { handleSubmit, handleChange, values, errors, submitForm, validateForm, isSubmitting } = useFormik({
         initialValues: {
             code: '',
         },
         validationSchema: otpSchemaValidation,
         onSubmit: async (formValues) => {
+            loader.start();
             try {
                 const resOTPConfirm = await dispatch(
                     userOTPConfirmThunk({
@@ -48,6 +51,7 @@ export default function ConfirmContainer() {
                 const axiosError = error as AxiosError;
                 setToastr({ open: true, type: 'error', message: 'Login failed: invalid code' });
             }
+            loader.stop();
         },
     });
 
@@ -76,6 +80,7 @@ export default function ConfirmContainer() {
                 handleResendCode={handleResendCode}
                 handleChange={handleCustomChange}
                 handleSubmit={handleSubmit}
+                isLoading={loader.isLoading}
             />
             <CustomizedSnackbar
                 type={toastr.type}

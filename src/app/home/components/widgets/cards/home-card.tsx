@@ -2,7 +2,7 @@ import { Grid, CardContent, Typography, Box } from '@mui/material';
 import Image from 'next/image';
 import { Theme } from '@mui/material';
 
-interface HomeCardProps {
+export interface HomeCardProps {
     bgcolor: keyof Theme['palette'];
     icon: string;
     title: string;

@@ -14,3 +14,7 @@ export interface WaitingItem {
 }
 
 export type GetListApiRes = APIResponse<WaitingItem[]>;
+
+export interface InitialState {
+    all: WaitingItem[];
+}

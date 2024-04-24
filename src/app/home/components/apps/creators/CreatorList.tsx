@@ -2,8 +2,7 @@ import List from '@mui/material/List';
 
 import Scrollbar from '../../custom-scroll/Scrollbar';
 import CreatorListItem from './CreatorListItem';
-
-import { CreatorType } from '@/mock/creators';
+import { CreatorType } from '@/features/creator';
 
 type Props = {
   creatorId: string;

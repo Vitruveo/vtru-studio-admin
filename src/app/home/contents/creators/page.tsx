@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector } from '@/store/hooks';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Drawer from '@mui/material/Drawer';
@@ -14,26 +14,23 @@ import CreatorList from '@/app/home/components/apps/creators/CreatorList';
 import CreatorSearch from '@/app/home/components/apps/creators/CreatorSearch';
 import CreatorFilter from '@/app/home/components/apps/creators/CreatorFilter';
 import AppCard from '@/app/home/components/shared/AppCard';
-import { CreatorType } from '@/mock/creators';
 import { CreatorDialogDelete } from '../../components/apps/creators/CreatorDialogDelete';
 import { useDispatch } from '@/store/hooks';
 import { subscribeWebSocketThunk, unsubscribeWebSocketThunk, websocketSelector } from '@/features/ws';
-import { list } from '@/services/apiEventSource';
+import { deleteCreatorThunk, getCreatorsThunk } from '@/features/creator';
 
 const drawerWidth = 240;
 const secdrawerWidth = 320;
 
 export default function Creators() {
     const dispatch = useDispatch();
-
+    const creators = useSelector((state) => state.creator.all)
+    const { creatorsOnline } = useSelector(websocketSelector(['creatorsOnline']));
     const [isLeftSidebarOpen, setLeftSidebarOpen] = useState(false);
     const [isRightSidebarOpen, setRightSidebarOpen] = useState(false);
     const lgUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('lg'));
     const mdUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
 
-    const { creatorsOnline } = useSelector(websocketSelector(['creatorsOnline']));
-
-    const [creators, setCreators] = useState<{ [key: string]: CreatorType }>({});
     const [search, setSearch] = useState('');
     const [creatorId, setCreatorId] = useState('');
     const [isCreatorsOnline, setIsCreatorsOnline] = useState(false);
@@ -42,13 +39,12 @@ export default function Creators() {
 
     useEffect(() => {
         dispatch(subscribeWebSocketThunk());
-
         return () => {
             dispatch(unsubscribeWebSocketThunk());
         };
     }, []);
 
-    useEffect(() => {
+    /*useEffect(() => {
         const diff: { [key: string]: CreatorType } = {};
         creatorsOnline?.forEach((item) => {
             diff[item._id] = {
@@ -56,18 +52,12 @@ export default function Creators() {
                 emails: [{ email: item.email }],
             } as CreatorType;
         });
-
+        
         setCreators((prevState) => ({ ...diff, ...prevState }));
-    }, [creatorsOnline]);
+    }, [creatorsOnline]);*/
 
     useEffect(() => {
-        const fetchData = async () => {
-            await list<CreatorType>({
-                path: 'creators',
-                callback: (creator) => setCreators((prevState) => ({ ...prevState, [creator._id]: creator })),
-            });
-        };
-        fetchData();
+        dispatch(getCreatorsThunk());
     }, []);
 
     const creatorsFiltered = useMemo(() => {
@@ -92,15 +82,8 @@ export default function Creators() {
     };
 
     const onDeleteConfirm = () => {
-        const { id } = creatorDelete;
-
-        setCreators((prevState) => {
-            delete prevState[id];
-
-            return prevState;
-        });
-        if (id === creatorId) setCreatorId('');
-
+        dispatch(deleteCreatorThunk(creatorDelete.id))
+        if (creatorDelete.id === creatorId) setCreatorId('');
         setIsOpenDialogDelete(false);
     };
 

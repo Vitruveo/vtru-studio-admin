@@ -4,7 +4,7 @@ import { userSlice } from '../features/user';
 import { customizerSlice } from '../features/customizer';
 import { roleSlice } from '../features/role';
 import { websocketSlice } from '../features/ws';
-import { assetSlice } from '@/features/assets/slice';
+import { assetSlice } from '@/features/assets';
 
 interface RootState {
     asset: ReturnType<typeof assetSlice.reducer>;

@@ -43,6 +43,11 @@ const AssetsPage = () => {
             if (filter === 'blocked') {
                 return asset?.consignArtwork?.status === 'blocked';
             }
+
+            if (filter === 'consigned') {
+                return asset?.contractExplorer?.explorer;
+            }
+
             if (filter === 'all') {
                 return true;
             }

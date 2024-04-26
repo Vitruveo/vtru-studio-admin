@@ -13,6 +13,9 @@ export interface AssetType {
     consignArtwork: {
         status: string;
     };
+    contractExplorer: {
+        explorer: string;
+    };
 }
 
 export interface Formats {

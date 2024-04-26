@@ -45,23 +45,14 @@ const AssetList = ({ onClick, onChangeSearch, assets, isLoading = false }: Props
                 {assets.length > 0 ? (
                     <>
                         {assets.map((asset) => (
-                            <Grid
-                                item
-                                xs={12}
-                                sm={6}
-                                md={4}
-                                lg={4}
-                                xl={3}
-                                display="flex"
-                                alignItems="stretch"
-                                key={asset._id}
-                            >
+                            <Grid item display="flex" flexWrap={'wrap'} alignItems="stretch" key={asset._id}>
                                 <AssetCard
                                     id={asset._id}
                                     isLoading={isLoading}
                                     title={asset.assetMetadata?.context?.formData?.title ?? 'Untitled'}
                                     media={buildAssetSource(asset.formats?.preview?.path)}
                                     isBlocked={asset?.consignArtwork?.status === 'blocked'}
+                                    isConsigned={asset?.contractExplorer?.explorer.length > 0}
                                 />
                             </Grid>
                         ))}

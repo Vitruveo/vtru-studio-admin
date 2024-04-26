@@ -37,6 +37,8 @@ export default function AllowList() {
         const result = await findAllowList();
         if (result.data) {
             const uniqueEmails = result.data.sort((a: AllowItem, b: AllowItem) => {
+                if (!a?.framework?.createdAt || !b?.framework?.createdAt) return 0;
+
                 if (new Date(a.framework.createdAt).getTime() > new Date(b.framework.createdAt).getTime()) {
                     return -1;
                 }

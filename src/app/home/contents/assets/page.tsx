@@ -12,8 +12,6 @@ import { UsePaginationProps } from '@mui/lab';
 import { useDispatch, useSelector } from '@/store/hooks';
 import { getAssetsThunk } from '@/features/assets/thunks';
 
-const BCrumb = [{ title: 'Home' }, { title: 'Contents' }, { title: 'Assets' }];
-
 const AssetsPage = () => {
     const dispatch = useDispatch();
 
@@ -70,7 +68,7 @@ const AssetsPage = () => {
 
     return (
         <PageContainer title="Assets" description="List all assets">
-            <Breadcrumb title="Assets" subtitle="List all assets" items={BCrumb} />
+            <Breadcrumb title="Assets" subtitle="List all assets" />
             <AppCard>
                 <AssetSidebar isMobileSidebarOpen={isMobileSidebarOpen} onSidebarClose={onSidebarClose} />
                 <Box p={3} flexGrow={1} display="flex" flexDirection="column" justifyContent="space-between">

@@ -9,7 +9,7 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { useTheme } from '@mui/material/styles';
 import { IconStar, IconTrash } from '@tabler/icons-react';
-import { CreatorType } from '@/mock/creators';
+import { CreatorType } from '@/features/creator';
 import { useSelector } from 'react-redux';
 import { websocketSelector } from '@/features/ws';
 

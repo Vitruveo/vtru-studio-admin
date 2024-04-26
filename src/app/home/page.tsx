@@ -1,83 +1,63 @@
-"use client";
-import { useEffect, useState } from "react";
-import Box from "@mui/material/Box";
-import Grid from "@mui/material/Grid";
-
-import PageContainer from "@/app/home/components/container/PageContainer";
-// components
-import YearlyBreakup from "@/app/home/components/dashboards/modern/YearlyBreakup";
-import MonthlyEarnings from "@/app/home/components/dashboards/modern/MonthlyEarnings";
-import TopCards from "@/app/home/components/dashboards/modern/TopCards";
-import RevenueUpdates from "@/app/home/components/dashboards/modern/RevenueUpdates";
-import EmployeeSalary from "@/app/home/components/dashboards/modern/EmployeeSalary";
-import Customers from "@/app/home/components/dashboards/modern/Customers";
-import Projects from "@/app/home/components/dashboards/modern/Projects";
-import Social from "@/app/home/components/dashboards/modern/Social";
-import SellingProducts from "@/app/home/components/dashboards/modern/SellingProducts";
-import WeeklyStats from "@/app/home/components/dashboards/modern/WeeklyStats";
-import TopPerformers from "@/app/home/components/dashboards/modern/TopPerformers";
+'use client';
+import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid';
+import PageContainer from '@/app/home/components/container/PageContainer';
+import activeAssetsIcon from '../../../public/images/svgs/icon-dd-application.svg';
+import userMaleIcon from '../../../public/images/svgs/icon-user-male.svg';
+import mailBoxIcon from '../../../public/images/svgs/icon-mailbox.svg';
+import { HomeCard, HomeCardProps } from './components/widgets/cards/home-card';
+import { useDispatch, useSelector } from '@/store/hooks';
+import { useEffect } from 'react';
+import { getCreatorsThunk } from '@/features/creator';
+import { getAssetsThunk } from '@/features/assets/thunks';
+import { getWaitingListThunk } from '@/features/waitingList/thunks';
 
 export default function Dashboard() {
-  const [isLoading, setLoading] = useState(true);
-  useEffect(() => {
-    setLoading(false);
-  }, []);
+    const dispatch = useDispatch();
+    const activeAssetsCount = useSelector((state) => state.asset.allIds.length);
+    const creatorsCount = useSelector((state) => state.creator.all.length);
+    const waitingListCount = useSelector(state => state.waitingList.all.length);
 
-  return (
-    <PageContainer title="Dashboard" description="this is Dashboard">
-      <Box mt={3}>
-        <Grid container spacing={3}>
-          {/* column */}
-          <Grid item xs={12} lg={12}>
-            <TopCards />
-          </Grid>
-          {/* column */}
-          <Grid item xs={12} lg={8}>
-            <RevenueUpdates isLoading={isLoading} />
-          </Grid>
-          {/* column */}
-          <Grid item xs={12} lg={4}>
-            <Grid container spacing={3}>
-              <Grid item xs={12} sm={6} lg={12}>
-                <YearlyBreakup isLoading={isLoading} />
-              </Grid>
-              <Grid item xs={12} sm={6} lg={12}>
-                <MonthlyEarnings isLoading={isLoading} />
-              </Grid>
-            </Grid>
-          </Grid>
-          {/* column */}
-          <Grid item xs={12} lg={4}>
-            <EmployeeSalary isLoading={isLoading} />
-          </Grid>
-          {/* column */}
-          <Grid item xs={12} lg={4}>
-            <Grid container spacing={3}>
-              <Grid item xs={12} sm={6}>
-                <Customers isLoading={isLoading} />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <Projects isLoading={isLoading} />
-              </Grid>
-              <Grid item xs={12}>
-                <Social />
-              </Grid>
-            </Grid>
-          </Grid>
-          {/* column */}
-          <Grid item xs={12} lg={4}>
-            <SellingProducts />
-          </Grid>
-          {/* column */}
-          <Grid item xs={12} lg={4}>
-            <WeeklyStats isLoading={isLoading} />
-          </Grid>
-          {/* column */}
-          <Grid item xs={12} lg={8}>
-            <TopPerformers />
-          </Grid>
-        </Grid>
-      </Box>
-    </PageContainer>
-  );
+    useEffect(() => {
+        dispatch(getCreatorsThunk());
+        dispatch(getAssetsThunk())
+        dispatch(getWaitingListThunk())
+    }, [dispatch]);
+
+    const cards: HomeCardProps[] = [
+        {
+            bgcolor: 'primary',
+            icon: userMaleIcon,
+            title: 'Creators',
+            digits: `${creatorsCount}`,
+        },
+        {
+            bgcolor: 'secondary',
+            icon: activeAssetsIcon,
+            title: 'Active Assets',
+            digits: `${activeAssetsCount}`,
+        },
+        {
+            bgcolor: 'info',
+            icon: mailBoxIcon,
+            title: 'Waiting List',
+            digits: `${waitingListCount}`,
+        },
+    ];
+
+    return (
+        <PageContainer title="Dashboard" description="this is Dashboard">
+            <Box mt={3}>
+                <Grid container spacing={3}>
+                    <Grid item xs={12} lg={12}>
+                        <Grid container spacing={3} mt={1}>
+                            {cards.map((card, index) => (
+                                <HomeCard key={index} {...card} />
+                            ))}
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </Box>
+        </PageContainer>
+    );
 }

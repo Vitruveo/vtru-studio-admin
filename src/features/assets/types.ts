@@ -17,7 +17,7 @@ export interface GetAssetStatusByCreatorIdParams {
 export interface InitialState {
     byId: Record<string, AssetType>;
     allIds: string[];
-    filter: 'all' | 'blocked';
+    filter: 'all' | 'blocked' | 'consigned';
 }
 
-export type ChangeFilterParams = 'all' | 'blocked';
+export type ChangeFilterParams = 'all' | 'blocked' | 'consigned';

@@ -1,6 +1,5 @@
 'use client';
-
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Drawer, useMediaQuery, Theme, Box, Button } from '@mui/material';
 import * as Yup from 'yup';
 import PageContainer from '../components/container/PageContainer';
@@ -12,7 +11,6 @@ import Search from './components/search';
 import Details from './components/details';
 import {
     addMultipleWaitingList,
-    findWaitingList,
     deletWaitingList,
     updateWaitingList,
 } from '@/features/waitingList/requests';
@@ -20,6 +18,8 @@ import CustomizedSnackbar, { CustomizedSnackbarState } from '@/app/common/toastr
 import { WaitingItem } from '@/features/waitingList/types';
 import { AllowItem } from '@/features/allowList/types';
 import { addAllowList, findAllowList } from '@/features/allowList/requests';
+import { useDispatch, useSelector } from '@/store/hooks';
+import { getWaitingListThunk } from '@/features/waitingList/thunks';
 
 const drawerWidth = 240;
 const secdrawerWidth = 320;
@@ -32,7 +32,9 @@ export default function WaitingList() {
         open: false,
         message: '',
     });
-    const [emails, setEmails] = useState<WaitingItem[]>([]);
+    const dispatch = useDispatch();
+    const waitingList = useSelector((state) => state.waitingList.all);
+
     const [allowList, setAllowList] = useState<AllowItem[]>([]);
     const lgUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('lg'));
     const mdUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
@@ -41,20 +43,13 @@ export default function WaitingList() {
     const [activeEmail, setActiveEmail] = useState<WaitingItem>();
     const [search, setSearch] = useState('');
 
-    const handleGetWaitingList = async () => {
-        const result = await findWaitingList();
-        if (result.data) {
-            const uniqueEmails = result.data.sort((a: WaitingItem, b: WaitingItem) => {
-                if (new Date(a.framework.createdAt).getTime() > new Date(b.framework.createdAt).getTime()) {
-                    return -1;
-                }
-                if (new Date(a.framework.createdAt).getTime() < new Date(b.framework.createdAt).getTime()) {
-                    return 1;
-                }
-                return 0;
-            });
-            setEmails(uniqueEmails);
-        }
+    useEffect(() => {
+        handleGetAllowList();
+        getWaitingList();
+    }, []);
+
+    const getWaitingList = () => {
+        dispatch(getWaitingListThunk());
     };
 
     const handleGetAllowList = async () => {
@@ -71,7 +66,7 @@ export default function WaitingList() {
                 await emailSchema.validate(email);
                 return (
                     email.length &&
-                    !emails.some((item) => item.email === email) &&
+                    !waitingList.some((item) => item.email === email) &&
                     !allowList.some((e) => e.email === email) &&
                     index === self.findIndex((e) => e === email)
                 );
@@ -86,7 +81,7 @@ export default function WaitingList() {
 
         if (validEmails.length) {
             await addMultipleWaitingList(validEmails.map((email) => ({ email })));
-            await handleGetWaitingList();
+            getWaitingList();
             if (validAllowList.length) {
                 setToastr({
                     type: 'info',
@@ -104,12 +99,12 @@ export default function WaitingList() {
     };
 
     const onDeleteClick = async (params: WaitingItem) => {
-        const newEmails = emails.filter((item) => item.email !== params.email);
+        const newEmails = waitingList.filter((item) => item.email !== params.email);
         if (activeEmail?.email === params.email) {
             setActiveEmail(newEmails[0]);
         }
         await deletWaitingList(params._id);
-        await handleGetWaitingList();
+        getWaitingList();
     };
 
     const onAddAllowList = async (params: WaitingItem) => {
@@ -119,12 +114,12 @@ export default function WaitingList() {
 
     const handleUpdateEmail = async (params: WaitingItem) => {
         if (
-            !emails.some((item) => item.email.trim() === params.email.trim()) &&
+            !waitingList.some((item) => item.email.trim() === params.email.trim()) &&
             !allowList.some((e) => e.email === params.email)
         ) {
             setActiveEmail(undefined);
             await updateWaitingList(params);
-            await handleGetWaitingList();
+            getWaitingList();
         } else {
             setToastr({
                 type: 'info',
@@ -134,14 +129,9 @@ export default function WaitingList() {
         }
     };
 
-    const emailsFiltered = useMemo(() => {
-        return search.length > 0 ? emails.filter((v) => v.email.toLowerCase().includes(search.toLowerCase())) : [];
-    }, [search, emails]);
-
-    useEffect(() => {
-        handleGetWaitingList();
-        handleGetAllowList();
-    }, []);
+    const waitingListFiltered = useMemo(() => {
+        return search.length > 0 ? waitingList.filter((v) => v.email.toLowerCase().includes(search.toLowerCase())) : [];
+    }, [search, waitingList]);
 
     return (
         <PageContainer title="Waiting List">
@@ -179,7 +169,7 @@ export default function WaitingList() {
                     <List
                         onAddAllowList={onAddAllowList}
                         activeEmail={activeEmail}
-                        emails={search.length > 0 ? emailsFiltered : emails}
+                        emails={search.length > 0 ? waitingListFiltered : waitingList}
                         onDeleteClick={onDeleteClick}
                         onEmailClick={(waitingItem) => setActiveEmail(waitingItem)}
                     />

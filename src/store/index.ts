@@ -4,6 +4,7 @@ import thunkMiddleware from 'redux-thunk';
 import { persistReducer, persistStore, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist';
 
 import { reducer } from './rootReducer';
+import { PERSIST_KEY, PERSIST_VERSION } from '@/constants/store';
 
 const createNoopStorage = () => {
     return {
@@ -22,8 +23,8 @@ const createNoopStorage = () => {
 const storage = typeof window !== 'undefined' ? createWebStorage('local') : createNoopStorage();
 
 const persistConfig = {
-    key: 'root',
-    version: 1,
+    key: PERSIST_KEY,
+    version: PERSIST_VERSION,
     storage,
 };
 

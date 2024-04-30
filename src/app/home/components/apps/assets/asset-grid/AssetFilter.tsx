@@ -6,7 +6,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
-import { IconCircles, IconLock } from '@tabler/icons-react';
+import { IconCircles, IconLock, IconChecklist } from '@tabler/icons-react';
 import { AssetFiterType } from '../../../../types/apps/eCommerce';
 import { customizer } from '@/app/common/customizer';
 import { changeFilterThunk } from '@/features/assets/thunks';
@@ -35,6 +35,13 @@ const AssetFilter = () => {
             sort: 'blocked',
             icon: IconLock,
             onClick: () => dispatch(changeFilterThunk('blocked')),
+        },
+        {
+            id: 4,
+            name: 'Consigned',
+            sort: 'consigned',
+            icon: IconChecklist,
+            onClick: () => dispatch(changeFilterThunk('consigned')),
         },
     ];
 

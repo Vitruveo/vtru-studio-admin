@@ -16,7 +16,7 @@ import { IconPencil, IconStar, IconTrash } from '@tabler/icons-react';
 import emailIcon from 'public/images/breadcrumb/emailSv.png';
 import CustomizedSnackbar, { CustomizedSnackbarState } from '@/app/common/toastr';
 import { apiService } from '@/services/api';
-import { CreatorType } from '@/mock/creators';
+import { CreatorType } from '@/features/creator';
 import { websocketSelector } from '@/features/ws';
 
 const creatorSchemaValidation = yup.object({

@@ -63,7 +63,7 @@ const AssetsOnePage = ({ params }: Props) => {
                         <Typography variant="body1">{asset.assetMetadata?.context?.formData.description}</Typography>
 
                         <Grid container>
-                            <Grid item lg={4} xs={12} mt={2}>
+                            <Grid item lg={12} xs={12} mt={2}>
                                 <Typography variant="h6" color="text.secondary">
                                     Status Consign Artwork
                                 </Typography>

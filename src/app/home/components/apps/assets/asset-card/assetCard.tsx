@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { IconLock } from '@tabler/icons-react';
+import { IconLock, IconChecklist } from '@tabler/icons-react';
 import { Typography, CardContent, Skeleton, Box } from '@mui/material';
 import BlankCard from '../../../shared/BlankCard';
 import { AssetPreview } from '../asset-preview/assetPreview';
@@ -12,6 +12,7 @@ interface AssetCardProps {
     title: string;
     isLoading?: boolean;
     isBlocked?: boolean;
+    isConsigned?: boolean;
 }
 
 const AssetSkeleton = () => (
@@ -25,7 +26,7 @@ const AssetSkeleton = () => (
     ></Skeleton>
 );
 
-export const AssetCard = ({ id, media, title, isLoading, isBlocked }: AssetCardProps) => {
+export const AssetCard = ({ id, media, title, isLoading, isBlocked, isConsigned }: AssetCardProps) => {
     const router = useRouter();
 
     if (isLoading) return <AssetSkeleton />;
@@ -39,6 +40,12 @@ export const AssetCard = ({ id, media, title, isLoading, isBlocked }: AssetCardP
                         <Box display="flex" alignItems="center" gap={1}>
                             <IconLock style={{ marginBottom: 7 }} width={20} />
                             <Typography variant="body2">Blocked</Typography>
+                        </Box>
+                    )}
+                    {isConsigned && (
+                        <Box display="flex" alignItems="center" gap={1}>
+                            <IconChecklist style={{ marginBottom: 7 }} width={20} />
+                            <Typography variant="body2">Consigned</Typography>
                         </Box>
                     )}
                     <Typography variant="h6">{title}</Typography>

@@ -6,6 +6,7 @@ import { AssetType } from '@/app/home/types/apps/asset';
 const initialState: InitialState = {
     byId: {},
     allIds: [],
+    creator: '',
     filter: 'all',
 };
 
@@ -26,6 +27,9 @@ export const assetSlice = createSlice({
         },
         changeFilter: (state, action: PayloadAction<ChangeFilterParams>) => {
             state.filter = action.payload;
+        },
+        changeCreator: (state, action: PayloadAction<string>) => {
+            state.creator = action.payload;
         },
     },
 });

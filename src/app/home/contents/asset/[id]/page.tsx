@@ -1,7 +1,7 @@
 'use client';
 
-import React from 'react';
-import { Typography, Box, Grid, Switch } from '@mui/material';
+import React, { useEffect } from 'react';
+import { Typography, Box, Grid, Switch, Button } from '@mui/material';
 
 import Breadcrumb from '@/app/home/layout/shared/breadcrumb/Breadcrumb';
 import PageContainer from '@/app/home/components/container/PageContainer';
@@ -9,7 +9,8 @@ import AppCard from '@/app/home/components/shared/AppCard';
 import { AssetPreview } from '@/app/home/components/apps/assets/asset-preview/assetPreview';
 import { useDispatch, useSelector } from '@/store/hooks';
 import { buildAssetSource } from '@/utils/assets';
-import { updateAssetStatusByIdThunk } from '@/features/assets/thunks';
+import { getCreatorNameByAssetIdThunk, updateAssetStatusByIdThunk } from '@/features/assets/thunks';
+import { BASE_URL_STORE } from '@/constants/api';
 
 const BCrumb = [
     { title: 'Home' },
@@ -25,11 +26,21 @@ interface Props {
 const AssetsOnePage = ({ params }: Props) => {
     const dispatch = useDispatch();
     const asset = useSelector((state) => state.asset.byId[params.id]);
+    const creator = useSelector((state) => state.asset.creator);
 
     const handleChangeAssetBlocked = ({ status }: { status: 'active' | 'blocked' }) => {
         if (!asset) return;
 
         dispatch(updateAssetStatusByIdThunk({ id: asset._id, status }));
+    };
+
+    useEffect(() => {
+        dispatch(getCreatorNameByAssetIdThunk({ id: asset._id }));
+    }, []);
+
+    const handleClickPreview = () => {
+        const URL = `${BASE_URL_STORE}/${creator}/${asset._id}/${Date.now()}`;
+        window.open(URL, '_blank');
     };
 
     if (!asset) {
@@ -81,6 +92,10 @@ const AssetsOnePage = ({ params }: Props) => {
                                 </Box>
                             </Grid>
                         </Grid>
+
+                        <Button disabled={!asset || !creator} onClick={handleClickPreview}>
+                            <Typography>Preview</Typography>
+                        </Button>
                     </Box>
                 </Box>
             </AppCard>

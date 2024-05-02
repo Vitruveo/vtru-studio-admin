@@ -1,8 +1,8 @@
 import { fetchEventSource } from '@microsoft/fetch-event-source';
 
 import { ReduxThunkAction } from '@/store';
-import { updateAssetStatusById } from './requests';
-import type { ChangeFilterParams, UpdateAssetStatusByIdParams } from './types';
+import { getCreatorNameByAssetId, updateAssetStatusById } from './requests';
+import type { ChangeFilterParams, GetCreatorNameByAssetIdParams, UpdateAssetStatusByIdParams } from './types';
 import { APIResponse } from '../common/types';
 import { assetActionsCreators } from './slice';
 import { BASE_URL_API } from '@/constants/api';
@@ -61,5 +61,17 @@ export function updateAssetStatusByIdThunk(
 export function changeFilterThunk(payload: ChangeFilterParams): ReduxThunkAction {
     return async function (dispatch) {
         dispatch(assetActionsCreators.changeFilter(payload));
+    };
+}
+
+export function getCreatorNameByAssetIdThunk(payload: GetCreatorNameByAssetIdParams): ReduxThunkAction {
+    return function (dispatch) {
+        dispatch(assetActionsCreators.changeCreator(''));
+
+        getCreatorNameByAssetId(payload).then((response) => {
+            if (!response.data) return;
+
+            dispatch(assetActionsCreators.changeCreator(response.data.username));
+        });
     };
 }

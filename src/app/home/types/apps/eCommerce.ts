@@ -17,7 +17,6 @@ export interface AssetType {
 }
 
 export interface AssetFiterType {
-    id: number;
     filterbyTitle?: string;
     name?: string;
     sort?: string;

@@ -1,20 +1,21 @@
-import React from 'react';
-import Image from 'next/image';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Fab from '@mui/material/Fab';
-import Grid from '@mui/material/Grid';
-import Stack from '@mui/material/Stack';
+import { useState } from 'react';
 import { Theme } from '@mui/material/styles';
-import Typography from '@mui/material/Typography';
-import useMediaQuery from '@mui/material/useMediaQuery';
-import { IconMenu2 } from '@tabler/icons-react';
-import emptyCart from 'public/images/products/empty-shopping-cart.svg';
+import { IconChecklist, IconDeselect, IconLock, IconMenu2 } from '@tabler/icons-react';
 import { AssetType } from '@/app/home/types/apps/asset';
 import { AssetCard } from '@/app/home/components/apps/assets/asset-card/assetCard';
-import AssetSearch from './AssetSearch';
 import { buildAssetSource } from '@/utils/assets';
-import { useSelector } from '@/store/hooks';
+import { Checkbox, FormControlLabel, Box, Button, Fab, Grid, Stack } from '@mui/material';
+import { useRouter } from 'next/navigation';
+import { useArray } from '@/app/hooks/use-array';
+import { ConfirmationDialog } from './ConfirmationDialog';
+import { IconSelectAll } from '@tabler/icons-react';
+import AssetSearch from './AssetSearch';
+import Image from 'next/image';
+import Typography from '@mui/material/Typography';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import emptyCart from 'public/images/products/empty-shopping-cart.svg';
+import { useDispatch } from '@/store/hooks';
+import { updateManyAssetsStatusByIdsThunk } from '@/features/assets/thunks';
 
 interface Props {
     onClick: (event: React.SyntheticEvent | Event) => void;
@@ -25,33 +26,147 @@ interface Props {
 
 const AssetList = ({ onClick, onChangeSearch, assets, isLoading = false }: Props) => {
     const lgUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('lg'));
+    const router = useRouter();
+    const dispatch = useDispatch();
+
+    const [isSelecting, setIsSelecting] = useState(false);
+    const selectedAssetsIds = useArray<string>([]);
+
+    const onSelectingChange = () => {
+        setIsSelecting((prev) => !prev);
+    };
+
+    const onCardClick = (id: string) => {
+        if (isSelecting) {
+            if (!selectedAssetsIds.state.includes(id)) {
+                selectedAssetsIds.push(id);
+                return;
+            }
+            selectedAssetsIds.removeByValue(id);
+            return;
+        }
+        router.push(`asset/${id}`);
+    };
+
+    const isAssetSelected = (id: string) => selectedAssetsIds.state.includes(id);
+
+    const getAssetStatus = (asset: AssetType) => {
+        if (asset?.consignArtwork?.status === 'blocked') {
+            return 'blocked';
+        }
+
+        if (asset?.consignArtwork?.status === 'active') {
+            return 'active';
+        }
+
+        return undefined;
+    };
+
+    const onSelectAll = () => {
+        setIsSelecting(true);
+        assets.forEach((asset) => {
+            if (!selectedAssetsIds.state.includes(asset._id)) {
+                selectedAssetsIds.push(asset._id);
+            }
+        });
+    };
+
+    const onClearSelectionConfirm = () => {
+        setIsSelecting(true);
+        selectedAssetsIds.clear();
+    };
+
+    const selectedCount = selectedAssetsIds.state.length;
+
+    const onActivateSelection = () => {
+        dispatch(updateManyAssetsStatusByIdsThunk({ ids: selectedAssetsIds.state, status: 'active' }));
+        selectedAssetsIds.clear();
+    };
+
+    const onBlockSelectionConsign = () => {
+        dispatch(updateManyAssetsStatusByIdsThunk({ ids: selectedAssetsIds.state, status: 'blocked' }));
+        selectedAssetsIds.clear();
+    };
 
     return (
         <Box>
             <Stack direction="row" justifyContent="space-between" pb={3}>
-                {lgUp ? (
-                    <Typography variant="h5">Assets</Typography>
-                ) : (
-                    <Fab onClick={onClick} color="primary" size="small">
-                        <IconMenu2 width="16" />
-                    </Fab>
-                )}
-                <Box>
-                    <AssetSearch onChange={(event) => onChangeSearch(event.target.value)} />
-                </Box>
+                <Stack direction="row" alignItems="center" gap={2}>
+                    {lgUp ? (
+                        <Typography variant="h5">Assets</Typography>
+                    ) : (
+                        <Fab onClick={onClick} color="primary" size="small">
+                            <IconMenu2 width="16" />
+                        </Fab>
+                    )}
+                </Stack>
             </Stack>
 
-            <Grid container spacing={3}>
+            <Typography>{isSelecting ? `${selectedCount} selected` : ''}</Typography>
+
+            <Stack direction="row" flexWrap="wrap" alignItems="center" justifyContent="space-between" gap={1} mb={4}>
+                <Stack direction="row" flexWrap="wrap" alignItems="center" gap={1}>
+                    <FormControlLabel
+                        control={<Checkbox size="small" checked={isSelecting} onChange={onSelectingChange} />}
+                        label="Select multiple"
+                    />
+                    <Button startIcon={<IconSelectAll />} onClick={onSelectAll}>
+                        Select all
+                    </Button>
+                    <ConfirmationDialog
+                        onConfirm={onClearSelectionConfirm}
+                        title="Clear selection"
+                        description="Are you sure you want to clear the selection? This action will clear all selected assets including the other pages."
+                    >
+                        {(open) => (
+                            <Button
+                                startIcon={<IconDeselect />}
+                                onClick={() => selectedAssetsIds.state.length > 0 && open()}
+                            >
+                                Clear selection
+                            </Button>
+                        )}
+                    </ConfirmationDialog>
+                    <ConfirmationDialog
+                        onConfirm={onActivateSelection}
+                        title="Activate selection"
+                        description="Are you sure you want activate the selected assets?"
+                    >
+                        {(open) => (
+                            <Button startIcon={<IconChecklist />} onClick={open}>
+                                Activate
+                            </Button>
+                        )}
+                    </ConfirmationDialog>
+                    <ConfirmationDialog
+                        onConfirm={onBlockSelectionConsign}
+                        title="Block Selection"
+                        description="Are you sure you want to block the selected assets?"
+                    >
+                        {(open) => (
+                            <Button startIcon={<IconLock />} onClick={open}>
+                                Block
+                            </Button>
+                        )}
+                    </ConfirmationDialog>
+                </Stack>
+                <AssetSearch onChange={(event) => onChangeSearch(event.target.value)} />
+            </Stack>
+
+            <Grid container spacing={8} justifyContent="center">
                 {assets.length > 0 ? (
                     <>
                         {assets.map((asset) => (
                             <Grid item display="flex" flexWrap={'wrap'} alignItems="stretch" key={asset._id}>
                                 <AssetCard
-                                    id={asset._id}
+                                    creator={asset.assetMetadata?.creators?.formData?.[0]?.name}
+                                    onClick={() => onCardClick(asset._id)}
                                     isLoading={isLoading}
                                     title={asset.assetMetadata?.context?.formData?.title ?? 'Untitled'}
                                     media={buildAssetSource(asset.formats?.preview?.path)}
-                                    isBlocked={asset?.consignArtwork?.status === 'blocked'}
+                                    status={getAssetStatus(asset)}
+                                    variant={isSelecting ? 'selectable' : 'default'}
+                                    isSelected={isAssetSelected(asset._id)}
                                     isConsigned={asset?.contractExplorer?.explorer.length > 0}
                                 />
                             </Grid>

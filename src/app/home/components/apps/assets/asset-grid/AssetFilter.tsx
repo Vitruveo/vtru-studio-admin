@@ -6,7 +6,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
-import { IconCircles, IconLock, IconChecklist } from '@tabler/icons-react';
+import { IconCircles, IconLock, IconChecklist, IconCloudCheck } from '@tabler/icons-react';
 import { AssetFiterType } from '../../../../types/apps/eCommerce';
 import { customizer } from '@/app/common/customizer';
 import { changeFilterThunk } from '@/features/assets/thunks';
@@ -19,28 +19,30 @@ const AssetFilter = () => {
 
     const filterCategory: AssetFiterType[] = [
         {
-            id: 1,
             filterbyTitle: 'Filter by Category',
         },
         {
-            id: 2,
             name: 'All',
             sort: 'all',
             icon: IconCircles,
             onClick: () => dispatch(changeFilterThunk('all')),
         },
         {
-            id: 3,
+            name: 'Active',
+            sort: 'active',
+            icon: IconChecklist,
+            onClick: () => dispatch(changeFilterThunk('active')),
+        },
+        {
             name: 'Blocked',
             sort: 'blocked',
             icon: IconLock,
             onClick: () => dispatch(changeFilterThunk('blocked')),
         },
         {
-            id: 4,
             name: 'Consigned',
             sort: 'consigned',
-            icon: IconChecklist,
+            icon: IconCloudCheck,
             onClick: () => dispatch(changeFilterThunk('consigned')),
         },
     ];
@@ -48,15 +50,15 @@ const AssetFilter = () => {
     return (
         <>
             <List>
-                {filterCategory.map((filter) => {
+                {filterCategory.map((filter, index) => {
                     if (filter.filterbyTitle) {
                         return (
-                            <Typography variant="subtitle2" fontWeight={600} px={3} mt={2} pb={2} key={filter.id}>
+                            <Typography variant="subtitle2" fontWeight={600} px={3} mt={2} pb={2} key={index}>
                                 {filter.filterbyTitle}
                             </Typography>
                         );
                     } else if (filter.devider) {
-                        return <Divider key={filter.id} />;
+                        return <Divider key={index} />;
                     }
 
                     return (
@@ -64,7 +66,7 @@ const AssetFilter = () => {
                             sx={{ mb: 1, mx: 3, borderRadius: br }}
                             selected={active === filter.sort}
                             onClick={filter.onClick}
-                            key={filter.id}
+                            key={index}
                         >
                             <ListItemIcon sx={{ minWidth: '30px' }}>
                                 <filter.icon stroke="1.5" size="19" />

@@ -24,7 +24,7 @@ const AssetsPage = () => {
 
     useEffect(() => {
         dispatch(getAssetsThunk());
-    }, []);
+    }, [dispatch]);
 
     const onPaginationChange: UsePaginationProps['onChange'] = (event, page) => {
         setCurrentPage(page);
@@ -42,6 +42,10 @@ const AssetsPage = () => {
         return assets.filter((asset) => {
             if (filter === 'blocked') {
                 return asset?.consignArtwork?.status === 'blocked';
+            }
+
+            if (filter == 'active') {
+                return asset?.consignArtwork?.status === 'active';
             }
 
             if (filter === 'consigned') {

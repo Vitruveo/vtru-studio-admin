@@ -1,27 +1,21 @@
 'use client';
 
-import { useState } from 'react';
 import { useFormik } from 'formik';
 import { useRouter } from 'next/navigation';
 
 import { useDispatch } from '@/store/hooks';
 import { userLoginThunk } from '@/features/user/thunks';
 import { codesVtruApi } from '@/services/codes';
-import CustomizedSnackbar, { CustomizedSnackbarState } from '@/app/common/toastr';
 
 import LoginView from './view';
 import { loginSchemaValidation } from './formSchema';
 import { AxiosError } from 'axios';
+import { useToastr } from '@/app/hooks/use-toastr';
 
 const LoginContainer = () => {
-    const [toastr, setToastr] = useState<CustomizedSnackbarState>({
-        type: 'success',
-        open: false,
-        message: '',
-    });
-
     const router = useRouter();
     const dispatch = useDispatch();
+    const toastr = useToastr();
 
     const { handleSubmit, handleChange, resetForm, values, errors } = useFormik({
         initialValues: {
@@ -40,12 +34,12 @@ const LoginContainer = () => {
                     router.push('/login/oneTimePassword');
                     return;
                 } else {
-                    setToastr({ open: true, type: 'error', message: 'Something went wrong! Try again later.' });
+                    toastr.display({ type: 'error', message: 'Something went wrong! Try again later.' });
                 }
             } catch (error) {
                 const axiosError = error as AxiosError;
                 if (axiosError.response?.status === 404) {
-                    setToastr({ open: true, type: 'error', message: 'User not found!' });
+                    toastr.display({ type: 'error', message: 'User not found!' });
                     return;
                 }
             }
@@ -55,12 +49,6 @@ const LoginContainer = () => {
     return (
         <>
             <LoginView values={values} errors={errors} handleSubmit={handleSubmit} handleChange={handleChange} />
-            <CustomizedSnackbar
-                type={toastr.type}
-                open={toastr.open}
-                message={toastr.message}
-                setOpentate={setToastr}
-            />
         </>
     );
 };

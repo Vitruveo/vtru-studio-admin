@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Drawer, useMediaQuery, Theme, Box, Button } from '@mui/material';
 import * as Yup from 'yup';
 import PageContainer from '../components/container/PageContainer';
@@ -11,8 +11,8 @@ import List from './components/list';
 import Search from './components/search';
 import Details from './components/details';
 import { addMultipleAllowList, findAllowList, deletAllowList, updateAllowList } from '@/features/allowList/requests';
-import CustomizedSnackbar, { CustomizedSnackbarState } from '@/app/common/toastr';
 import { AllowItem } from '@/features/allowList/types';
+import { useToastr } from '@/app/hooks/use-toastr';
 
 const drawerWidth = 240;
 const secdrawerWidth = 320;
@@ -20,11 +20,7 @@ const secdrawerWidth = 320;
 const emailSchema = Yup.string().email().required();
 
 export default function AllowList() {
-    const [toastr, setToastr] = useState<CustomizedSnackbarState>({
-        type: 'success',
-        open: false,
-        message: '',
-    });
+    const toastr = useToastr();
     const [emails, setEmails] = useState<AllowItem[]>([]);
     const lgUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('lg'));
     const mdUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
@@ -73,9 +69,8 @@ export default function AllowList() {
             await addMultipleAllowList(validEmails.map((email) => ({ email })));
             await handleGetAllowList();
         } else {
-            setToastr({
+            toastr.display({
                 type: 'info',
-                open: true,
                 message: 'emails/email already belong to the allowlist',
             });
         }
@@ -96,10 +91,9 @@ export default function AllowList() {
             await updateAllowList(params);
             await handleGetAllowList();
         } else {
-            setToastr({
+            toastr.display({
                 type: 'info',
-                open: true,
-                message: 'This email already exists in the list',
+                message: 'emails/email already belong to the allowlist',
             });
         }
     };
@@ -196,12 +190,6 @@ export default function AllowList() {
                     />
                 </Drawer>
             </AppCard>
-            <CustomizedSnackbar
-                type={toastr.type}
-                open={toastr.open}
-                message={toastr.message}
-                setOpentate={setToastr}
-            />
         </PageContainer>
     );
 }

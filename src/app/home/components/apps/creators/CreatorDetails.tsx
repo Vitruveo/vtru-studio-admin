@@ -14,7 +14,6 @@ import Typography from '@mui/material/Typography';
 import { IconPencil, IconStar, IconTrash } from '@tabler/icons-react';
 
 import emailIcon from 'public/images/breadcrumb/emailSv.png';
-import CustomizedSnackbar, { CustomizedSnackbarState } from '@/app/common/toastr';
 import { apiService } from '@/services/api';
 import { CreatorType } from '@/features/creator';
 import { websocketSelector } from '@/features/ws';
@@ -35,11 +34,6 @@ export default function CreatorDetails({ creatorId, onDeleteClick }: Props) {
     const [creator, setCreator] = useState<CreatorType | null>(null);
     const [isEditing, setIsEditing] = useState(false);
     const [starred, setStarred] = useState(false);
-    const [toastr, setToastr] = useState<CustomizedSnackbarState>({
-        type: 'success',
-        open: false,
-        message: '',
-    });
 
     useEffect(() => {
         if (creatorId) {
@@ -206,13 +200,6 @@ export default function CreatorDetails({ creatorId, onDeleteClick }: Props) {
                     </Box>
                 </Box>
             )}
-
-            <CustomizedSnackbar
-                type={toastr.type}
-                open={toastr.open}
-                message={toastr.message}
-                setOpentate={setToastr}
-            />
         </>
     );
 }

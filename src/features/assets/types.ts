@@ -5,6 +5,11 @@ export interface UpdateAssetStatusByIdParams {
     status: 'active' | 'blocked';
 }
 
+export interface UpdateManyAssetsStatusByIdsParams {
+    ids: string[];
+    status: 'active' | 'blocked';
+}
+
 export interface GetCreatorNameByAssetIdParams {
     id: string;
 }
@@ -22,7 +27,7 @@ export interface InitialState {
     byId: Record<string, AssetType>;
     allIds: string[];
     creator: string;
-    filter: 'all' | 'blocked' | 'consigned';
+    filter: ChangeFilterParams
 }
 
-export type ChangeFilterParams = 'all' | 'blocked' | 'consigned';
+export type ChangeFilterParams = 'all' | 'blocked' | 'consigned' | 'active';

@@ -1,17 +1,18 @@
 'use client';
-import React from 'react';
-import { useRouter } from 'next/navigation';
-import { IconLock, IconChecklist } from '@tabler/icons-react';
-import { Typography, CardContent, Skeleton, Box } from '@mui/material';
+import { IconLock, IconChecklist, IconFileUnknown } from '@tabler/icons-react';
+import { Typography, CardContent, Skeleton, Box, Checkbox, Stack } from '@mui/material';
 import BlankCard from '../../../shared/BlankCard';
 import { AssetPreview } from '../asset-preview/assetPreview';
 
 interface AssetCardProps {
-    id: string;
     media?: string;
     title: string;
     isLoading?: boolean;
-    isBlocked?: boolean;
+    variant?: 'default' | 'selectable';
+    onClick?: (event: React.SyntheticEvent | Event) => void;
+    isSelected?: boolean;
+    status?: 'active' | 'blocked';
+    creator?: string;
     isConsigned?: boolean;
 }
 
@@ -26,29 +27,72 @@ const AssetSkeleton = () => (
     ></Skeleton>
 );
 
-export const AssetCard = ({ id, media, title, isLoading, isBlocked, isConsigned }: AssetCardProps) => {
-    const router = useRouter();
-
+export const AssetCard = ({
+    media,
+    title,
+    isLoading,
+    status,
+    variant,
+    isSelected,
+    creator,
+    onClick,
+    isConsigned,
+}: AssetCardProps) => {
     if (isLoading) return <AssetSkeleton />;
 
     return (
-        <Box onClick={() => router.push(`asset/${id}`)} minWidth={250} maxWidth={250} sx={{ cursor: 'pointer' }}>
+        <Box onClick={onClick} minWidth={250} maxWidth={250} sx={{ cursor: 'pointer' }}>
             <BlankCard className="hoverCard">
                 <AssetPreview media={media} />
                 <CardContent>
-                    {isBlocked && (
+                    <Box mb={2}>{variant === 'selectable' && <Checkbox checked={isSelected} sx={{ p: 0 }} />}</Box>
+                    <Stack direction="row" justifyContent="space-between" alignItems="center">
                         <Box display="flex" alignItems="center" gap={1}>
-                            <IconLock style={{ marginBottom: 7 }} width={20} />
-                            <Typography variant="body2">Blocked</Typography>
+                            {status == 'blocked' && (
+                                <>
+                                    <IconLock style={{ marginBottom: 7 }} width={20} />
+                                    <Typography variant="body2">Blocked</Typography>
+                                </>
+                            )}
+                            {status == 'active' && (
+                                <>
+                                    <IconChecklist style={{ marginBottom: 7 }} width={20} />
+                                    <Typography variant="body2">Active</Typography>
+                                </>
+                            )}
+                            {!status && (
+                                <>
+                                    <IconFileUnknown style={{ marginBottom: 7 }} width={20} />
+                                    <Typography variant="body2">Unknown</Typography>
+                                </>
+                            )}
                         </Box>
-                    )}
-                    {isConsigned && (
-                        <Box display="flex" alignItems="center" gap={1}>
-                            <IconChecklist style={{ marginBottom: 7 }} width={20} />
-                            <Typography variant="body2">Consigned</Typography>
+                        <Stack>
+                            {isConsigned && (
+                                <Typography variant="body2" color="primary">
+                                    Consigned
+                                </Typography>
+                            )}
+                        </Stack>
+                    </Stack>
+                    <Stack gap={1}>
+                        <Box title={title}>
+                            <Typography overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap" variant="h6">
+                                {title}
+                            </Typography>
                         </Box>
-                    )}
-                    <Typography variant="h6">{title}</Typography>
+                        <Box title={creator ?? 'No creator'}>
+                            <Typography
+                                overflow="hidden"
+                                fontSize={14}
+                                textOverflow="ellipsis"
+                                whiteSpace="nowrap"
+                                variant="body2"
+                            >
+                                {creator ?? 'No creator'}
+                            </Typography>
+                        </Box>
+                    </Stack>
                 </CardContent>
             </BlankCard>
         </Box>

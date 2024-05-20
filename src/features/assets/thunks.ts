@@ -1,8 +1,13 @@
 import { fetchEventSource } from '@microsoft/fetch-event-source';
 
 import { ReduxThunkAction } from '@/store';
-import { getCreatorNameByAssetId, updateAssetStatusById } from './requests';
-import type { ChangeFilterParams, GetCreatorNameByAssetIdParams, UpdateAssetStatusByIdParams } from './types';
+import { getCreatorNameByAssetId, updateAssetStatusById, updateManyAssetsStatusByIds } from './requests';
+import type {
+    ChangeFilterParams,
+    GetCreatorNameByAssetIdParams,
+    UpdateAssetStatusByIdParams,
+    UpdateManyAssetsStatusByIdsParams,
+} from './types';
 import { APIResponse } from '../common/types';
 import { assetActionsCreators } from './slice';
 import { BASE_URL_API } from '@/constants/api';
@@ -46,7 +51,7 @@ export function getAssetsThunk(): ReduxThunkAction {
 export function updateAssetStatusByIdThunk(
     payload: UpdateAssetStatusByIdParams
 ): ReduxThunkAction<Promise<APIResponse>> {
-    return async function (dispatch) {
+    return function (dispatch) {
         dispatch(
             assetActionsCreators.setStatus({
                 id: payload.id,
@@ -58,8 +63,19 @@ export function updateAssetStatusByIdThunk(
     };
 }
 
-export function changeFilterThunk(payload: ChangeFilterParams): ReduxThunkAction {
+export function updateManyAssetsStatusByIdsThunk(payload: UpdateManyAssetsStatusByIdsParams): ReduxThunkAction {
     return async function (dispatch) {
+        try {
+            await updateManyAssetsStatusByIds(payload);
+            dispatch(assetActionsCreators.setManyStatus(payload))
+        } catch (e) {
+            console.error(e);
+        }
+    };
+}
+
+export function changeFilterThunk(payload: ChangeFilterParams): ReduxThunkAction {
+    return function (dispatch) {
         dispatch(assetActionsCreators.changeFilter(payload));
     };
 }

@@ -35,6 +35,7 @@ const BlankCard = ({ children, className, sx }: Props) => {
                 border: !customizer.isCardShadow ? `1px solid ${borderColor}` : 'none',
                 position: 'relative',
                 sx,
+                height: '100%',
             }}
             style={{ flex: 1 }}
             className={className}

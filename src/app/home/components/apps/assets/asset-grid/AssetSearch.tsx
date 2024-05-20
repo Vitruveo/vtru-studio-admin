@@ -18,7 +18,6 @@ export default function AssetSearch(props: Omit<TextFieldProps, 'variant'>) {
                     </InputAdornment>
                 ),
             }}
-            fullWidth
             {...props}
         />
     );

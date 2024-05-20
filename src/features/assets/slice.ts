@@ -1,6 +1,6 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
-import type { ChangeFilterParams, InitialState } from './types';
+import type { ChangeFilterParams, InitialState, UpdateManyAssetsStatusByIdsParams } from './types';
 import { AssetType } from '@/app/home/types/apps/asset';
 
 const initialState: InitialState = {
@@ -30,6 +30,11 @@ export const assetSlice = createSlice({
         },
         changeCreator: (state, action: PayloadAction<string>) => {
             state.creator = action.payload;
+        },
+        setManyStatus: (state, action: PayloadAction<UpdateManyAssetsStatusByIdsParams>) => {
+            action.payload.ids.forEach((id) => {
+                state.byId[id].consignArtwork.status = action.payload.status;
+            });
         },
     },
 });

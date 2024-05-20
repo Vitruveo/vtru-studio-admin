@@ -1,10 +1,8 @@
-import { useState } from 'react';
 import { useFormik } from 'formik';
 import { useRouter } from 'next/navigation';
 
 import { useDispatch, useSelector } from '@/store/hooks';
 import { userLoginThunk, userOTPConfirmThunk } from '@/features/user/thunks';
-import CustomizedSnackbar, { CustomizedSnackbarState } from '@/app/common/toastr';
 import { connectWebSocketThunk, loginWebSocketThunk } from '@/features/ws';
 import { codesVtruApi } from '@/services/codes';
 
@@ -12,16 +10,14 @@ import ConfirmView from './view';
 import { otpSchemaValidation } from './formSchema';
 import { AxiosError } from 'axios';
 import { useLoader } from '@/app/hooks/use-loader';
+import { useToastr } from '@/app/hooks/use-toastr';
 
 export default function ConfirmContainer() {
-    const [toastr, setToastr] = useState<CustomizedSnackbarState>({ type: 'success', open: false, message: '' });
     const loader = useLoader();
-
     const dispatch = useDispatch();
-
     const login = useSelector((state) => state.user.login);
-
     const router = useRouter();
+    const toastr = useToastr();
 
     const { handleSubmit, handleChange, values, errors, submitForm, validateForm, isSubmitting } = useFormik({
         initialValues: {
@@ -39,17 +35,17 @@ export default function ConfirmContainer() {
                 );
 
                 if (codesVtruApi.success.login.includes(resOTPConfirm.code)) {
-                    await dispatch(connectWebSocketThunk());
-                    await dispatch(loginWebSocketThunk());
-                    setToastr({ open: true, type: 'success', message: 'OTP confirmed!' });
+                    dispatch(connectWebSocketThunk());
+                    dispatch(loginWebSocketThunk());
+                    toastr.display({ type: 'success', message: 'OTP confirmed!' });
                     router.push('/home');
                     return;
                 } else {
-                    setToastr({ open: true, type: 'error', message: 'Login failed: invalid code' });
+                    toastr.display({ type: 'error', message: 'Login failed: invalid code' });
                 }
             } catch (error) {
                 const axiosError = error as AxiosError;
-                setToastr({ open: true, type: 'error', message: 'Login failed: invalid code' });
+                toastr.display({ type: 'error', message: 'Login failed: invalid code' });
             }
             loader.stop();
         },
@@ -68,8 +64,8 @@ export default function ConfirmContainer() {
     const handleResendCode = async () => {
         const resUserLogin = await dispatch(userLoginThunk({ email: login?.email }));
         if (codesVtruApi.success.login.includes(resUserLogin.code)) {
-            setToastr({ open: true, type: 'success', message: 'Code sent to your email!' });
-        } else setToastr({ open: true, type: 'error', message: 'Something went wrong! Try again later.' });
+            toastr.display({ type: 'success', message: 'Code sent to your email!' });
+        } else toastr.display({ type: 'error', message: 'Something went wrong! Try again later.' });
     };
 
     return (
@@ -81,12 +77,6 @@ export default function ConfirmContainer() {
                 handleChange={handleCustomChange}
                 handleSubmit={handleSubmit}
                 isLoading={loader.isLoading}
-            />
-            <CustomizedSnackbar
-                type={toastr.type}
-                open={toastr.open}
-                message={toastr.message}
-                setOpentate={setToastr}
             />
         </>
     );

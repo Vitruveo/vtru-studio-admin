@@ -9,6 +9,8 @@ import Providers from '@/store/Provider';
 import { NextAppDirEmotionCacheProvider } from '@/app/common/theme/EmotionCache';
 import { configTheme } from '@/app/common/theme/Theme';
 import '@/utils/i18n';
+import CustomizedSnackbar from './common/toastr';
+import { useToastr } from './hooks/use-toastr';
 
 const inter = Inter({
     subsets: ['latin'],
@@ -16,6 +18,8 @@ const inter = Inter({
 
 const MyApp = ({ children }: { children: React.ReactNode }) => {
     const theme = configTheme();
+    const toastr = useToastr();
+
     return (
         <>
             <NextAppDirEmotionCacheProvider options={{ key: 'modernize' }}>
@@ -85,6 +89,12 @@ const MyApp = ({ children }: { children: React.ReactNode }) => {
                         },
                     })}
                 >
+                    <CustomizedSnackbar
+                        open={toastr.data.open}
+                        type={toastr.data.type}
+                        message={toastr.data.message}
+                        setOpenState={toastr.setState}
+                    />
                     <CssBaseline />
                     {children}
                 </ThemeProvider>

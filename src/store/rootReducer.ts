@@ -7,6 +7,7 @@ import { websocketSlice } from '@/features/ws';
 import { assetSlice } from '@/features/assets/slice';
 import { creatorSlice } from '@/features/creator';
 import { waitingListSlice } from '@/features/waitingList';
+import { toastrSlice } from '@/features/toastr';
 
 interface RootState {
     asset: ReturnType<typeof assetSlice.reducer>;
@@ -16,6 +17,7 @@ interface RootState {
     websocket: ReturnType<typeof websocketSlice.reducer>;
     creator: ReturnType<typeof creatorSlice.reducer>;
     waitingList: ReturnType<typeof waitingListSlice.reducer>;
+    toastr: ReturnType<typeof toastrSlice.reducer>;
 }
 
 export const appReducer = combineReducers({
@@ -26,6 +28,7 @@ export const appReducer = combineReducers({
     websocket: websocketSlice.reducer,
     creator: creatorSlice.reducer,
     waitingList: waitingListSlice.reducer,
+    toastr: toastrSlice.reducer,
 });
 
 export const reducer: Reducer<RootState, AnyAction> = (state: RootState | undefined, action: AnyAction) => {

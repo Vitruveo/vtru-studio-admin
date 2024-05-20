@@ -27,7 +27,7 @@ export interface InitialState {
     byId: Record<string, AssetType>;
     allIds: string[];
     creator: string;
-    filter: 'all' | 'blocked' | 'consigned' | 'active';
+    filter: ChangeFilterParams;
 }
 
 export type ChangeFilterParams = 'all' | 'blocked' | 'consigned' | 'active';

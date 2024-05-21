@@ -20,6 +20,7 @@ import { AllowItem } from '@/features/allowList/types';
 import { addAllowList, findAllowList } from '@/features/allowList/requests';
 import { useDispatch, useSelector } from '@/store/hooks';
 import { getWaitingListThunk } from '@/features/waitingList/thunks';
+import { useToastr } from '@/app/hooks/use-toastr';
 
 const drawerWidth = 240;
 const secdrawerWidth = 320;
@@ -27,14 +28,8 @@ const secdrawerWidth = 320;
 const emailSchema = Yup.string().email().required();
 
 export default function WaitingList() {
-    const [toastr, setToastr] = useState<CustomizedSnackbarState>({
-        type: 'success',
-        open: false,
-        message: '',
-    });
     const dispatch = useDispatch();
     const waitingList = useSelector((state) => state.waitingList.all);
-
     const [allowList, setAllowList] = useState<AllowItem[]>([]);
     const lgUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('lg'));
     const mdUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
@@ -42,6 +37,7 @@ export default function WaitingList() {
     const [isLeftSidebarOpen, setLeftSidebarOpen] = useState(false);
     const [activeEmail, setActiveEmail] = useState<WaitingItem>();
     const [search, setSearch] = useState('');
+    const toastr = useToastr();
 
     useEffect(() => {
         handleGetAllowList();
@@ -83,16 +79,14 @@ export default function WaitingList() {
             await addMultipleWaitingList(validEmails.map((email) => ({ email })));
             getWaitingList();
             if (validAllowList.length) {
-                setToastr({
+                toastr.display({
                     type: 'info',
-                    open: true,
                     message: 'Only the emails not on the allow list have been added.',
                 });
             }
         } else {
-            setToastr({
+            toastr.display({
                 type: 'info',
-                open: true,
                 message: `emails/email already belong to the ${validAllowList.length ? 'allow list' : 'waiting list'}`,
             });
         }
@@ -121,9 +115,8 @@ export default function WaitingList() {
             await updateWaitingList(params);
             getWaitingList();
         } else {
-            setToastr({
+            toastr.display({
                 type: 'info',
-                open: true,
                 message: 'This email already exists in the Allow or Waiting list',
             });
         }
@@ -218,12 +211,6 @@ export default function WaitingList() {
                     />
                 </Drawer>
             </AppCard>
-            <CustomizedSnackbar
-                type={toastr.type}
-                open={toastr.open}
-                message={toastr.message}
-                setOpentate={setToastr}
-            />
         </PageContainer>
     );
 }

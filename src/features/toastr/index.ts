@@ -1,0 +1,1 @@
+export { toastrSlice } from './slice';

@@ -12,6 +12,8 @@ import { APIResponse } from '../common/types';
 import { assetActionsCreators } from './slice';
 import { BASE_URL_API } from '@/constants/api';
 import { AssetType } from '@/app/home/types/apps/asset';
+import { toastrActionsCreators } from '../toastr/slice';
+import { AxiosError } from 'axios';
 
 export function getAssetsThunk(): ReduxThunkAction {
     return async function (dispatch, getState) {
@@ -67,9 +69,33 @@ export function updateManyAssetsStatusByIdsThunk(payload: UpdateManyAssetsStatus
     return async function (dispatch) {
         try {
             await updateManyAssetsStatusByIds(payload);
-            dispatch(assetActionsCreators.setManyStatus(payload))
+            dispatch(assetActionsCreators.setManyStatus(payload));
+            dispatch(
+                toastrActionsCreators.displayToastr({
+                    type: 'success',
+                    message: 'Assets status updated successfully.',
+                })
+            );
         } catch (e) {
-            console.error(e);
+            const { response } = e as AxiosError;
+            switch (response?.status) {
+                case 401:
+                    dispatch(
+                        toastrActionsCreators.displayToastr({
+                            type: 'error',
+                            message: 'You are not authorized to perform this action.',
+                        })
+                    );
+                    break;
+                default:
+                    dispatch(
+                        toastrActionsCreators.displayToastr({
+                            type: 'error',
+                            message: 'An error occurred while updating the assets status.',
+                        })
+                    );
+                    break;
+            }
         }
     };
 }

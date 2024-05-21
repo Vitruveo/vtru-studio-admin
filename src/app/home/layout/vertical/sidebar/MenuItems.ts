@@ -1,4 +1,5 @@
 import { uniqueId } from 'lodash';
+import packageJSON from '@/../package.json';
 
 interface MenuitemsType {
     [x: string]: any;
@@ -79,6 +80,10 @@ const Menuitems: MenuitemsType[] = [
         icon: IconChartDonut3,
         href: '/home/contents/roles',
     },
+    {
+        subheader: 'v' + packageJSON.version,
+        navlabel: true
+    }
 ];
 
 export default Menuitems;

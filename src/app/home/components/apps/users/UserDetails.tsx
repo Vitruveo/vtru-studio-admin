@@ -77,8 +77,18 @@ export default function UserDetails({ roles, userId, onDeleteClick, handleUpdate
                         _id: user._id,
                         name: payload.name,
                         roles: payload.roles,
-                        email: user.login.email,
-                        framework: user.framework
+                        // email: user.login.email,
+                        emails: user.emails,
+                        login: {
+                            email: user.login.email,
+                        },
+                        profile: {
+                            avatar: user.profile.avatar,
+                            phone: user.profile.phone,
+                            language: user.profile.language,
+                            location: user.profile.location,
+                        },
+                        framework: user.framework,
                     })
                 );
 

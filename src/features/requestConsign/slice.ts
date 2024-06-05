@@ -32,7 +32,17 @@ export const requestConsignSlice = createSlice({
                 transaction: action.payload.transaction,
             };
         },
-        setLogs: (state, action: PayloadAction<{ id: string; logs: string[] }>) => {
+        setLogs: (
+            state,
+            action: PayloadAction<{
+                id: string;
+                logs: {
+                    status: string;
+                    message: string;
+                    when: string;
+                }[];
+            }>
+        ) => {
             state.byId[action.payload.id] = {
                 ...state.byId[action.payload.id],
                 logs: action.payload.logs,

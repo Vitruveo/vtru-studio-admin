@@ -1,5 +1,7 @@
 import { AxiosError } from 'axios';
 import { fetchEventSource } from '@microsoft/fetch-event-source';
+import cookie from 'cookiejs';
+
 import { ReduxThunkAction } from '@/store';
 import { requestConsignActionsCreators } from './slice';
 import { BASE_URL_API } from '@/constants/api';
@@ -45,6 +47,9 @@ export function requestConsignGetThunk(): ReduxThunkAction<Promise<void>> {
     return async function (dispatch, getState) {
         const state = getState();
         const token = state.auth.token;
+
+        const domain = window.location.hostname.replace('admin.', '');
+        cookie.set('token', state.auth.token, { path: '/', domain });
 
         const ctrl = new AbortController();
 

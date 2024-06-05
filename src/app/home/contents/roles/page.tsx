@@ -14,13 +14,10 @@ import RoleList from '@/app/home/components/apps/roles/RoleList';
 import RoleSearch from '@/app/home/components/apps/roles/RoleSearch';
 import RoleFilter from '@/app/home/components/apps/roles/RoleFilter';
 import AppCard from '@/app/home/components/shared/AppCard';
-import { RoleType } from '@/mock/roles';
-import { PermissionType } from '@/mock/permissions';
-import { useDispatch } from '@/store/hooks';
-import { roleDeleteThunk } from '@/features/role/thunks';
+import { useDispatch, useSelector } from '@/store/hooks';
+import { roleDeleteThunk, roleGetThunk } from '@/features/role/thunks';
 import RoleAdd from '../../components/apps/roles/RoleAdd';
 import { RoleDialogDelete } from '../../components/apps/roles/RoleDialogDelete';
-import { list } from '@/services/apiEventSource';
 
 const drawerWidth = 240;
 const secdrawerWidth = 320;
@@ -30,8 +27,8 @@ export default function Roles() {
     const mdUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
     const dispatch = useDispatch();
 
-    const [roles, setRoles] = useState<RoleType[]>([]);
-    const [permissions, setPermissions] = useState<PermissionType[]>([]);
+    const roles = useSelector((state) => state.role.allIds.map((id) => state.role.byId[id]));
+
     const [roleId, setRoleId] = useState('');
     const [search, setSearch] = useState('');
     const [category, setCategory] = useState('');
@@ -47,19 +44,7 @@ export default function Roles() {
     }, [roles]);
 
     useEffect(() => {
-        const fetchData = async () => {
-            await list<RoleType>({
-                path: 'roles',
-                callback: (role) => setRoles((prevState) => [...prevState, role]),
-            });
-
-            await list<PermissionType>({
-                path: 'permissions',
-                callback: (permission) => setPermissions((prevState) => [...prevState, permission]),
-            });
-        };
-
-        fetchData();
+        dispatch(roleGetThunk());
     }, []);
 
     const rolesFiltered = useMemo(() => {
@@ -79,13 +64,20 @@ export default function Roles() {
     }, [category, roles]);
 
     const categories = useMemo(() => {
-        return permissions.reduce((acc: string[], cur) => {
-            const [categoryName] = cur.key.split(':');
-            if (acc.includes(categoryName)) return acc;
+        return roles
+            .reduce((acc: string[], role) => {
+                role.permissions.forEach((permission) => {
+                    const [categoryName] = permission.split(':');
 
-            return [...acc, categoryName];
-        }, []);
-    }, [permissions]);
+                    if (!acc.includes(categoryName)) {
+                        acc.push(categoryName);
+                    }
+                });
+
+                return acc;
+            }, [])
+            .sort();
+    }, [roles]);
 
     const onDeleteClick = ({ id, name }: { id: string; name: string }) => {
         setIsOpenDialogDelete(true);
@@ -96,59 +88,10 @@ export default function Roles() {
         const { id } = roleDelete;
 
         dispatch(roleDeleteThunk({ _id: id }));
-        setRoles((prevState) => prevState.filter((item) => item._id !== id));
-        if (id === roleId) setRoleId('');
 
+        if (id === roleId) setRoleId('');
         setIsOpenDialogDelete(false);
     };
-
-    const handleAddNewRole = useCallback(
-        ({ id, name, description }: { id: string; name: string; description: string }) => {
-            setRoles((prevState) => [
-                {
-                    _id: id,
-                    name,
-                    description,
-                    permissions: [],
-                },
-                ...prevState,
-            ]);
-
-            setRoleId(id);
-        },
-        []
-    );
-
-    const handleUpdateRole = useCallback(
-        ({
-            id,
-            name,
-            description,
-            permissions: permissionsKeys,
-        }: {
-            id: string;
-            name: string;
-            description: string;
-            permissions: string[];
-        }) => {
-            setRoles((prevState) =>
-                prevState.map((item) => {
-                    if (item._id === id) {
-                        return {
-                            ...item,
-                            name,
-                            description,
-                            permissions: permissionsKeys,
-                        };
-                    }
-
-                    return item;
-                })
-            );
-        },
-        []
-    );
-
     return (
         <PageContainer title="Role" description="this is Role">
             <Breadcrumb title="Roles Application" subtitle="List Your Roles" />
@@ -167,7 +110,7 @@ export default function Roles() {
                     }}
                     variant={lgUp ? 'permanent' : 'temporary'}
                 >
-                    <RoleAdd handleAddNewRole={handleAddNewRole} />
+                    <RoleAdd />
                     <RoleFilter categories={categories} category={category} setCategory={setCategory} />
                 </Drawer>
 
@@ -232,12 +175,7 @@ export default function Roles() {
                             </Button>
                         </Box>
                     )}
-                    <RoleDetails
-                        roleId={roleId}
-                        permissions={permissions}
-                        onDeleteClick={onDeleteClick}
-                        handleUpdateRole={handleUpdateRole}
-                    />
+                    <RoleDetails roleId={roleId} onDeleteClick={onDeleteClick} />
                 </Drawer>
             </AppCard>
 

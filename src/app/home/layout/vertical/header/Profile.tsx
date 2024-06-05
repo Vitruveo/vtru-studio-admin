@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
 import Link from 'next/link';
 import { Box, Menu, Avatar, Typography, Divider, Button, IconButton } from '@mui/material';
 import * as dropdownData from './data';
@@ -7,13 +6,13 @@ import * as dropdownData from './data';
 import { IconMail } from '@tabler/icons-react';
 import { Stack } from '@mui/system';
 
-import { userSelector } from '@/features/user';
+import { useSelector } from '@/store/hooks';
 
 const Profile = () => {
-    const { name } = useSelector(userSelector(['name']));
     const {
+        name,
         login: { email },
-    } = useSelector(userSelector(['login']));
+    } = useSelector((state) => state.auth);
 
     const [anchorEl2, setAnchorEl2] = useState(null);
     const handleClick2 = (event: any) => {

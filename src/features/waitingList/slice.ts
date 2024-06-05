@@ -2,15 +2,23 @@ import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import type { InitialState, WaitingItem } from './types';
 
 const initialState: InitialState = {
-    all: [],
+    byId: {},
+    allIds: [],
+    status: '',
+    error: '',
 };
 
 export const waitingListSlice = createSlice({
     name: 'waitingList',
     initialState,
     reducers: {
-        setAll: (state, action: PayloadAction<WaitingItem[]>) => {
-            state.all = action.payload;
+        setWaitingList: (state, action: PayloadAction<WaitingItem>) => {
+            state.byId[action.payload._id] = action.payload;
+            state.allIds = Object.keys(state.byId);
+        },
+        resetWaitingList: (state) => {
+            state.byId = {};
+            state.allIds = [];
         },
     },
 });

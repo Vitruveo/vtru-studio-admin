@@ -1,50 +1,32 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
-import { userAddThunk, userLoginThunk, userOTPConfirmThunk, userDeleteThunk, userUpdateThunk } from './thunks';
-import { UserSliceState } from './types';
+import { userAddThunk, userDeleteThunk, userUpdateThunk } from './thunks';
+import { UserSliceState, User } from './types';
 
 const initialState: UserSliceState = {
-    _id: '',
-    token: '',
-    name: '',
-    login: {
-        email: '',
-    },
-    emails: [],
-    profile: {
-        avatar: '',
-        phone: '',
-        language: '',
-        location: '',
-    },
-    roles: [],
-    status: '',
+    byId: {},
+    allIds: [],
     error: '',
+    status: '',
 };
 
 export const userSlice = createSlice({
     name: 'user',
     initialState,
     reducers: {
-        logout: () => {
-            return initialState;
+        logout: (state) => {
+            state = initialState;
         },
-        login: (state, action) => {
-            state.status = `succeeded: ${action.type}`;
-            state.login.email = action.payload.email;
+        setUser: (state, action: PayloadAction<User>) => {
+            state.byId[action.payload._id] = action.payload;
+            state.allIds = Object.keys(state.byId);
         },
-        otpConfirm: (state, action) => {
-            state.status = `succeeded: ${action.type}`;
-            state.token = action.payload.data.token;
-            state._id = action.payload.data.user._id;
-            state.emails = action.payload.data.user.emails;
-        },
-        error: (state, action) => {
-            state.status = `failed: ${action.type}`;
-            state.error = action.payload;
+        resetUser: (state) => {
+            state.byId = {};
+            state.allIds = [];
         },
     },
 });
 
 export const userActionsCreators = userSlice.actions;
-export { userOTPConfirmThunk, userAddThunk, userLoginThunk, userDeleteThunk, userUpdateThunk };
+export { userAddThunk, userDeleteThunk, userUpdateThunk };

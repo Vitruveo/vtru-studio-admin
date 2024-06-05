@@ -2,7 +2,7 @@ import { useFormik } from 'formik';
 import { useRouter } from 'next/navigation';
 
 import { useDispatch, useSelector } from '@/store/hooks';
-import { userLoginThunk, userOTPConfirmThunk } from '@/features/user/thunks';
+import { userLoginThunk, userOTPConfirmThunk } from '@/features/auth/thunks';
 import { connectWebSocketThunk, loginWebSocketThunk } from '@/features/ws';
 import { codesVtruApi } from '@/services/codes';
 
@@ -15,7 +15,7 @@ import { useToastr } from '@/app/hooks/use-toastr';
 export default function ConfirmContainer() {
     const loader = useLoader();
     const dispatch = useDispatch();
-    const login = useSelector((state) => state.user.login);
+    const login = useSelector((state) => state.auth.login);
     const router = useRouter();
     const toastr = useToastr();
 

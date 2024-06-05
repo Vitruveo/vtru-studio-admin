@@ -25,7 +25,7 @@ const buildSearchQuery = (search?: string) => {
 
 export const list = async <T = undefined>({ callback, path, filter }: FetchEventSourceParams<T>) => {
     const state = store.getState();
-    const token = state.user.token;
+    const token = state.auth.token;
     const searchQuery = buildSearchQuery(filter?.query);
 
     const url = `${BASE_URL_API}/${path}?${searchQuery}`;

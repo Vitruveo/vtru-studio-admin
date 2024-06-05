@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import { fetchEventSource } from '@microsoft/fetch-event-source';
 
 import { ReduxThunkAction } from '@/store';
@@ -13,14 +14,11 @@ import { assetActionsCreators } from './slice';
 import { BASE_URL_API } from '@/constants/api';
 import { AssetType } from '@/app/home/types/apps/asset';
 import { toastrActionsCreators } from '../toastr/slice';
-import { AxiosError } from 'axios';
 
-export function getAssetsThunk(): ReduxThunkAction {
+export function getAssetsThunk({ ctrl }: { ctrl: AbortController }): ReduxThunkAction {
     return async function (dispatch, getState) {
         const state = getState();
-        const token = state.user.token;
-
-        const ctrl = new AbortController();
+        const token = state.auth.token;
 
         const url = `${BASE_URL_API}/assets`;
         const headers = {
@@ -28,7 +26,20 @@ export function getAssetsThunk(): ReduxThunkAction {
             Authorization: `Bearer ${token}`,
         };
 
-        return fetchEventSource(url, {
+        const response = await fetch(url, { method: 'HEAD', headers });
+
+        if (response.status === 401) {
+            dispatch(
+                toastrActionsCreators.displayToastr({
+                    type: 'error',
+                    message: 'You are not authorized to view this page.',
+                })
+            );
+
+            return;
+        }
+
+        fetchEventSource(url, {
             method: 'GET',
             headers,
             onmessage(event) {
@@ -39,13 +50,13 @@ export function getAssetsThunk(): ReduxThunkAction {
                     dispatch(assetActionsCreators.setById({ id: parsed._id, asset: parsed }));
                 }
             },
-            signal: ctrl.signal,
             onclose() {
                 ctrl.abort();
             },
             onerror() {
-                ctrl.abort();
+                throw new Error('Error fetching event source');
             },
+            signal: ctrl.signal,
         });
     };
 }

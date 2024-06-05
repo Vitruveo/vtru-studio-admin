@@ -1,0 +1,27 @@
+import axios from 'axios';
+import { apiService } from '@/services/api';
+import {} from './types';
+import { APIResponse } from '../common/types';
+import { BASE_URL_BATCH } from '@/constants/api';
+
+export async function updateStatusRequestConsign({
+    id,
+    status,
+}: {
+    id: string;
+    status: 'approved' | 'rejected' | 'running' | 'error';
+}): Promise<APIResponse> {
+    const response = await apiService.patch(`/requestConsign/${id}`, {
+        status,
+    });
+
+    return response;
+}
+
+export async function consign(id: string) {
+    return axios.post(`${BASE_URL_BATCH}/consign/${id}`);
+}
+
+export async function eventsByTransaction(transaction: string) {
+    return axios.get(`${BASE_URL_BATCH}/events/${transaction}`);
+}

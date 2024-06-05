@@ -15,14 +15,20 @@ import { getWaitingListThunk } from '@/features/waitingList/thunks';
 export default function Dashboard() {
     const dispatch = useDispatch();
     const activeAssetsCount = useSelector((state) => state.asset.allIds.length);
-    const creatorsCount = useSelector((state) => state.creator.all.length);
-    const waitingListCount = useSelector(state => state.waitingList.all.length);
+    const creatorsCount = useSelector((state) => state.creator.allIds.length);
+    const waitingListCount = useSelector((state) => state.waitingList.allIds.length);
 
     useEffect(() => {
+        const ctrl = new AbortController();
+
         dispatch(getCreatorsThunk());
-        dispatch(getAssetsThunk())
-        dispatch(getWaitingListThunk())
-    }, [dispatch]);
+        dispatch(getAssetsThunk({ ctrl }));
+        dispatch(getWaitingListThunk());
+
+        return () => {
+            ctrl.abort();
+        };
+    }, []);
 
     const cards: HomeCardProps[] = [
         {

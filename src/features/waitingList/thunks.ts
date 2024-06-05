@@ -1,26 +1,66 @@
+import { AxiosError } from 'axios';
+import { fetchEventSource } from '@microsoft/fetch-event-source';
 import { ReduxThunkAction } from '@/store';
-import { findWaitingList } from './requests';
 import { waitingListActionsCreators } from './slice';
-import { WaitingItem } from './types';
+import { BASE_URL_API } from '@/constants/api';
+import { toastrActionsCreators } from '../toastr/slice';
+import { addMultipleWaitingList } from './requests';
 
-export function getWaitingListThunk(): ReduxThunkAction {
+export function addMultipleWaitingListThunk(data: any): ReduxThunkAction<Promise<void>> {
     return async function (dispatch, getState) {
         try {
-            const res = await findWaitingList();
-            if (res.data) {
-                const sorted = res.data.sort((a: WaitingItem, b: WaitingItem) => {
-                    if (new Date(a.framework.createdAt).getTime() > new Date(b.framework.createdAt).getTime()) {
-                        return -1;
-                    }
-                    if (new Date(a.framework.createdAt).getTime() < new Date(b.framework.createdAt).getTime()) {
-                        return 1;
-                    }
-                    return 0;
-                });
-                dispatch(waitingListActionsCreators.setAll(sorted));
-            }
+            await addMultipleWaitingList(data);
         } catch (error) {
-            // TODO: IMPLEMENTAR TRATAMENTO DE ERRO
+            if (error instanceof AxiosError && error.response?.status === 401) {
+                dispatch(
+                    toastrActionsCreators.displayToastr({
+                        message: 'Unauthorized',
+                        type: 'error',
+                    })
+                );
+            }
         }
+    };
+}
+
+export function getWaitingListThunk(): ReduxThunkAction<Promise<void>> {
+    return async function (dispatch, getState) {
+        const state = getState();
+        const token = state.auth.token;
+
+        const ctrl = new AbortController();
+
+        const url = `${BASE_URL_API}/waitingList`;
+        const headers = {
+            Accept: 'text/event-stream',
+            Authorization: `Bearer ${token}`,
+        };
+
+        const response = await fetch(url, { method: 'HEAD', headers });
+
+        if (response.status === 401) {
+            dispatch(
+                toastrActionsCreators.displayToastr({
+                    type: 'error',
+                    message: 'You are not authorized to view this page.',
+                })
+            );
+
+            dispatch(waitingListActionsCreators.resetWaitingList());
+
+            return;
+        }
+
+        fetchEventSource(url, {
+            method: 'GET',
+            headers,
+            onmessage(message) {
+                dispatch(waitingListActionsCreators.setWaitingList(JSON.parse(message.data)));
+            },
+            onerror() {
+                throw new Error('Error fetching event source');
+            },
+            signal: ctrl.signal,
+        });
     };
 }

@@ -116,9 +116,22 @@ export function eventTransactionThunk({ requestId }: { requestId: string }): Red
         if (!transaction) return Promise.resolve();
 
         return eventsByTransaction(transaction).then((response) => {
+            if (!response.data?.data?.history || !response.data?.data?.current) {
+                dispatch(
+                    toastrActionsCreators.displayToastr({
+                        type: 'error',
+                        message: 'Error fetching transaction events',
+                    })
+                );
+
+                return;
+            }
+
             const logs = response.data.data.history || [];
 
-            logs.push(response.data.data.current);
+            if (!logs.some((item: { status: string }) => item.status === response.data.data.current.status)) {
+                logs.push(response.data.data.current);
+            }
 
             dispatch(
                 requestConsignActionsCreators.setLogs({

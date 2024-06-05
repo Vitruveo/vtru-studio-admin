@@ -134,13 +134,19 @@ export function eventTransactionThunk({ requestId }: { requestId: string }): Red
                         status: 'error',
                     })
                 );
-                updateStatusRequestConsign({ id: requestId, status: 'error' }).catch(() => {
+                updateStatusRequestConsign({ id: requestId, status: 'error', logs }).catch(() => {
                     // do nothing
                 });
             }
 
             if (response.data.data.current.status === CONSIGN_STATUS_MAP.finished) {
-                updateStatusRequestConsign({ id: requestId, status: 'approved' }).catch(() => {
+                dispatch(
+                    requestConsignActionsCreators.setRequestConsignStatus({
+                        id: requestId,
+                        status: 'approved',
+                    })
+                );
+                updateStatusRequestConsign({ id: requestId, status: 'approved', logs }).catch(() => {
                     // do nothing
                 });
             }

@@ -7,12 +7,15 @@ import { BASE_URL_BATCH } from '@/constants/api';
 export async function updateStatusRequestConsign({
     id,
     status,
+    logs,
 }: {
     id: string;
     status: 'approved' | 'rejected' | 'running' | 'error';
+    logs?: any[];
 }): Promise<APIResponse> {
     const response = await apiService.patch(`/requestConsign/${id}`, {
         status,
+        ...(logs && { logs }),
     });
 
     return response;

@@ -10,13 +10,14 @@ import AppCard from '@/app/home/components/shared/AppCard';
 import { Pagination } from '@mui/material';
 import { UsePaginationProps } from '@mui/lab';
 import { useDispatch, useSelector } from '@/store/hooks';
-import { getAssetsThunk } from '@/features/assets/thunks';
+import { getAssetsThunk, setCurrentPageThunk } from '@/features/assets/thunks';
 
 const AssetsPage = () => {
     const dispatch = useDispatch();
+    const currentP = useSelector((state) => state.asset.currentPage);
 
     const [isMobileSidebarOpen, setMobileSidebarOpen] = useState(true);
-    const [currentPage, setCurrentPage] = useState(1);
+    const [currentPage, setCurrentPage] = useState(currentP || 1);
     const [searchText, setSearchText] = useState('');
 
     const assets = useSelector((state) => state.asset.allIds.map((id) => state.asset.byId[id]));
@@ -30,10 +31,11 @@ const AssetsPage = () => {
         return () => {
             ctrl.abort();
         };
-    }, []);
+    }, [dispatch]);
 
-    const onPaginationChange: UsePaginationProps['onChange'] = (event, page) => {
+    const onPaginationChange: UsePaginationProps['onChange'] = (_event, page) => {
         setCurrentPage(page);
+        dispatch(setCurrentPageThunk(page));
     };
 
     const onFabClick = () => {

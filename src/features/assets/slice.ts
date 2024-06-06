@@ -8,6 +8,7 @@ const initialState: InitialState = {
     allIds: [],
     creator: '',
     filter: 'all',
+    currentPage: 1,
 };
 
 export const assetSlice = createSlice({
@@ -39,6 +40,9 @@ export const assetSlice = createSlice({
         resetAsset: (state) => {
             state.byId = {};
             state.allIds = [];
+        },
+        setCurrentPage: (state, action: PayloadAction<number>) => {
+            state.currentPage = action.payload;
         },
     },
 });

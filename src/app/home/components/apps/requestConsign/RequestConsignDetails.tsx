@@ -56,19 +56,6 @@ export default function RequestConsignDetails({
         <>
             <Box p={3} py={2} display={'flex'} alignItems="center">
                 <Typography variant="h5">Request Consign Details</Typography>
-
-                <Stack gap={0} direction="row" ml={'auto'}>
-                    <Tooltip title="Edit">
-                        <IconButton onClick={() => {}}>
-                            <IconPencil size="18" stroke={1.3} />
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Delete">
-                        <IconButton>
-                            <IconTrash size="18" stroke={1.3} />
-                        </IconButton>
-                    </Tooltip>
-                </Stack>
             </Box>
             <Divider />
             <Box p={2}>

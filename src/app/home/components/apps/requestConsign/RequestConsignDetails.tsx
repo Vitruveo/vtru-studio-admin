@@ -80,10 +80,12 @@ export default function RequestConsignDetails({
                         <Button variant="contained" onClick={handleOpenStore}>
                             Open in New Window
                         </Button>
-                        <IconButton onClick={handleOpen}>
-                            <IconNotes size="18" stroke={1.3} style={{ marginRight: 5 }} />
-                            {statusRequestConsign === 'running' && <CircularProgress size={20} />}
-                        </IconButton>
+                        <Tooltip title="Logs">
+                            <IconButton onClick={handleOpen}>
+                                <IconNotes size="18" stroke={1.3} style={{ marginRight: 5 }} />
+                                {statusRequestConsign === 'running' && <CircularProgress size={20} />}
+                            </IconButton>
+                        </Tooltip>
                     </Box>
                     <Button variant="contained" color="error" onClick={handleReject}>
                         Reject

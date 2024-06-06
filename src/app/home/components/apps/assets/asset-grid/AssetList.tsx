@@ -179,7 +179,7 @@ const AssetList = ({ onClick, onChangeSearch, assets, isLoading = false }: Props
                                         status={assetsStatus}
                                         variant={isSelecting && assetsStatus != undefined ? 'selectable' : 'default'}
                                         isSelected={isAssetSelected(asset._id)}
-                                        isConsigned={asset?.contractExplorer?.explorer.length > 0}
+                                        isConsigned={asset?.contractExplorer?.explorer?.length > 0}
                                     />
                                 </Grid>
                             );

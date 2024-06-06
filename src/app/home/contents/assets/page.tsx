@@ -14,10 +14,10 @@ import { getAssetsThunk, setCurrentPageThunk } from '@/features/assets/thunks';
 
 const AssetsPage = () => {
     const dispatch = useDispatch();
-    const currentP = useSelector((state) => state.asset.currentPage);
+    const cachePage = useSelector((state) => state.asset.currentPage);
 
     const [isMobileSidebarOpen, setMobileSidebarOpen] = useState(true);
-    const [currentPage, setCurrentPage] = useState(currentP || 1);
+    const [currentPage, setCurrentPage] = useState(cachePage || 1);
     const [searchText, setSearchText] = useState('');
 
     const assets = useSelector((state) => state.asset.allIds.map((id) => state.asset.byId[id]));

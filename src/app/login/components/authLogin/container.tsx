@@ -4,7 +4,7 @@ import { useFormik } from 'formik';
 import { useRouter } from 'next/navigation';
 
 import { useDispatch } from '@/store/hooks';
-import { userLoginThunk } from '@/features/user/thunks';
+import { userLoginThunk } from '@/features/auth/thunks';
 import { codesVtruApi } from '@/services/codes';
 
 import LoginView from './view';

@@ -36,7 +36,7 @@ export default function CreatorListItem({
     const { creatorsOnline } = useSelector(websocketSelector(['creatorsOnline']));
 
     return (
-        <ListItemButton sx={{ mb: 1 }} selected={active}>
+        <ListItemButton sx={{ mb: 1 }} selected={active} onClick={onCreatorClick}>
             <ListItemAvatar>
                 <Box position="relative">
                     <Avatar alt="" src="" sx={{ fontSize: 14 }}>
@@ -56,7 +56,7 @@ export default function CreatorListItem({
             </ListItemAvatar>
             <ListItemText>
                 <Stack direction="row" gap="10px" alignItems="center">
-                    <Box mr="auto" onClick={onCreatorClick}>
+                    <Box mr="auto">
                         <Typography variant="subtitle1" noWrap fontWeight={600} sx={{ maxWidth: '150px' }}>
                             {name || (emails?.length > 0 && emails[0].email) || ''}
                         </Typography>

@@ -2,21 +2,16 @@ import List from '@mui/material/List';
 
 import Scrollbar from '../../custom-scroll/Scrollbar';
 import RoleListItem from './RoleListItem';
-import { RoleType } from '@/mock/roles';
+import { Role } from '@/features/role/types';
 
 type Props = {
     roleId: string;
-    data: RoleType[];
+    data: Role[];
     onRoleClick(params: { id: string }): void;
     onDeleteClick(params: { id: string; name: string }): void;
 };
 
-export default function RoleList({
-    roleId,
-    data,
-    onRoleClick,
-    onDeleteClick,
-}: Props) {
+export default function RoleList({ roleId, data, onRoleClick, onDeleteClick }: Props) {
     return (
         <Scrollbar
             sx={{
@@ -31,12 +26,9 @@ export default function RoleList({
                     <RoleListItem
                         key={role._id}
                         active={role._id === roleId}
-                        image=""
                         {...role}
                         onRoleClick={() => onRoleClick({ id: role._id })}
-                        onDeleteClick={() =>
-                            onDeleteClick({ id: role._id, name: role.name })
-                        }
+                        onDeleteClick={() => onDeleteClick({ id: role._id, name: role.name })}
                         onStarredClick={() => {}}
                     />
                 ))}

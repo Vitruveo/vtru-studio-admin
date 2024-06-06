@@ -16,7 +16,7 @@ export function connectWebSocketThunk(): ReduxThunkAction {
 export function loginWebSocketThunk(): ReduxThunkAction {
     return async function (dispatch, getState) {
         const socket = getState().websocket.connection!;
-        const user = getState().user;
+        const user = getState().auth;
 
         socket.emit('login', {
             id: user._id,

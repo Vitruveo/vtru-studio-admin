@@ -43,6 +43,8 @@ export default function UserAdd({ handleAddNewUser }: Props) {
                     login: { email: payload.email },
                 })
             );
+            if (!response) return;
+
             handleAddNewUser({
                 id: response.data?.insertedId || '',
                 name: payload.name,

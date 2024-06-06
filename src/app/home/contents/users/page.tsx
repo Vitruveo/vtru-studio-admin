@@ -14,15 +14,14 @@ import UserList from '@/app/home/components/apps/users/UserList';
 import UserSearch from '@/app/home/components/apps/users/UserSearch';
 import UserFilter from '@/app/home/components/apps/users/UserFilter';
 import AppCard from '@/app/home/components/shared/AppCard';
-import { UserType } from '@/mock/users';
-import { useDispatch } from '@/store/hooks';
-import { RoleType } from '@/mock/roles';
-import { list } from '@/services/apiEventSource';
+import { useDispatch, useSelector } from '@/store/hooks';
 import { userDeleteThunk } from '@/features/user/slice';
 
 import UserAdd from '../../components/apps/users/UserAdd';
 
 import { UserDialogDelete } from '../../components/apps/users/UserDialogDelete';
+import { userAddThunk, userGetThunk, userUpdateThunk } from '@/features/user/thunks';
+import { roleGetThunk } from '@/features/role/thunks';
 
 const drawerWidth = 240;
 const secdrawerWidth = 320;
@@ -35,8 +34,8 @@ export default function Users() {
     const lgUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('lg'));
     const mdUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
 
-    const [users, setUsers] = useState<Omit<UserType, 'roles'>[]>([]);
-    const [roles, setRoles] = useState<RoleType[]>([]);
+    const users = useSelector((state) => state.user.allIds.map((id) => state.user.byId[id]));
+    const usersById = useSelector((state) => state.user.byId);
 
     const [search, setSearch] = useState('');
     const [userId, setUserId] = useState('');
@@ -44,19 +43,8 @@ export default function Users() {
     const [userDelete, setUserDelete] = useState({ email: '', id: '' });
 
     useEffect(() => {
-        const fetchData = async () => {
-            await list<UserType>({
-                path: 'users',
-                callback: (user) => setUsers((prevState) => [...prevState, user]),
-            });
-
-            await list<RoleType>({
-                path: 'roles',
-                callback: (role) => setRoles((prevState) => [...prevState, role]),
-            });
-        };
-
-        fetchData();
+        dispatch(userGetThunk());
+        dispatch(roleGetThunk());
     }, []);
 
     const usersFiltered = useMemo(() => {
@@ -78,38 +66,18 @@ export default function Users() {
         const { id } = userDelete;
 
         dispatch(userDeleteThunk({ _id: id }));
-        setUsers((prevState) => prevState.filter((item) => item._id !== id));
         if (id === userId) setUserId('');
 
         setIsOpenDialogDelete(false);
     };
 
     const handleAddNewUser = useCallback(({ id, name, email }: { id: string; name: string; email: string }) => {
-        setUsers((prevState) => [
-            {
-                _id: id,
-                name,
-                login: { email },
-            },
-            ...prevState,
-        ]);
-
+        dispatch(userAddThunk({ name, login: { email } }));
         setUserId(id);
     }, []);
 
     const handleUpdateUser = useCallback(({ id, name }: { id: string; name: string }) => {
-        setUsers((prevState) =>
-            prevState.map((item) => {
-                if (item._id === id) {
-                    return {
-                        ...item,
-                        name,
-                    };
-                }
-
-                return item;
-            })
-        );
+        dispatch(userUpdateThunk({ ...usersById[id], _id: id, name }));
     }, []);
 
     return (
@@ -178,7 +146,7 @@ export default function Users() {
                         </Box>
                     )}
                     <UserDetails
-                        roles={roles}
+                        roles={[]}
                         userId={userId}
                         onDeleteClick={onDeleteClick}
                         handleUpdateUser={handleUpdateUser}

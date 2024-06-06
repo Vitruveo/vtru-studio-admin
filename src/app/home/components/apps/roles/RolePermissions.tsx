@@ -1,27 +1,29 @@
-import {
-    TableContainer,
-    Table,
-    TableRow,
-    TableCell,
-    TableBody,
-    Typography,
-    TableHead,
-    Switch,
-} from '@mui/material';
+import { TableContainer, Table, TableRow, TableCell, TableBody, Typography, TableHead, Switch } from '@mui/material';
 import BlankCard from '@/app/home/components/shared/BlankCard';
-import { PermissionType } from '@/mock/permissions';
+
+const permissions = [
+    'asset:admin',
+    'asset:reader',
+    'creator:admin',
+    'creator:reader',
+    'role:admin',
+    'role:reader',
+    'user:admin',
+    'user:reader',
+    'allow-list:admin',
+    'allow-list:reader',
+    'waiting-list:admin',
+    'waiting-list:reader',
+    'moderator:admin',
+    'moderator:reader',
+];
 
 interface Props {
-    permissions: PermissionType[];
     activePermissions: string[];
     handleChangePermission(permissionKey: string): void;
 }
 
-export default function RolePermissionsTable({
-    permissions,
-    activePermissions,
-    handleChangePermission,
-}: Props) {
+export default function RolePermissionsTable({ activePermissions, handleChangePermission }: Props) {
     return (
         <BlankCard>
             <TableContainer>
@@ -34,29 +36,17 @@ export default function RolePermissionsTable({
                     <TableHead>
                         <TableRow>
                             <TableCell>
-                                <Typography
-                                    display="flex"
-                                    justifyContent="center"
-                                    variant="h6"
-                                >
+                                <Typography display="flex" justifyContent="center" variant="h6">
                                     Category
                                 </Typography>
                             </TableCell>
                             <TableCell>
-                                <Typography
-                                    display="flex"
-                                    justifyContent="center"
-                                    variant="h6"
-                                >
+                                <Typography display="flex" justifyContent="center" variant="h6">
                                     Permission
                                 </Typography>
                             </TableCell>
                             <TableCell>
-                                <Typography
-                                    display="flex"
-                                    justifyContent="center"
-                                    variant="h6"
-                                >
+                                <Typography display="flex" justifyContent="center" variant="h6">
                                     Status
                                 </Typography>
                             </TableCell>
@@ -64,10 +54,10 @@ export default function RolePermissionsTable({
                     </TableHead>
                     <TableBody>
                         {permissions.map((permission) => {
-                            const [category, name] = permission.key.split(':');
+                            const [category, name] = permission.split(':');
 
                             return (
-                                <TableRow key={permission._id}>
+                                <TableRow key={permission}>
                                     <TableCell>
                                         <Typography
                                             display="flex"
@@ -101,14 +91,8 @@ export default function RolePermissionsTable({
                                             fontWeight={400}
                                         >
                                             <Switch
-                                                checked={activePermissions.includes(
-                                                    permission.key
-                                                )}
-                                                onChange={() =>
-                                                    handleChangePermission(
-                                                        permission.key
-                                                    )
-                                                }
+                                                checked={activePermissions.includes(permission)}
+                                                onChange={() => handleChangePermission(permission)}
                                             />
                                         </Typography>
                                     </TableCell>

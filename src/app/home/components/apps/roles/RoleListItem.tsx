@@ -7,51 +7,19 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import { useTheme } from '@mui/material/styles';
 import { IconStar, IconTrash } from '@tabler/icons-react';
-import { RoleType } from '@/mock/roles';
+import { Role } from '@/features/role/types';
 
-interface Props extends RoleType {
+interface Props extends Role {
     onRoleClick: (event: React.MouseEvent<HTMLElement>) => void;
     onStarredClick: React.MouseEventHandler<SVGElement>;
     onDeleteClick: React.MouseEventHandler<SVGElement>;
-    image: string;
     active: any;
 }
 
-export default function RoleListItem({
-    onRoleClick,
-    onStarredClick,
-    onDeleteClick,
-    name,
-    description,
-    image,
-    active,
-}: Props) {
-    const customizer = {
-        activeDir: 'ltr',
-        activeMode: 'light', // This can be light or dark
-        activeTheme: 'BLUE_THEME', // BLUE_THEME, GREEN_THEME, BLACK_THEME, PURPLE_THEME, ORANGE_THEME
-        SidebarWidth: 270,
-        MiniSidebarWidth: 87,
-        TopbarHeight: 70,
-        isLayout: 'full', // This can be full or boxed
-        isCollapse: false, // to make sidebar Mini by default
-        isSidebarHover: false,
-        isMobileSidebar: false,
-        isHorizontal: false,
-        isLanguage: 'en',
-        isCardShadow: true,
-        borderRadius: 7,
-    };
-    const br = `${customizer.borderRadius}px`;
-
-    const theme = useTheme();
-
-    const warningColor = theme.palette.warning.main;
-
+export default function RoleListItem({ onRoleClick, onStarredClick, onDeleteClick, name, description, active }: Props) {
     return (
-        <ListItemButton sx={{ mb: 1 }} selected={active}>
+        <ListItemButton sx={{ mb: 1 }} selected={active} onClick={onRoleClick}>
             <ListItemAvatar>
                 <Avatar alt="" src="" sx={{ fontSize: 14 }}>
                     {name.slice(0, 2).toUpperCase()}
@@ -60,19 +28,10 @@ export default function RoleListItem({
             <ListItemText>
                 <Stack direction="row" gap="10px" alignItems="center">
                     <Box mr="auto" onClick={onRoleClick}>
-                        <Typography
-                            variant="subtitle1"
-                            noWrap
-                            fontWeight={600}
-                            sx={{ maxWidth: '150px' }}
-                        >
+                        <Typography variant="subtitle1" noWrap fontWeight={600} sx={{ maxWidth: '150px' }}>
                             {name}
                         </Typography>
-                        <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            noWrap
-                        >
+                        <Typography variant="body2" color="text.secondary" noWrap>
                             {description}
                         </Typography>
                     </Box>

@@ -14,7 +14,7 @@ const api = axios.create({
 api.interceptors.request.use(
     (config) => {
         const state = store.getState();
-        const token = state.user.token;
+        const token = state.auth.token;
 
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
@@ -49,6 +49,15 @@ export const apiService = {
     put: async <T = unknown, E = any>(url: string, data: any): Promise<APIResponse<T, E>> => {
         try {
             const response: AxiosResponse = await api.put(url, data);
+            return response.data;
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
+    },
+    patch: async <T = unknown, E = any>(url: string, data: any): Promise<APIResponse<T, E>> => {
+        try {
+            const response: AxiosResponse = await api.patch(url, data);
             return response.data;
         } catch (error) {
             console.error(error);

@@ -16,5 +16,8 @@ export interface WaitingItem {
 export type GetListApiRes = APIResponse<WaitingItem[]>;
 
 export interface InitialState {
-    all: WaitingItem[];
+    byId: { [key: string]: WaitingItem };
+    allIds: string[];
+    status: '' | 'loading' | 'succeeded' | 'failed';
+    error: string;
 }

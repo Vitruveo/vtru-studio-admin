@@ -4,24 +4,35 @@ interface Email {
     email: string;
     checkedAt: Date | null;
 }
-interface User {
+
+interface Login {
+    email: string;
+}
+
+interface Profile {
+    avatar: string | null;
+    phone: string | null;
+    language: string | null;
+    location: string | null;
+}
+export interface User {
     _id: string;
     name: string;
     emails: Email[];
-    login: {
-        email: string;
+    login: Login;
+    profile: Profile;
+    roles: string[];
+    framework: {
+        createdAt: Date;
+        updatedAt: Date;
+        createdBy: string;
+        updatedBy: string;
     };
-    profile: {
-        avatar: string | null;
-        phone: string | null;
-        language: string | null;
-        location: string | null;
-    };
-    roles: Array<string>;
 }
-export interface UserSliceState extends User {
-    token: string;
-    status: string;
+export interface UserSliceState {
+    byId: { [key: string]: User };
+    allIds: string[];
+    status: '' | 'loading' | 'succeeded' | 'failed';
     error: string;
 }
 
@@ -47,8 +58,16 @@ export interface UserAddReq {
 export interface UserUpdateReq {
     _id: string;
     name: string;
-    email: string;
+    emails: Email[];
+    login: Login;
+    profile: Profile;
     roles: string[];
+    framework: {
+        createdAt: Date;
+        updatedAt: Date;
+        createdBy: string;
+        updatedBy: string;
+    };
 }
 
 export interface UserDeleteReq {
@@ -68,20 +87,7 @@ export interface UserUpdateRes {
     login: { email: string };
 }
 
-export interface UserOTPConfirmReq {
-    email: string;
-    code: string;
-}
-
-export interface UserOTPConfirmRes {
-    user: User;
-    token: string;
-}
-
 export type UserAddApiRes = APIResponse<UserAddRes>;
-export type UserAuthApiRes = APIResponse<UserAuthRes>;
-export type UserLoginApiRes = APIResponse<string>;
-export type UserOTPConfirmApiRes = APIResponse<UserOTPConfirmRes>;
 
 export interface UserResCreate {
     acknowledged: boolean;

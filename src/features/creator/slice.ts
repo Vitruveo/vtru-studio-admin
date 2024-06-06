@@ -2,23 +2,32 @@ import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import type { InitialState, CreatorType } from './types';
 
 const initialState: InitialState = {
-    all: []
+    byId: {},
+    allIds: [],
+    error: '',
+    status: '',
 };
 
 export const creatorSlice = createSlice({
     name: 'creator',
     initialState,
     reducers: {
-        push: (state, action: PayloadAction<CreatorType>) => {
-            state.all.push(action.payload);
+        setCreator: (state, action: PayloadAction<CreatorType>) => {
+            state.byId = {
+                ...state.byId,
+                [action.payload._id]: action.payload,
+            };
+            state.allIds = Object.keys(state.byId);
         },
-        remove: (state, action: PayloadAction<{ id: string }>) => {
-            state.all.filter((item) => item._id !== action.payload.id);
+        removeCreator: (state, action: PayloadAction<{ id: string }>) => {
+            delete state.byId[action.payload.id];
+            state.allIds = Object.keys(state.byId);
         },
-        setAll: (state, action: PayloadAction<CreatorType[]>) => {
-            state.all = action.payload;
-        }
-    }
+        resetCreator: (state) => {
+            state.byId = {};
+            state.allIds = [];
+        },
+    },
 });
 
 export const creatorActionsCreators = creatorSlice.actions;

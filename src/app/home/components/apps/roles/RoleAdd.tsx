@@ -14,17 +14,12 @@ import TextField from '@mui/material/TextField';
 
 import { useDispatch } from '@/store/hooks';
 import { roleCreateThunk } from '@/features/role';
-import { RoleApiResCreate } from '@/features/role/types';
 
 const roleSchemaValidation = yup.object({
     name: yup.string().min(3, 'name field needs at least 3 characters').required('field name is required.'),
 });
 
-interface Props {
-    handleAddNewRole(params: { id: string; name: string; description: string }): void;
-}
-
-export default function RoleAdd({ handleAddNewRole }: Props) {
+export default function RoleAdd() {
     const dispatch = useDispatch();
 
     const [modal, setModal] = React.useState(false);
@@ -36,7 +31,7 @@ export default function RoleAdd({ handleAddNewRole }: Props) {
         },
         validationSchema: roleSchemaValidation,
         onSubmit: async (payload) => {
-            const response = await dispatch(
+            dispatch(
                 roleCreateThunk({
                     name: payload.name,
                     description: payload.description,
@@ -44,11 +39,6 @@ export default function RoleAdd({ handleAddNewRole }: Props) {
                 })
             );
 
-            handleAddNewRole({
-                id: response?.data?.insertedId || '',
-                name: payload.name,
-                description: payload.description,
-            });
             toggle();
             resetForm();
         },

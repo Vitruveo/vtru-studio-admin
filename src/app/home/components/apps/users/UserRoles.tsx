@@ -74,8 +74,8 @@ export default function UserRolesTable({ roles, activeRoles, handleChangeRole }:
                                             fontWeight={400}
                                         >
                                             <Switch
-                                                checked={activeRoles?.includes(role.name)}
-                                                onChange={() => handleChangeRole(role.name)}
+                                                checked={activeRoles?.includes(role._id)}
+                                                onChange={() => handleChangeRole(role._id)}
                                             />
                                         </Typography>
                                     </TableCell>

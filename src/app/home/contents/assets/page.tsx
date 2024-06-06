@@ -23,8 +23,14 @@ const AssetsPage = () => {
     const filter = useSelector((state) => state.asset.filter);
 
     useEffect(() => {
-        dispatch(getAssetsThunk());
-    }, [dispatch]);
+        const ctrl = new AbortController();
+
+        dispatch(getAssetsThunk({ ctrl }));
+
+        return () => {
+            ctrl.abort();
+        };
+    }, []);
 
     const onPaginationChange: UsePaginationProps['onChange'] = (event, page) => {
         setCurrentPage(page);

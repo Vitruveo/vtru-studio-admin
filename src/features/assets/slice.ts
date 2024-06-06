@@ -36,6 +36,10 @@ export const assetSlice = createSlice({
                 state.byId[id].consignArtwork.status = action.payload.status;
             });
         },
+        resetAsset: (state) => {
+            state.byId = {};
+            state.allIds = [];
+        },
     },
 });
 

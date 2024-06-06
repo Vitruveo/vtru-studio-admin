@@ -9,17 +9,12 @@ import AddList from './components/addList';
 import List from './components/list';
 import Search from './components/search';
 import Details from './components/details';
-import {
-    addMultipleWaitingList,
-    deletWaitingList,
-    updateWaitingList,
-} from '@/features/waitingList/requests';
-import CustomizedSnackbar, { CustomizedSnackbarState } from '@/app/common/toastr';
+import { deletWaitingList, updateWaitingList } from '@/features/waitingList/requests';
 import { WaitingItem } from '@/features/waitingList/types';
 import { AllowItem } from '@/features/allowList/types';
 import { addAllowList, findAllowList } from '@/features/allowList/requests';
 import { useDispatch, useSelector } from '@/store/hooks';
-import { getWaitingListThunk } from '@/features/waitingList/thunks';
+import { addMultipleWaitingListThunk, getWaitingListThunk } from '@/features/waitingList/thunks';
 import { useToastr } from '@/app/hooks/use-toastr';
 
 const drawerWidth = 240;
@@ -29,7 +24,7 @@ const emailSchema = Yup.string().email().required();
 
 export default function WaitingList() {
     const dispatch = useDispatch();
-    const waitingList = useSelector((state) => state.waitingList.all);
+    const waitingList = useSelector((state) => state.waitingList.allIds.map((id) => state.waitingList.byId[id]));
     const [allowList, setAllowList] = useState<AllowItem[]>([]);
     const lgUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('lg'));
     const mdUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
@@ -40,7 +35,7 @@ export default function WaitingList() {
     const toastr = useToastr();
 
     useEffect(() => {
-        handleGetAllowList();
+        // handleGetAllowList();
         getWaitingList();
     }, []);
 
@@ -76,8 +71,8 @@ export default function WaitingList() {
         const validEmails = params.emails.filter((email, index) => emailResults[index]);
 
         if (validEmails.length) {
-            await addMultipleWaitingList(validEmails.map((email) => ({ email })));
-            getWaitingList();
+            await dispatch(addMultipleWaitingListThunk(validEmails.map((email) => ({ email }))));
+
             if (validAllowList.length) {
                 toastr.display({
                     type: 'info',

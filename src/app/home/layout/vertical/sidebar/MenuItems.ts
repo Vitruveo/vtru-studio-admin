@@ -14,6 +14,7 @@ interface MenuitemsType {
     chipColor?: string;
     variant?: string;
     external?: boolean;
+    permission?: string;
 }
 import { IconPackage, IconChartDonut3, IconAperture, IconList } from '@tabler/icons-react';
 
@@ -35,21 +36,31 @@ const Menuitems: MenuitemsType[] = [
     },
     {
         id: uniqueId(),
+        title: 'Moderation',
+        icon: IconAperture,
+        href: '/home/moderation',
+        permission: 'moderator',
+    },
+    {
+        id: uniqueId(),
         title: 'Allow List',
         icon: IconList,
         href: '/home/allowList',
+        permission: 'allow-list',
     },
     {
         id: uniqueId(),
         title: 'Waiting List',
         icon: IconList,
         href: '/home/waitingList',
+        permission: 'waiting-list',
     },
     {
         id: uniqueId(),
         title: 'Users',
         icon: IconPackage,
         href: '/home/contents/users',
+        permission: 'user',
     },
 
     {
@@ -57,12 +68,14 @@ const Menuitems: MenuitemsType[] = [
         title: 'Creators',
         icon: IconChartDonut3,
         href: '/home/contents/creators',
+        permission: 'creator',
     },
     {
         id: uniqueId(),
         title: 'Assets',
         icon: IconChartDonut3,
         href: '/home/contents/assets',
+        permission: 'asset',
     },
     {
         navlabel: true,
@@ -79,11 +92,12 @@ const Menuitems: MenuitemsType[] = [
         title: 'Roles',
         icon: IconChartDonut3,
         href: '/home/contents/roles',
+        permission: 'role',
     },
     {
         subheader: 'v' + packageJSON.version,
-        navlabel: true
-    }
+        navlabel: true,
+    },
 ];
 
 export default Menuitems;

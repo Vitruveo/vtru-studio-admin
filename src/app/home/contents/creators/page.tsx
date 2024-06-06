@@ -24,7 +24,7 @@ const secdrawerWidth = 320;
 
 export default function Creators() {
     const dispatch = useDispatch();
-    const creators = useSelector((state) => state.creator.all)
+    const creators = useSelector((state) => state.creator.allIds.map((id) => state.creator.byId[id]));
     const { creatorsOnline } = useSelector(websocketSelector(['creatorsOnline']));
     const [isLeftSidebarOpen, setLeftSidebarOpen] = useState(false);
     const [isRightSidebarOpen, setRightSidebarOpen] = useState(false);
@@ -43,18 +43,6 @@ export default function Creators() {
             dispatch(unsubscribeWebSocketThunk());
         };
     }, []);
-
-    /*useEffect(() => {
-        const diff: { [key: string]: CreatorType } = {};
-        creatorsOnline?.forEach((item) => {
-            diff[item._id] = {
-                _id: item._id,
-                emails: [{ email: item.email }],
-            } as CreatorType;
-        });
-        
-        setCreators((prevState) => ({ ...diff, ...prevState }));
-    }, [creatorsOnline]);*/
 
     useEffect(() => {
         dispatch(getCreatorsThunk());
@@ -82,7 +70,7 @@ export default function Creators() {
     };
 
     const onDeleteConfirm = () => {
-        dispatch(deleteCreatorThunk(creatorDelete.id))
+        dispatch(deleteCreatorThunk(creatorDelete.id));
         if (creatorDelete.id === creatorId) setCreatorId('');
         setIsOpenDialogDelete(false);
     };

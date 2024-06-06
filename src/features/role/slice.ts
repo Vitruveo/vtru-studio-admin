@@ -1,21 +1,34 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
-import { roleCreateThunk } from './thunks';
-import { RoleSliceState } from './types';
+import { Role, RoleSliceState } from './types';
 
 const initialState: RoleSliceState = {
-  name: '',
-  description: '',
-  permissions: [],
-  byId: {},
-  status: '',
-  error: '',
+    byId: {},
+    allIds: [],
+    status: '',
+    error: '',
 };
 
 export const roleSlice = createSlice({
-  name: 'role',
-  initialState,
-  reducers: {},
+    name: 'role',
+    initialState,
+    reducers: {
+        setRole: (state, action: PayloadAction<Role>) => {
+            state.byId = {
+                ...state.byId,
+                [action.payload._id]: action.payload,
+            };
+            state.allIds = Object.keys(state.byId);
+        },
+        removeRole: (state, action: PayloadAction<string>) => {
+            delete state.byId[action.payload];
+            state.allIds = Object.keys(state.byId);
+        },
+        resetRole: (state) => {
+            state.byId = {};
+            state.allIds = [];
+        },
+    },
 });
 
 export const roleActionsCreators = roleSlice.actions;

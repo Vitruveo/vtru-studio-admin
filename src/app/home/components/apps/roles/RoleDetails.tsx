@@ -10,13 +10,12 @@ import IconButton from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import { IconPencil, IconStar, IconTrash, IconDeviceFloppy } from '@tabler/icons-react';
+import { IconPencil, IconStar, IconTrash } from '@tabler/icons-react';
 
 import emailIcon from 'public/images/breadcrumb/emailSv.png';
 import RolePermissionsTable from './RolePermissions';
 import { RoleType } from '@/mock/roles';
 import { apiService } from '@/services/api';
-import { PermissionType } from '@/mock/permissions';
 import { useDispatch } from '@/store/hooks';
 import { roleUpdateThunk } from '@/features/role';
 
@@ -24,6 +23,7 @@ import CustomFormLabel from '../../forms/theme-elements/CustomFormLabel';
 import CustomTextField from '../../forms/theme-elements/CustomTextField';
 import BlankCard from '../../shared/BlankCard';
 import Scrollbar from '../../custom-scroll/Scrollbar';
+import { Role } from '@/features/role/types';
 
 const roleSchemaValidation = yup.object({
     name: yup.string().min(3, 'name field needs at least 3 characters').required('field name is required.'),
@@ -31,13 +31,10 @@ const roleSchemaValidation = yup.object({
 
 interface Props {
     roleId: string;
-    permissions: PermissionType[];
-
     onDeleteClick(params: { id: string; name: string }): void;
-    handleUpdateRole(params: { id: string; name: string; description: string; permissions: string[] }): void;
 }
 
-export default function RoleDetails({ roleId, permissions, onDeleteClick, handleUpdateRole }: Props) {
+export default function RoleDetails({ roleId, onDeleteClick }: Props) {
     const dispatch = useDispatch();
 
     const [role, setRole] = useState<RoleType | null>(null);
@@ -58,41 +55,28 @@ export default function RoleDetails({ roleId, permissions, onDeleteClick, handle
         if (!roleId) setRole(null);
     }, [roleId]);
 
-    const { values, errors, setFieldValue, handleSubmit, handleChange } = useFormik<Omit<RoleType, '_id'>>({
+    const { values, errors, setFieldValue, handleSubmit, handleChange } = useFormik<Omit<Role, '_id'>>({
         validationSchema: roleSchemaValidation,
         initialValues: {
             name: '',
             description: '',
             permissions: [],
+            framework: {
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                createdBy: '',
+                updatedBy: '',
+            },
         },
         onSubmit: async (payload) => {
-            if (role?._id) {
-                await dispatch(
-                    roleUpdateThunk({
-                        _id: role._id,
-                        ...payload,
-                    })
-                );
+            if (!role?._id) return;
 
-                if (isEditing) {
-                    const getRole = async () => {
-                        const response = await apiService.get<RoleType>(`/roles/${roleId}`);
-
-                        if (response.data) {
-                            setRole(response.data);
-                            setIsEditing(false);
-                        }
-                    };
-
-                    getRole();
-                }
-                handleUpdateRole({
-                    id: roleId,
-                    name: payload.name,
-                    description: payload.description,
-                    permissions: payload.permissions,
-                });
-            }
+            dispatch(
+                roleUpdateThunk({
+                    _id: role._id,
+                    ...payload,
+                })
+            );
         },
     });
 
@@ -101,6 +85,7 @@ export default function RoleDetails({ roleId, permissions, onDeleteClick, handle
             setFieldValue('name', role.name);
             setFieldValue('description', role.description);
             setFieldValue('permissions', role.permissions);
+            setFieldValue('framework', role.framework);
         }
     }, [role]);
 
@@ -189,7 +174,6 @@ export default function RoleDetails({ roleId, permissions, onDeleteClick, handle
                                     </Box>
                                     <Box p={3}>
                                         <RolePermissionsTable
-                                            permissions={permissions}
                                             activePermissions={values.permissions}
                                             handleChangePermission={handleChangePermission}
                                         />

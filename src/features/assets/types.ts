@@ -28,6 +28,7 @@ export interface InitialState {
     allIds: string[];
     creator: string;
     filter: ChangeFilterParams;
+    currentPage: number;
 }
 
 export type ChangeFilterParams = 'all' | 'blocked' | 'consigned' | 'active';

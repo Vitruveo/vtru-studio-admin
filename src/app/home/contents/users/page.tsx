@@ -36,6 +36,7 @@ export default function Users() {
 
     const users = useSelector((state) => state.user.allIds.map((id) => state.user.byId[id]));
     const usersById = useSelector((state) => state.user.byId);
+    const roles = useSelector((state) => state.role.allIds.map((id) => state.role.byId[id]));
 
     const [search, setSearch] = useState('');
     const [userId, setUserId] = useState('');
@@ -146,7 +147,7 @@ export default function Users() {
                         </Box>
                     )}
                     <UserDetails
-                        roles={[]}
+                        roles={roles}
                         userId={userId}
                         onDeleteClick={onDeleteClick}
                         handleUpdateUser={handleUpdateUser}

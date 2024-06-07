@@ -56,19 +56,6 @@ export default function RequestConsignDetails({
         <>
             <Box p={3} py={2} display={'flex'} alignItems="center">
                 <Typography variant="h5">Request Consign Details</Typography>
-
-                <Stack gap={0} direction="row" ml={'auto'}>
-                    <Tooltip title="Edit">
-                        <IconButton onClick={() => {}}>
-                            <IconPencil size="18" stroke={1.3} />
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Delete">
-                        <IconButton>
-                            <IconTrash size="18" stroke={1.3} />
-                        </IconButton>
-                    </Tooltip>
-                </Stack>
             </Box>
             <Divider />
             <Box p={2}>
@@ -80,10 +67,12 @@ export default function RequestConsignDetails({
                         <Button variant="contained" onClick={handleOpenStore}>
                             Open in New Window
                         </Button>
-                        <IconButton onClick={handleOpen}>
-                            <IconNotes size="18" stroke={1.3} style={{ marginRight: 5 }} />
-                            {statusRequestConsign === 'running' && <CircularProgress size={20} />}
-                        </IconButton>
+                        <Tooltip title="Logs">
+                            <IconButton onClick={handleOpen}>
+                                <IconNotes size="18" stroke={1.3} style={{ marginRight: 5 }} />
+                                {statusRequestConsign === 'running' && <CircularProgress size={20} />}
+                            </IconButton>
+                        </Tooltip>
                     </Box>
                     <Button variant="contained" color="error" onClick={handleReject}>
                         Reject

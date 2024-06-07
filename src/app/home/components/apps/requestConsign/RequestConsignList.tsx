@@ -1,7 +1,7 @@
 import Scrollbar from '../../custom-scroll/Scrollbar';
 import RequestConsignListItem from './RequestConsignListItem';
 import { RequestConsign } from '@/features/requestConsign';
-import { Stack, List, IconButton } from '@mui/material';
+import { Stack, List, IconButton, Tooltip } from '@mui/material';
 import { IconCheck, IconHandOff, IconClock, IconX } from '@tabler/icons-react';
 
 type Props = {
@@ -28,18 +28,26 @@ export default function RequestConsignList({ requestConsignId, data, activeFilte
             }}
         >
             <Stack direction="row" justifyContent="center" gap={1}>
-                <IconButton onClick={() => handleFilter('pending')} sx={styleActive('pending')}>
-                    <IconClock size="18" stroke={1.3} />
-                </IconButton>
-                <IconButton onClick={() => handleFilter('approved')} sx={styleActive('approved')}>
-                    <IconCheck size="18" stroke={1.3} />
-                </IconButton>
-                <IconButton onClick={() => handleFilter('rejected')} sx={styleActive('rejected')}>
-                    <IconHandOff size="18" stroke={1.3} />
-                </IconButton>
-                <IconButton onClick={() => handleFilter('error')} sx={styleActive('error')}>
-                    <IconX size="18" stroke={1.3} />
-                </IconButton>
+                <Tooltip title="Pending">
+                    <IconButton onClick={() => handleFilter('pending')} sx={styleActive('pending')}>
+                        <IconClock size="18" stroke={1.3} />
+                    </IconButton>
+                </Tooltip>
+                <Tooltip title="Approved">
+                    <IconButton onClick={() => handleFilter('approved')} sx={styleActive('approved')}>
+                        <IconCheck size="18" stroke={1.3} />
+                    </IconButton>
+                </Tooltip>
+                <Tooltip title="Rejected">
+                    <IconButton onClick={() => handleFilter('rejected')} sx={styleActive('rejected')}>
+                        <IconHandOff size="18" stroke={1.3} />
+                    </IconButton>
+                </Tooltip>
+                <Tooltip title="Error">
+                    <IconButton onClick={() => handleFilter('error')} sx={styleActive('error')}>
+                        <IconX size="18" stroke={1.3} />
+                    </IconButton>
+                </Tooltip>
             </Stack>
             <List>
                 {data.map((item) => (

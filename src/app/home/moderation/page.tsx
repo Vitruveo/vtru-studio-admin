@@ -60,7 +60,6 @@ const ModerationPage = () => {
 
     const handleApprove = () => {
         if (selected) {
-            dispatch(requestConsignUpdateStatusThunk(selected._id, 'running'));
             dispatch(consignThunk({ requestId: selected._id }));
         } else {
             dispatch(toastrActionsCreators.displayToastr({ message: 'No Asset selected', type: 'error' }));

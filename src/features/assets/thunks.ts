@@ -128,3 +128,9 @@ export function getCreatorNameByAssetIdThunk(payload: GetCreatorNameByAssetIdPar
         });
     };
 }
+
+export function setCurrentPageThunk(payload: number): ReduxThunkAction {
+    return function (dispatch) {
+        dispatch(assetActionsCreators.setCurrentPage(payload));
+    };
+}

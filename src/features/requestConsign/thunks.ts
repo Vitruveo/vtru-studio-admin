@@ -48,7 +48,9 @@ export function requestConsignGetThunk(): ReduxThunkAction<Promise<void>> {
         const state = getState();
         const token = state.auth.token;
 
-        const domain = window.location.hostname.replace('admin.', '');
+        const replaceDomain = window.location.hostname.includes('vitruveo.xyz') ? 'studio-admin.' : 'admin.';
+
+        const domain = window.location.hostname.replace(replaceDomain, '');
         cookie.set('token', state.auth.token, { path: '/', domain });
 
         const ctrl = new AbortController();

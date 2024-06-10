@@ -99,14 +99,35 @@ export function consignThunk({ requestId }: { requestId: string }): ReduxThunkAc
     return function (dispatch, getState) {
         const requestConsign = getState().requestConsign.byId[requestId];
 
-        return consign(requestConsign.asset._id).then((response) => {
-            dispatch(requestConsignActionsCreators.resetConsign({ id: requestId }));
-            consignThunk;
-            dispatch(
-                requestConsignActionsCreators.setTransaction({ id: requestId, transaction: response.data.transaction })
-            );
-            dispatch(eventTransactionThunk({ requestId }));
-        });
+        return consign(requestConsign.asset._id)
+            .then((response) => {
+                dispatch(requestConsignActionsCreators.resetConsign({ id: requestId }));
+                consignThunk;
+                dispatch(
+                    requestConsignActionsCreators.setTransaction({
+                        id: requestId,
+                        transaction: response.data.transaction,
+                    })
+                );
+                dispatch(eventTransactionThunk({ requestId }));
+            })
+            .catch((error) => {
+                if (error instanceof AxiosError && error.response?.status === 400) {
+                    dispatch(
+                        toastrActionsCreators.displayToastr({
+                            message: 'Consign already exists',
+                            type: 'warning',
+                        })
+                    );
+
+                    dispatch(
+                        requestConsignActionsCreators.setRequestConsignStatus({
+                            id: requestId,
+                            status: 'approved',
+                        })
+                    );
+                }
+            });
     };
 }
 

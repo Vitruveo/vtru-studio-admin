@@ -101,8 +101,9 @@ export function consignThunk({ requestId }: { requestId: string }): ReduxThunkAc
 
         return consign(requestConsign.asset._id)
             .then((response) => {
+                dispatch(requestConsignUpdateStatusThunk(requestId, 'running'));
                 dispatch(requestConsignActionsCreators.resetConsign({ id: requestId }));
-                consignThunk;
+
                 dispatch(
                     requestConsignActionsCreators.setTransaction({
                         id: requestId,

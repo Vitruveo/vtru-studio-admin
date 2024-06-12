@@ -74,7 +74,12 @@ export default function RequestConsignDetails({
                             </IconButton>
                         </Tooltip>
                     </Box>
-                    <Button variant="contained" color="error" onClick={handleReject}>
+                    <Button
+                        variant="contained"
+                        color="error"
+                        onClick={handleReject}
+                        disabled={statusRequestConsign !== 'pending'}
+                    >
                         Reject
                     </Button>
                 </Stack>

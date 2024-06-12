@@ -10,7 +10,7 @@ import AppCard from '@/app/home/components/shared/AppCard';
 import { Pagination } from '@mui/material';
 import { UsePaginationProps } from '@mui/lab';
 import { useDispatch, useSelector } from '@/store/hooks';
-import { getAssetsThunk, setCurrentPageThunk } from '@/features/assets/thunks';
+import { setCurrentPageThunk } from '@/features/assets/thunks';
 
 const AssetsPage = () => {
     const dispatch = useDispatch();
@@ -22,16 +22,6 @@ const AssetsPage = () => {
 
     const assets = useSelector((state) => state.asset.allIds.map((id) => state.asset.byId[id]));
     const filter = useSelector((state) => state.asset.filter);
-
-    useEffect(() => {
-        const ctrl = new AbortController();
-
-        dispatch(getAssetsThunk({ ctrl }));
-
-        return () => {
-            ctrl.abort();
-        };
-    }, [dispatch]);
 
     const onPaginationChange: UsePaginationProps['onChange'] = (_event, page) => {
         setCurrentPage(page);

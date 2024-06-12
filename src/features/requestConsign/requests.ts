@@ -15,7 +15,7 @@ export async function updateStatusRequestConsign({
 }): Promise<APIResponse> {
     const response = await apiService.patch(`/requestConsign/${id}`, {
         status,
-        ...(logs && { logs }),
+        ...(logs && logs.length > 0 && { logs }),
     });
 
     return response;

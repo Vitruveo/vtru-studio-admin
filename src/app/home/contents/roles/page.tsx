@@ -43,10 +43,6 @@ export default function Roles() {
         }
     }, [roles]);
 
-    useEffect(() => {
-        dispatch(roleGetThunk());
-    }, []);
-
     const rolesFiltered = useMemo(() => {
         return search.length > 0 ? roles.filter((role) => role.name.toLowerCase().includes(search.toLowerCase())) : [];
     }, [search, roles]);

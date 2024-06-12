@@ -26,28 +26,15 @@ export default function ConfirmContainer() {
         validationSchema: otpSchemaValidation,
         onSubmit: async (formValues) => {
             loader.start();
-            try {
-                const resOTPConfirm = await dispatch(
-                    userOTPConfirmThunk({
-                        code: formValues.code,
-                        email: login?.email,
-                    })
-                );
 
-                if (codesVtruApi.success.login.includes(resOTPConfirm.code)) {
-                    dispatch(connectWebSocketThunk());
-                    dispatch(loginWebSocketThunk());
-                    toastr.display({ type: 'success', message: 'OTP confirmed!' });
-                    router.push('/home');
-                    return;
-                } else {
-                    toastr.display({ type: 'error', message: 'Login failed: invalid code' });
-                }
-            } catch (error) {
-                const axiosError = error as AxiosError;
-                toastr.display({ type: 'error', message: 'Login failed: invalid code' });
-            }
-            loader.stop();
+            await dispatch(
+                userOTPConfirmThunk({
+                    code: formValues.code,
+                    email: login?.email,
+                })
+            )
+                .then(() => router.push('/home'))
+                .finally(() => loader.stop());
         },
     });
 

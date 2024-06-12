@@ -34,11 +34,6 @@ export default function WaitingList() {
     const [search, setSearch] = useState('');
     const toastr = useToastr();
 
-    useEffect(() => {
-        // handleGetAllowList();
-        getWaitingList();
-    }, []);
-
     const getWaitingList = () => {
         dispatch(getWaitingListThunk());
     };

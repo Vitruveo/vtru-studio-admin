@@ -43,11 +43,6 @@ export default function Users() {
     const [isOpenDialogDelete, setIsOpenDialogDelete] = useState(false);
     const [userDelete, setUserDelete] = useState({ email: '', id: '' });
 
-    useEffect(() => {
-        dispatch(userGetThunk());
-        dispatch(roleGetThunk());
-    }, []);
-
     const usersFiltered = useMemo(() => {
         return search.length > 0
             ? users.filter(

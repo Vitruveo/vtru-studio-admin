@@ -1,0 +1,1 @@
+export { allowListSlice } from './slice';

@@ -15,6 +15,10 @@ export const assetSlice = createSlice({
     name: 'asset',
     initialState,
     reducers: {
+        setAsset: (state, action: PayloadAction<AssetType>) => {
+            state.byId[action.payload._id] = action.payload;
+            state.allIds = Object.keys(state.byId);
+        },
         setStatus: (state, action: PayloadAction<{ id: string; status: string }>) => {
             state.byId[action.payload.id].consignArtwork.status = action.payload.status;
         },

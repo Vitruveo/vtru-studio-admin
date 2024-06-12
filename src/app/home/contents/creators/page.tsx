@@ -17,7 +17,7 @@ import AppCard from '@/app/home/components/shared/AppCard';
 import { CreatorDialogDelete } from '../../components/apps/creators/CreatorDialogDelete';
 import { useDispatch } from '@/store/hooks';
 import { subscribeWebSocketThunk, unsubscribeWebSocketThunk, websocketSelector } from '@/features/ws';
-import { deleteCreatorThunk, getCreatorsThunk } from '@/features/creator';
+import { deleteCreatorThunk } from '@/features/creator';
 
 const drawerWidth = 240;
 const secdrawerWidth = 320;
@@ -42,10 +42,6 @@ export default function Creators() {
         return () => {
             dispatch(unsubscribeWebSocketThunk());
         };
-    }, []);
-
-    useEffect(() => {
-        dispatch(getCreatorsThunk());
     }, []);
 
     const creatorsFiltered = useMemo(() => {

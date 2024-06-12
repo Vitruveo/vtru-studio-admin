@@ -157,12 +157,13 @@ export function eventTransactionThunk({ requestId }: { requestId: string }): Red
                 logs.push(response.data.data.current);
             }
 
-            dispatch(
-                requestConsignActionsCreators.setLogs({
-                    id: requestId,
-                    logs,
-                })
-            );
+            if (logs.length > 0)
+                dispatch(
+                    requestConsignActionsCreators.setLogs({
+                        id: requestId,
+                        logs,
+                    })
+                );
 
             if (response.data.data.current.status === CONSIGN_STATUS_MAP.failed) {
                 dispatch(

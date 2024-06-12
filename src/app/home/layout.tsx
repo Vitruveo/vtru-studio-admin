@@ -7,8 +7,10 @@ import Header from './layout/vertical/header/Header';
 import Sidebar from './layout/vertical/sidebar/Sidebar';
 import Navigation from './layout/horizontal/navbar/Navigation';
 import HorizontalHeader from './layout/horizontal/header/Header';
-import { useSelector } from '@/store/hooks';
+import { useDispatch, useSelector } from '@/store/hooks';
 import { useRouter } from 'next/navigation';
+import { persistor } from '@/store';
+import { getEventsThunk } from '@/features/events/thunks';
 
 const MainWrapper = styled('div')(() => ({
     display: 'flex',
@@ -31,11 +33,19 @@ interface Props {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     const router = useRouter();
+    const dispatch = useDispatch();
+
     const hasToken = useSelector((state) => state.auth.token);
 
     useEffect(() => {
         if (!hasToken) router.push('/login');
     }, []);
+
+    useEffect(() => {
+        if (persistor.getState().bootstrapped) {
+            dispatch(getEventsThunk());
+        }
+    }, [persistor]);
 
     const customizer = {
         activeDir: 'ltr',

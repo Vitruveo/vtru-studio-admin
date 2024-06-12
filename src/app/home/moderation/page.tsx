@@ -41,10 +41,6 @@ const ModerationPage = () => {
     );
     const requestConsignById = useSelector((state) => state.requestConsign.byId);
 
-    useEffect(() => {
-        dispatch(requestConsignGetThunk());
-    }, []);
-
     const handleSelect = (id: string) => {
         setSelected(requestConsignById[id]);
     };

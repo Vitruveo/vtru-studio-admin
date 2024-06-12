@@ -6,9 +6,12 @@ import * as dropdownData from './data';
 import { IconMail } from '@tabler/icons-react';
 import { Stack } from '@mui/system';
 
-import { useSelector } from '@/store/hooks';
+import { useDispatch, useSelector } from '@/store/hooks';
+import { authSlice } from '@/features/auth';
 
 const Profile = () => {
+    const dispatch = useDispatch();
+
     const {
         name,
         login: { email },
@@ -139,7 +142,14 @@ const Profile = () => {
                     </Box>
                 ))}
                 <Box mt={2}>
-                    <Button href="/login" variant="outlined" color="primary" component={Link} fullWidth>
+                    <Button
+                        onClick={() => dispatch(authSlice.actions.logout())}
+                        href="/login"
+                        variant="outlined"
+                        color="primary"
+                        component={Link}
+                        fullWidth
+                    >
                         Logout
                     </Button>
                 </Box>

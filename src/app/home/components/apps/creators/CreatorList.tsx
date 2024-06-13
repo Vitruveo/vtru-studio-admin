@@ -3,7 +3,6 @@ import List from '@mui/material/List';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
 import { CreatorType } from '@/features/creator';
-import Scrollbar from '../../custom-scroll/Scrollbar';
 import CreatorListItem from './CreatorListItem';
 
 type Props = {
@@ -31,13 +30,15 @@ export default function CreatorList({ creatorId, data, onCreatorClick, onDeleteC
     });
 
     useEffect(() => {
-        setDataPaginated({
-            page: 1,
-            perPage: PER_PAGE,
-            data: data.slice(0, PER_PAGE),
-            lastPage: Math.ceil(data.length / PER_PAGE),
-        });
-    }, [data]);
+        if (data.length !== dataPaginated.data.length) {
+            setDataPaginated({
+                page: 1,
+                perPage: PER_PAGE,
+                data: data.slice(0, PER_PAGE),
+                lastPage: Math.ceil(data.length / PER_PAGE),
+            });
+        }
+    }, [data.length]);
 
     return (
         <List>

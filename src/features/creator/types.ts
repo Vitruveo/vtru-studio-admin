@@ -6,6 +6,11 @@ export interface CreatorType {
     login: { email: string };
     roles: string[];
     emails: EmailType[];
+    username: string;
+    vault: {
+        vaultAddress: string;
+        isBlocked: boolean;
+    };
 }
 
 export interface InitialState {
@@ -13,4 +18,9 @@ export interface InitialState {
     allIds: string[];
     status: '' | 'loading' | 'succeeded' | 'failed';
     error: string;
+}
+
+export interface UpdateVaultStateOptions {
+    vaultAddress: string;
+    state: boolean;
 }

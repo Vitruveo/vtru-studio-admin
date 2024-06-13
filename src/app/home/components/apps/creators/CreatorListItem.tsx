@@ -8,7 +8,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { useTheme } from '@mui/material/styles';
-import { IconStar, IconTrash } from '@tabler/icons-react';
+import { IconLock, IconTrash } from '@tabler/icons-react';
 import { CreatorType } from '@/features/creator';
 import { useSelector } from 'react-redux';
 import { websocketSelector } from '@/features/ws';
@@ -29,6 +29,7 @@ export default function CreatorListItem({
     name,
     emails,
     active,
+    vault,
 }: Props) {
     const theme = useTheme();
     const warningColor = theme.palette.warning.main;
@@ -61,7 +62,7 @@ export default function CreatorListItem({
                             {name || (emails?.length > 0 && emails[0].email) || ''}
                         </Typography>
                     </Box>
-                    <IconStar onClick={onStarredClick} size="16" stroke={1.5} />
+                    {vault?.isBlocked && <IconLock size="16" color={warningColor} />}
                     <IconTrash onClick={onDeleteClick} size="16" stroke={1.5} />
                 </Stack>
             </ListItemText>

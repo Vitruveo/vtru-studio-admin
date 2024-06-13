@@ -19,9 +19,15 @@ export const creatorSlice = createSlice({
             };
             state.allIds = Object.keys(state.byId);
         },
+        setVaultIsBlockedById: (state, action: PayloadAction<{ id: string; isBlocked: boolean }>) => {
+            state.byId[action.payload.id].vault.isBlocked = action.payload.isBlocked;
+        },
         removeCreator: (state, action: PayloadAction<{ id: string }>) => {
             delete state.byId[action.payload.id];
             state.allIds = Object.keys(state.byId);
+        },
+        setStatus: (state, action: PayloadAction<InitialState['status']>) => {
+            state.status = action.payload;
         },
         resetCreator: (state) => {
             state.byId = {};

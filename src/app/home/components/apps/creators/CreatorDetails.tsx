@@ -113,7 +113,7 @@ export default function CreatorDetails({ creatorId }: Props) {
                                 <Typography variant="subtitle1" fontWeight={600} mb={0.5}>
                                     {creator?.vault?.isBlocked ? 'Blocked' : 'Active'}
                                 </Typography>
-                                {true && <CircularProgress size={20} />}
+                                {status === 'loading' && <CircularProgress size={20} />}
                             </Box>
                         </Box>
                     </Box>

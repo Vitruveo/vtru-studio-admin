@@ -13,6 +13,13 @@ export const roleSlice = createSlice({
     name: 'role',
     initialState,
     reducers: {
+        setRoles: (state, action: PayloadAction<Role[]>) => {
+            state.byId = action.payload.reduce<{ [key: string]: Role }>((acc, cur) => {
+                acc[cur._id] = cur;
+                return acc;
+            }, {});
+            state.allIds = Object.keys(state.byId);
+        },
         setRole: (state, action: PayloadAction<Role>) => {
             state.byId = {
                 ...state.byId,

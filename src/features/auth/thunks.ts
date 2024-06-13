@@ -31,8 +31,6 @@ export function userOTPConfirmThunk(payload: UserOTPConfirmReq): ReduxThunkActio
                     })
                 );
 
-                dispatch(getEventsThunk());
-
                 return response;
             })
             .catch((error) => {

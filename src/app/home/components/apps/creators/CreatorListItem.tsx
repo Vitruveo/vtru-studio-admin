@@ -27,6 +27,7 @@ export default function CreatorListItem({
     onDeleteClick,
     _id,
     name,
+    username,
     emails,
     active,
     vault,
@@ -59,7 +60,10 @@ export default function CreatorListItem({
                 <Stack direction="row" gap="10px" alignItems="center">
                     <Box mr="auto">
                         <Typography variant="subtitle1" noWrap fontWeight={600} sx={{ maxWidth: '150px' }}>
-                            {name || (emails?.length > 0 && emails[0].email) || ''}
+                            {(emails?.length > 0 && emails[0].email) || 'unknown email'}
+                        </Typography>
+                        <Typography variant="body2" noWrap color="text.secondary">
+                            {username}
                         </Typography>
                     </Box>
                     {vault?.isBlocked && <IconLock size="16" color={warningColor} />}

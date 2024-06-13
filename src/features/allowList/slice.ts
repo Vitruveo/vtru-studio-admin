@@ -13,6 +13,13 @@ export const allowListSlice = createSlice({
     name: 'role',
     initialState,
     reducers: {
+        setAllowLists: (state, action: PayloadAction<AllowItem[]>) => {
+            state.byId = action.payload.reduce<{ [key: string]: AllowItem }>((acc, cur) => {
+                acc[cur._id] = cur;
+                return acc;
+            }, {});
+            state.allIds = Object.keys(state.byId);
+        },
         setAllowList: (state, action: PayloadAction<AllowItem>) => {
             state.byId = {
                 ...state.byId,

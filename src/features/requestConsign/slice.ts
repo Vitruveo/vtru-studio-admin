@@ -12,6 +12,13 @@ export const requestConsignSlice = createSlice({
     name: 'requestConsign',
     initialState,
     reducers: {
+        setRequestConsigns: (state, action: PayloadAction<RequestConsign[]>) => {
+            state.byId = action.payload.reduce<{ [key: string]: RequestConsign }>((acc, cur) => {
+                acc[cur._id] = cur;
+                return acc;
+            }, {});
+            state.allIds = Object.keys(state.byId);
+        },
         setRequestConsign: (state, action: PayloadAction<RequestConsign>) => {
             state.byId[action.payload._id] = action.payload;
             state.allIds = Object.keys(state.byId);

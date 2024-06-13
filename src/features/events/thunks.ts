@@ -9,13 +9,26 @@ import { waitingListActionsCreators } from '../waitingList';
 import { roleActionsCreators } from '../role/slice';
 import { allowListActionsCreators } from '../allowList/slice';
 
-const rolesEvents = ['roles', 'createdRole', 'updatedRole'];
-const assetsEvents = ['assets', 'createdAsset', 'updatedAsset'];
-const creatorsEvents = ['creators', 'createdCreator', 'updatedCreator'];
-const usersEvents = ['users', 'createdUser', 'updatedUser'];
-const waitingListEvents = ['waitingList', 'createdWaitingList', 'updatedWaitingList'];
-const requestConsignEvents = ['requestConsigns', 'createdRequestConsign', 'updatedRequestConsign'];
-const allowListEvents = ['allowList', 'createdAllowList', 'updatedAllowList'];
+const rolesAll = ['roles'];
+const rolesOne = ['createdRole', 'updatedRole', 'deletedRole'];
+
+const requestConsignEventsAll = ['requestConsigns'];
+const requestConsignEventsOne = ['createdRequestConsign', 'updatedRequestConsign', 'deletedRequestConsign'];
+
+const assetsAll = ['assets'];
+const assetsOne = ['createdAsset', 'updatedAsset', 'deletedAsset'];
+
+const usersAll = ['users'];
+const usersOne = ['createdUser', 'updatedUser', 'deletedUser'];
+
+const creatorsAll = ['creators'];
+const creatorsOne = ['createdCreator', 'updatedCreator', 'deletedCreator'];
+
+const waitingListAll = ['waitingList'];
+const waitingListOne = ['createdWaitingList', 'updatedWaitingList', 'deletedWaitingList'];
+
+const allowListAll = ['allowList'];
+const allowListOne = ['createdAllowList', 'updatedAllowList', 'deletedAllowList'];
 
 export function getEventsThunk(): ReduxThunkAction {
     return async function (dispatch, getState) {
@@ -35,22 +48,37 @@ export function getEventsThunk(): ReduxThunkAction {
             headers,
             onmessage(message) {
                 const parsed = JSON.parse(message.data);
-                if (requestConsignEvents.includes(message.event))
+                // request consign events
+                if (requestConsignEventsOne.includes(message.event))
                     dispatch(requestConsignActionsCreators.setRequestConsign(parsed));
+                if (requestConsignEventsAll.includes(message.event))
+                    dispatch(requestConsignActionsCreators.setRequestConsigns(parsed));
 
-                if (assetsEvents.includes(message.event)) dispatch(assetActionsCreators.setAsset(parsed));
+                // assets events
+                if (assetsOne.includes(message.event)) dispatch(assetActionsCreators.setAsset(parsed));
+                if (assetsAll.includes(message.event)) dispatch(assetActionsCreators.setAssets(parsed));
 
-                if (usersEvents.includes(message.event)) dispatch(userActionsCreators.setUser(parsed));
+                // users events
+                if (usersOne.includes(message.event)) dispatch(userActionsCreators.setUser(parsed));
+                if (usersAll.includes(message.event)) dispatch(userActionsCreators.setUsers(parsed));
 
-                if (creatorsEvents.includes(message.event)) dispatch(creatorActionsCreators.setCreator(parsed));
+                // creators events
+                if (creatorsOne.includes(message.event)) dispatch(creatorActionsCreators.setCreator(parsed));
+                if (creatorsAll.includes(message.event)) dispatch(creatorActionsCreators.setCreators(parsed));
 
-                if (waitingListEvents.includes(message.event))
-                    dispatch(waitingListActionsCreators.setWaitingList(parsed));
+                // waiting list events
+                if (waitingListOne.includes(message.event)) dispatch(waitingListActionsCreators.setWaitingList(parsed));
+                if (waitingListAll.includes(message.event))
+                    dispatch(waitingListActionsCreators.setWaitingLists(parsed));
 
-                if (rolesEvents.includes(message.event)) dispatch(roleActionsCreators.setRole(parsed));
+                // roles events
+                if (rolesOne.includes(message.event)) dispatch(roleActionsCreators.setRole(parsed));
+                if (rolesAll.includes(message.event)) dispatch(roleActionsCreators.setRoles(parsed));
                 if (message.event === 'deletedRole') dispatch(roleActionsCreators.removeRole(parsed.id));
 
-                if (allowListEvents.includes(message.event)) dispatch(allowListActionsCreators.setAllowList(parsed));
+                // allow list events
+                if (allowListOne.includes(message.event)) dispatch(allowListActionsCreators.setAllowList(parsed));
+                if (allowListAll.includes(message.event)) dispatch(allowListActionsCreators.setAllowLists(parsed));
             },
             onerror() {
                 throw new Error('Error fetching event source');

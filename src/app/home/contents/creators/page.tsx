@@ -47,9 +47,9 @@ export default function Creators() {
 
     const creatorsFiltered = useMemo(() => {
         return search.length > 0
-            ? Object.values(creators).filter(
+            ? creators.filter(
                   (creator) =>
-                      creator.name.toLowerCase().includes(search.toLowerCase()) ||
+                      creator?.username?.toLowerCase().includes(search.toLowerCase()) ||
                       creator.emails.some((item) => item.email.toLowerCase().includes(search.toLowerCase()))
               )
             : [];

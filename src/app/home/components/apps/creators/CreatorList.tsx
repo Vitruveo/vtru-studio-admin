@@ -3,7 +3,6 @@ import List from '@mui/material/List';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
 import { CreatorType } from '@/features/creator';
-import Scrollbar from '../../custom-scroll/Scrollbar';
 import CreatorListItem from './CreatorListItem';
 
 type Props = {
@@ -15,9 +14,7 @@ type Props = {
 
 type PaginatedData = {
     page: number;
-    perPage: number;
     data: Omit<CreatorType, 'roles'>[];
-    lastPage: number;
 };
 
 const PER_PAGE = 30;
@@ -25,19 +22,17 @@ const PER_PAGE = 30;
 export default function CreatorList({ creatorId, data, onCreatorClick, onDeleteClick }: Props) {
     const [dataPaginated, setDataPaginated] = useState<PaginatedData>({
         page: 1,
-        perPage: PER_PAGE,
         data: data.slice(0, PER_PAGE),
-        lastPage: Math.ceil(data.length / PER_PAGE),
     });
 
     useEffect(() => {
-        setDataPaginated({
-            page: 1,
-            perPage: PER_PAGE,
-            data: data.slice(0, PER_PAGE),
-            lastPage: Math.ceil(data.length / PER_PAGE),
-        });
-    }, [data]);
+        if (data.length !== dataPaginated.data.length) {
+            setDataPaginated({
+                page: 1,
+                data: data.slice(0, PER_PAGE),
+            });
+        }
+    }, [data.length]);
 
     return (
         <List>
@@ -53,7 +48,7 @@ export default function CreatorList({ creatorId, data, onCreatorClick, onDeleteC
                         ],
                     }));
                 }}
-                hasMore={dataPaginated.page < dataPaginated.lastPage}
+                hasMore={dataPaginated.page < Math.ceil(data.length / PER_PAGE)}
                 loader={<h4>Carregando...</h4>}
                 height="calc(100vh - 360px)"
             >

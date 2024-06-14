@@ -7,28 +7,11 @@ import userMaleIcon from '../../../public/images/svgs/icon-user-male.svg';
 import mailBoxIcon from '../../../public/images/svgs/icon-mailbox.svg';
 import { HomeCard, HomeCardProps } from './components/widgets/cards/home-card';
 import { useDispatch, useSelector } from '@/store/hooks';
-import { useEffect } from 'react';
-import { getCreatorsThunk } from '@/features/creator';
-import { getAssetsThunk } from '@/features/assets/thunks';
-import { getWaitingListThunk } from '@/features/waitingList/thunks';
 
 export default function Dashboard() {
-    const dispatch = useDispatch();
     const activeAssetsCount = useSelector((state) => state.asset.allIds.length);
     const creatorsCount = useSelector((state) => state.creator.allIds.length);
     const waitingListCount = useSelector((state) => state.waitingList.allIds.length);
-
-    useEffect(() => {
-        const ctrl = new AbortController();
-
-        dispatch(getCreatorsThunk());
-        dispatch(getAssetsThunk({ ctrl }));
-        dispatch(getWaitingListThunk());
-
-        return () => {
-            ctrl.abort();
-        };
-    }, []);
 
     const cards: HomeCardProps[] = [
         {

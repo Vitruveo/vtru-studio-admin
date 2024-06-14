@@ -17,6 +17,13 @@ export const userSlice = createSlice({
         logout: (state) => {
             state = initialState;
         },
+        setUsers: (state, action: PayloadAction<User[]>) => {
+            state.byId = action.payload.reduce<{ [key: string]: User }>((acc, cur) => {
+                acc[cur._id] = cur;
+                return acc;
+            }, {});
+            state.allIds = Object.keys(state.byId);
+        },
         setUser: (state, action: PayloadAction<User>) => {
             state.byId[action.payload._id] = action.payload;
             state.allIds = Object.keys(state.byId);

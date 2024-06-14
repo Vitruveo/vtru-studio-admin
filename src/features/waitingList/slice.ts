@@ -12,6 +12,13 @@ export const waitingListSlice = createSlice({
     name: 'waitingList',
     initialState,
     reducers: {
+        setWaitingLists: (state, action: PayloadAction<WaitingItem[]>) => {
+            state.byId = action.payload.reduce<{ [key: string]: WaitingItem }>((acc, cur) => {
+                acc[cur._id] = cur;
+                return acc;
+            }, {});
+            state.allIds = Object.keys(state.byId);
+        },
         setWaitingList: (state, action: PayloadAction<WaitingItem>) => {
             state.byId[action.payload._id] = action.payload;
             state.allIds = Object.keys(state.byId);

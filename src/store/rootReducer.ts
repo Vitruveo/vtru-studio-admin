@@ -10,6 +10,7 @@ import { waitingListSlice } from '@/features/waitingList';
 import { toastrSlice } from '@/features/toastr';
 import { authSlice } from '@/features/auth';
 import { requestConsignSlice } from '@/features/requestConsign';
+import { allowListSlice } from '@/features/allowList';
 
 interface RootState {
     asset: ReturnType<typeof assetSlice.reducer>;
@@ -22,6 +23,7 @@ interface RootState {
     toastr: ReturnType<typeof toastrSlice.reducer>;
     auth: ReturnType<typeof authSlice.reducer>;
     requestConsign: ReturnType<typeof requestConsignSlice.reducer>;
+    allowList: ReturnType<typeof allowListSlice.reducer>;
 }
 
 export const appReducer = combineReducers({
@@ -35,6 +37,7 @@ export const appReducer = combineReducers({
     toastr: toastrSlice.reducer,
     auth: authSlice.reducer,
     requestConsign: requestConsignSlice.reducer,
+    allowList: allowListSlice.reducer,
 });
 
 export const reducer: Reducer<RootState, AnyAction> = (state: RootState | undefined, action: AnyAction) => {

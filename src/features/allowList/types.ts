@@ -14,5 +14,11 @@ export interface AllowItem {
         updatedBy: string;
     };
 }
+export interface AllowListSliceState {
+    byId: { [key: string]: AllowItem };
+    allIds: string[];
+    status: '' | 'loading' | 'succeeded' | 'failed';
+    error: string;
+}
 
 export type GetListApiRes = APIResponse<AllowItem[]>;

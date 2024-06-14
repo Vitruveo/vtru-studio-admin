@@ -12,6 +12,13 @@ export const creatorSlice = createSlice({
     name: 'creator',
     initialState,
     reducers: {
+        setCreators: (state, action: PayloadAction<CreatorType[]>) => {
+            state.byId = action.payload.reduce<{ [key: string]: CreatorType }>((acc, cur) => {
+                acc[cur._id] = cur;
+                return acc;
+            }, {});
+            state.allIds = Object.keys(state.byId);
+        },
         setCreator: (state, action: PayloadAction<CreatorType>) => {
             state.byId = {
                 ...state.byId,
@@ -19,9 +26,15 @@ export const creatorSlice = createSlice({
             };
             state.allIds = Object.keys(state.byId);
         },
+        setVaultIsBlockedById: (state, action: PayloadAction<{ id: string; isBlocked: boolean }>) => {
+            state.byId[action.payload.id].vault.isBlocked = action.payload.isBlocked;
+        },
         removeCreator: (state, action: PayloadAction<{ id: string }>) => {
             delete state.byId[action.payload.id];
             state.allIds = Object.keys(state.byId);
+        },
+        setStatus: (state, action: PayloadAction<InitialState['status']>) => {
+            state.status = action.payload;
         },
         resetCreator: (state) => {
             state.byId = {};

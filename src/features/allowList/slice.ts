@@ -1,41 +1,41 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
-import { Role, RoleSliceState } from './types';
+import { AllowItem, AllowListSliceState } from './types';
 
-const initialState: RoleSliceState = {
+const initialState: AllowListSliceState = {
     byId: {},
     allIds: [],
     status: '',
     error: '',
 };
 
-export const roleSlice = createSlice({
+export const allowListSlice = createSlice({
     name: 'role',
     initialState,
     reducers: {
-        setRoles: (state, action: PayloadAction<Role[]>) => {
-            state.byId = action.payload.reduce<{ [key: string]: Role }>((acc, cur) => {
+        setAllowLists: (state, action: PayloadAction<AllowItem[]>) => {
+            state.byId = action.payload.reduce<{ [key: string]: AllowItem }>((acc, cur) => {
                 acc[cur._id] = cur;
                 return acc;
             }, {});
             state.allIds = Object.keys(state.byId);
         },
-        setRole: (state, action: PayloadAction<Role>) => {
+        setAllowList: (state, action: PayloadAction<AllowItem>) => {
             state.byId = {
                 ...state.byId,
                 [action.payload._id]: action.payload,
             };
             state.allIds = Object.keys(state.byId);
         },
-        removeRole: (state, action: PayloadAction<string>) => {
+        removeAllowList: (state, action: PayloadAction<string>) => {
             delete state.byId[action.payload];
             state.allIds = Object.keys(state.byId);
         },
-        resetRole: (state) => {
+        resetAllowList: (state) => {
             state.byId = {};
             state.allIds = [];
         },
     },
 });
 
-export const roleActionsCreators = roleSlice.actions;
+export const allowListActionsCreators = allowListSlice.actions;

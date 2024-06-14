@@ -1,71 +1,25 @@
-import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { useFormik } from 'formik';
-import * as yup from 'yup';
-import { Grid } from '@mui/material';
+import { CircularProgress, Grid, Switch } from '@mui/material';
 import Avatar from '@mui/material/Avatar';
 import Image from 'next/image';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
-import IconButton from '@mui/material/IconButton';
-import Stack from '@mui/material/Stack';
-import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import { IconPencil, IconStar, IconTrash } from '@tabler/icons-react';
 
 import emailIcon from 'public/images/breadcrumb/emailSv.png';
-import { apiService } from '@/services/api';
-import { CreatorType } from '@/features/creator';
 import { websocketSelector } from '@/features/ws';
-
-const creatorSchemaValidation = yup.object({
-    name: yup.string().required('field name is required.'),
-});
+import { useDispatch, useSelector } from '@/store/hooks';
+import { updateVaultStatethunk } from '@/features/creator/thunks';
 
 interface Props {
     creatorId: string;
-
     onDeleteClick(params: { id: string; email: string }): void;
 }
 
-export default function CreatorDetails({ creatorId, onDeleteClick }: Props) {
+export default function CreatorDetails({ creatorId }: Props) {
+    const dispatch = useDispatch();
     const { creatorsOnline = [] } = useSelector(websocketSelector(['creatorsOnline']));
-
-    const [creator, setCreator] = useState<CreatorType | null>(null);
-    const [isEditing, setIsEditing] = useState(false);
-    const [starred, setStarred] = useState(false);
-
-    useEffect(() => {
-        if (creatorId) {
-            const getCreator = async () => {
-                const response = await apiService.get<CreatorType>(`/creators/${creatorId}`);
-
-                if (response.data) setCreator(response.data);
-            };
-
-            getCreator();
-        }
-
-        if (!creatorId) setCreator(null);
-    }, [creatorId]);
-
-    const { values, setFieldValue } = useFormik<{ name: string; roles: string[] }>({
-        validationSchema: creatorSchemaValidation,
-        initialValues: {
-            name: '',
-            roles: [],
-        },
-        onSubmit: async (payload) => {},
-    });
-
-    useEffect(() => {
-        if (creator) {
-            setFieldValue('name', creator.name);
-            setFieldValue('roles', creator.roles);
-        }
-    }, [creator]);
-
-    const warningColor = '#FFAE1F';
+    const { byId, status } = useSelector((state) => state.creator);
+    const creator = byId[creatorId];
 
     return (
         <>
@@ -73,39 +27,6 @@ export default function CreatorDetails({ creatorId, onDeleteClick }: Props) {
                 <>
                     <Box p={3} py={2} display={'flex'} alignItems="center">
                         <Typography variant="h5">Creator Details</Typography>
-                        {!isEditing ? (
-                            <Stack gap={0} direction="row" ml={'auto'}>
-                                <Tooltip title={starred ? 'Unstar' : 'Star'}>
-                                    <IconButton onClick={() => setStarred(!starred)}>
-                                        <IconStar
-                                            stroke={1.3}
-                                            size="18"
-                                            style={{
-                                                fill: starred ? warningColor : '',
-                                                stroke: starred ? warningColor : '',
-                                            }}
-                                        />
-                                    </IconButton>
-                                </Tooltip>
-                                <Tooltip title="Edit">
-                                    <IconButton onClick={() => {}}>
-                                        <IconPencil size="18" stroke={1.3} />
-                                    </IconButton>
-                                </Tooltip>
-                                <Tooltip title="Delete">
-                                    <IconButton
-                                        onClick={() =>
-                                            onDeleteClick({
-                                                id: creator._id,
-                                                email: creator.emails[0].email,
-                                            })
-                                        }
-                                    >
-                                        <IconTrash size="18" stroke={1.3} />
-                                    </IconButton>
-                                </Tooltip>
-                            </Stack>
-                        ) : null}
                     </Box>
                     <Divider />
 
@@ -121,7 +42,11 @@ export default function CreatorDetails({ creatorId, onDeleteClick }: Props) {
                                             height: '72px',
                                         }}
                                     >
-                                        {(values.name || (creator.emails?.length > 0 && creator.emails[0]?.email) || '')
+                                        {(
+                                            creator.name ||
+                                            (creator.emails?.length > 0 && creator.emails[0]?.email) ||
+                                            ''
+                                        )
                                             .slice(0, 2)
                                             .toUpperCase()}
                                     </Avatar>
@@ -140,24 +65,14 @@ export default function CreatorDetails({ creatorId, onDeleteClick }: Props) {
                                         right={4}
                                     ></Box>
                                 </Box>
-                                <Box sx={{ ml: 2 }}>
+                                <Box pl={1}>
                                     <Typography variant="h6" mb={0.5}>
-                                        {creator.name}
+                                        {creator.username}
                                     </Typography>
-                                    {creator.roles.join('; ')}
-                                    <Typography variant="body2" color="text.secondary" mb={0.5}></Typography>
                                 </Box>
                             </Box>
 
                             <Grid container>
-                                <Grid item lg={6} xs={12} mt={4}>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Phone Number
-                                    </Typography>
-                                    <Typography variant="subtitle1" mb={0.5} fontWeight={600}>
-                                        empty
-                                    </Typography>
-                                </Grid>
                                 <Grid item lg={6} xs={12} mt={4}>
                                     <Typography variant="body2" color="text.secondary">
                                         Email address
@@ -171,23 +86,35 @@ export default function CreatorDetails({ creatorId, onDeleteClick }: Props) {
                                         ))}
                                     </Typography>
                                 </Grid>
-                                <Grid item lg={6} xs={12} mt={4}>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Language
-                                    </Typography>
-                                    <Typography variant="subtitle1" fontWeight={600} mb={0.5}>
-                                        Portuguese
-                                    </Typography>
-                                </Grid>
-                                <Grid item lg={6} xs={12} mt={4}>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Location
-                                    </Typography>
-                                    <Typography variant="subtitle1" fontWeight={600} mb={0.5}>
-                                        Brazil
-                                    </Typography>
-                                </Grid>
                             </Grid>
+                        </Box>
+                    </Box>
+                    <Box>
+                        <Divider />
+                        <Typography variant="h5" p={3} pb={1}>
+                            Creator Vault
+                        </Typography>
+                        <Box p={3} pt={0}>
+                            <Typography variant="body2" color="text.secondary">
+                                Vault Address
+                            </Typography>
+                            <Typography variant="subtitle1" fontWeight={600} mb={0.5}>
+                                {creator?.vault?.vaultAddress ?? 'N/A'}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                                State
+                            </Typography>
+                            <Box display="flex" alignItems="center" gap={1}>
+                                <Switch
+                                    checked={!creator?.vault?.isBlocked}
+                                    onChange={() => dispatch(updateVaultStatethunk({ id: creatorId }))}
+                                    disabled={!creator?.vault?.vaultAddress || status === 'loading'}
+                                />
+                                <Typography variant="subtitle1" fontWeight={600} mb={0.5}>
+                                    {creator?.vault?.isBlocked ? 'Blocked' : 'Active'}
+                                </Typography>
+                                {status === 'loading' && <CircularProgress size={20} />}
+                            </Box>
                         </Box>
                     </Box>
                 </>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Drawer, useMediaQuery, Theme, Box, Button } from '@mui/material';
 import * as Yup from 'yup';
 import PageContainer from '../components/container/PageContainer';
@@ -10,9 +10,10 @@ import AddList from './components/addList';
 import List from './components/list';
 import Search from './components/search';
 import Details from './components/details';
-import { addMultipleAllowList, findAllowList, deletAllowList, updateAllowList } from '@/features/allowList/requests';
+import { addMultipleAllowList, deletAllowList, updateAllowList } from '@/features/allowList/requests';
 import { AllowItem } from '@/features/allowList/types';
 import { useToastr } from '@/app/hooks/use-toastr';
+import { useSelector } from '@/store/hooks';
 
 const drawerWidth = 240;
 const secdrawerWidth = 320;
@@ -21,7 +22,7 @@ const emailSchema = Yup.string().email().required();
 
 export default function AllowList() {
     const toastr = useToastr();
-    const [emails, setEmails] = useState<AllowItem[]>([]);
+
     const lgUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('lg'));
     const mdUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
     const [isRightSidebarOpen, setRightSidebarOpen] = useState(false);
@@ -29,23 +30,7 @@ export default function AllowList() {
     const [activeEmail, setActiveEmail] = useState<AllowItem>();
     const [search, setSearch] = useState('');
 
-    const handleGetAllowList = async () => {
-        const result = await findAllowList();
-        if (result.data) {
-            const uniqueEmails = result.data.sort((a: AllowItem, b: AllowItem) => {
-                if (!a?.framework?.createdAt || !b?.framework?.createdAt) return 0;
-
-                if (new Date(a.framework.createdAt).getTime() > new Date(b.framework.createdAt).getTime()) {
-                    return -1;
-                }
-                if (new Date(a.framework.createdAt).getTime() < new Date(b.framework.createdAt).getTime()) {
-                    return 1;
-                }
-                return 0;
-            });
-            setEmails(uniqueEmails);
-        }
-    };
+    const emails = useSelector((state) => state.allowList.allIds.map((id) => state.allowList.byId[id]));
 
     const handleAddNewEmails = async (params: { emails: string[] }) => {
         const emailPromises = params.emails.map(async (email, index, self) => {
@@ -67,7 +52,6 @@ export default function AllowList() {
 
         if (validEmails.length) {
             await addMultipleAllowList(validEmails.map((email) => ({ email })));
-            await handleGetAllowList();
         } else {
             toastr.display({
                 type: 'info',
@@ -82,14 +66,12 @@ export default function AllowList() {
             setActiveEmail(newEmails[0]);
         }
         await deletAllowList(params._id);
-        await handleGetAllowList();
     };
 
     const handleUpdateEmail = async (params: AllowItem) => {
         if (!emails.some((item) => item.email.trim() === params.email.trim())) {
             setActiveEmail(undefined);
             await updateAllowList(params);
-            await handleGetAllowList();
         } else {
             toastr.display({
                 type: 'info',
@@ -101,10 +83,6 @@ export default function AllowList() {
     const emailsFiltered = useMemo(() => {
         return search.length > 0 ? emails.filter((v) => v.email.toLowerCase().includes(search.toLowerCase())) : [];
     }, [search, emails]);
-
-    useEffect(() => {
-        handleGetAllowList();
-    }, []);
 
     return (
         <PageContainer title="Allow List">

@@ -3,6 +3,7 @@ import { ReduxThunkAction } from '@/store';
 import { BASE_URL_API } from '@/constants/api';
 import { creatorActionsCreators } from './slice';
 import { toastrActionsCreators } from '../toastr/slice';
+import { updateVaultState } from './requests';
 
 export function getCreatorsThunk(): ReduxThunkAction {
     return async function (dispatch, getState) {
@@ -52,5 +53,25 @@ export function deleteCreatorThunk(id: string): ReduxThunkAction {
             dispatch(creatorActionsCreators.removeCreator({ id }));
             resolve();
         });
+    };
+}
+
+export function updateVaultStatethunk({ id }: { id: string }): ReduxThunkAction {
+    return async function (dispatch, getState) {
+        dispatch(creatorActionsCreators.setStatus('loading'));
+
+        const creator = getState().creator.byId[id];
+
+        updateVaultState({ vaultAddress: creator.vault.vaultAddress, state: !creator.vault.isBlocked })
+            .then(() => {
+                dispatch(toastrActionsCreators.displayToastr({ type: 'success', message: 'Vault state updated' }));
+                dispatch(creatorActionsCreators.setVaultIsBlockedById({ id, isBlocked: !creator.vault.isBlocked }));
+            })
+            .catch(() => {
+                dispatch(toastrActionsCreators.displayToastr({ type: 'error', message: 'Error updating vault state' }));
+            })
+            .finally(() => {
+                dispatch(creatorActionsCreators.setStatus(''));
+            });
     };
 }

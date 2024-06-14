@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { useSelector } from '@/store/hooks';
+import { useSelector, useDispatch } from '@/store/hooks';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Drawer from '@mui/material/Drawer';
@@ -15,9 +15,9 @@ import CreatorSearch from '@/app/home/components/apps/creators/CreatorSearch';
 import CreatorFilter from '@/app/home/components/apps/creators/CreatorFilter';
 import AppCard from '@/app/home/components/shared/AppCard';
 import { CreatorDialogDelete } from '../../components/apps/creators/CreatorDialogDelete';
-import { useDispatch } from '@/store/hooks';
+
 import { subscribeWebSocketThunk, unsubscribeWebSocketThunk, websocketSelector } from '@/features/ws';
-import { deleteCreatorThunk, getCreatorsThunk } from '@/features/creator';
+import { deleteCreatorThunk } from '@/features/creator';
 
 const drawerWidth = 240;
 const secdrawerWidth = 320;
@@ -35,6 +35,7 @@ export default function Creators() {
     const [creatorId, setCreatorId] = useState('');
     const [isCreatorsOnline, setIsCreatorsOnline] = useState(false);
     const [isOpenDialogDelete, setIsOpenDialogDelete] = useState(false);
+    const [isBlocked, setIsBlocked] = useState(false);
     const [creatorDelete, setCreatorDelete] = useState({ email: '', id: '' });
 
     useEffect(() => {
@@ -44,25 +45,23 @@ export default function Creators() {
         };
     }, []);
 
-    useEffect(() => {
-        dispatch(getCreatorsThunk());
-    }, []);
-
     const creatorsFiltered = useMemo(() => {
         return search.length > 0
-            ? Object.values(creators).filter(
+            ? creators.filter(
                   (creator) =>
-                      creator.name.toLowerCase().includes(search.toLowerCase()) ||
+                      creator?.username?.toLowerCase().includes(search.toLowerCase()) ||
                       creator.emails.some((item) => item.email.toLowerCase().includes(search.toLowerCase()))
               )
             : [];
     }, [search, creators]);
 
     const creatorsOnlineFiltered = useMemo(() => {
-        return isCreatorsOnline
-            ? Object.values(creators).filter((creator) => creatorsOnline.some((item) => creator._id === item._id))
-            : [];
-    }, [isCreatorsOnline]);
+        return creators.filter((creator) => creatorsOnline.some((item) => creator._id === item._id));
+    }, [creators, creatorsOnline]);
+
+    const creatorsBlockedFiltered = useMemo(() => {
+        return creators.filter((creator) => creator?.vault?.isBlocked);
+    }, [creators]);
 
     const onDeleteClick = ({ id, email }: { id: string; email: string }) => {
         setIsOpenDialogDelete(true);
@@ -93,7 +92,10 @@ export default function Creators() {
                     }}
                     variant={lgUp ? 'permanent' : 'temporary'}
                 >
-                    <CreatorFilter handleToggleOnline={() => setIsCreatorsOnline(!isCreatorsOnline)} />
+                    <CreatorFilter
+                        handleToggleOnline={() => setIsCreatorsOnline(!isCreatorsOnline)}
+                        handleToggleBlocked={() => setIsBlocked(!isBlocked)}
+                    />
                 </Drawer>
 
                 <Box
@@ -108,8 +110,9 @@ export default function Creators() {
                         creatorId={creatorId}
                         data={
                             (search.length > 0 && creatorsFiltered) ||
+                            (isBlocked && creatorsBlockedFiltered) ||
                             (isCreatorsOnline && creatorsOnlineFiltered) ||
-                            Object.values(creators)
+                            creators
                         }
                         onDeleteClick={onDeleteClick}
                         onCreatorClick={({ id }) => setCreatorId(id)}

@@ -1,14 +1,26 @@
 import { Box, Modal as MuiModal, Typography } from '@mui/material';
-import { LogsProps } from '../apps/requestConsign/RequestConsignDetails';
+import { CommentsProps, LogsProps } from '../apps/requestConsign/RequestConsignDetails';
 
 interface ModalProps {
-    open: boolean;
+    open: string | false;
     handleClose: () => void;
     title: string;
-    content: LogsProps[];
+    content: LogsProps[] | CommentsProps[];
 }
 
-export default function Modal({ open, handleClose, title, content }: ModalProps) {
+const Comments = ({ content }: { content: CommentsProps[] }) => {
+    return (
+        <>
+            {content.map((item, index) => (
+                <Typography key={index} id="modal-modal-description" sx={{ mt: 2 }}>
+                    {item.comment}
+                </Typography>
+            ))}
+        </>
+    );
+};
+
+const Logs = ({ content }: { content: LogsProps[] }) => {
     const handleColorStatus = (status: string) => {
         if (status === 'failed') return { color: 'red' };
         if (status === 'pending') return { color: 'orange' };
@@ -19,8 +31,45 @@ export default function Modal({ open, handleClose, title, content }: ModalProps)
     };
 
     return (
+        <>
+            {content
+                .map((item, index) => (
+                    <Typography
+                        key={index}
+                        id="modal-modal-description"
+                        sx={{ mt: 2, ...handleColorStatus(item.status) }}
+                    >
+                        <b>status:</b>
+                        {item.status} <br />
+                        <b>message:</b>
+                        {item.message} <br />
+                        <b>when:</b>
+                        {item.when} <br />
+                    </Typography>
+                ))
+                .reverse()}
+
+            {!content.length && <Typography id="modal-modal-description">No logs</Typography>}
+        </>
+    );
+};
+
+export default function Modal({ open, handleClose, title, content }: ModalProps) {
+    const isLogsProps = (value: any[]): value is LogsProps[] => {
+        return (value as LogsProps[])[0].status !== undefined;
+    };
+
+    const renderContent = () => {
+        if (isLogsProps(content)) {
+            return <Logs content={content as LogsProps[]} />;
+        } else {
+            return <Comments content={content as CommentsProps[]} />;
+        }
+    };
+
+    return (
         <MuiModal
-            open={open}
+            open={!!open}
             onClose={handleClose}
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
@@ -36,24 +85,7 @@ export default function Modal({ open, handleClose, title, content }: ModalProps)
                         overflowY: 'auto',
                     }}
                 >
-                    {content
-                        .map((item, index) => (
-                            <Typography
-                                key={index}
-                                id="modal-modal-description"
-                                sx={{ mt: 2, ...handleColorStatus(item.status) }}
-                            >
-                                <b>status:</b>
-                                {item.status} <br />
-                                <b>message:</b>
-                                {item.message} <br />
-                                <b>when:</b>
-                                {item.when} <br />
-                            </Typography>
-                        ))
-                        .reverse()}
-
-                    {!content.length && <Typography id="modal-modal-description">No logs</Typography>}
+                    {renderContent()}
                 </Box>
             </Box>
         </MuiModal>

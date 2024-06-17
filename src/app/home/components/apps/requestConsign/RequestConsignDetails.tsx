@@ -32,6 +32,15 @@ export interface LogsProps {
     when: string;
 }
 
+export interface CommentsProps {
+    comment: string;
+}
+
+interface SelectModalProps {
+    owner: string;
+    context: LogsProps[] | CommentsProps[];
+}
+
 export default function RequestConsignDetails({
     requestId,
     username,
@@ -42,13 +51,21 @@ export default function RequestConsignDetails({
     handleReject,
     handleOpenStore,
 }: Props) {
-    const [open, setOpen] = useState(false);
-    const handleOpen = () => setOpen(true);
+    const [open, setOpen] = useState<string | false>(false);
+    const [titleModal, setTitleModal] = useState<string>('');
+    const [content, setContent] = useState<LogsProps[] | CommentsProps[]>([]);
     const handleClose = () => setOpen(false);
 
     const url = useMemo(() => `${BASE_URL_STORE}/preview/${assetId}/${Date.now()}`, [assetId]);
     const logs: LogsProps[] = useSelector((state) => state.requestConsign.byId[requestId]?.logs || []);
+    const comments: CommentsProps[] = [{ comment: 'Comment 1' }, { comment: 'Comment 2' }];
     const statusRequestConsign = useSelector((state) => state.requestConsign.byId[requestId]?.status || '');
+
+    const selectModal = ({ owner, context }: SelectModalProps) => {
+        setOpen(owner);
+        setTitleModal(owner);
+        setContent(context);
+    };
 
     return (
         <>
@@ -66,13 +83,13 @@ export default function RequestConsignDetails({
                             Open in New Window
                         </Button>
                         <Tooltip title="Logs">
-                            <IconButton onClick={handleOpen}>
+                            <IconButton onClick={() => selectModal({ owner: 'View Logs', context: logs })}>
                                 <IconNotes size="18" stroke={1.3} />
                                 {statusRequestConsign === 'running' && <CircularProgress size={20} />}
                             </IconButton>
                         </Tooltip>
                         <Tooltip title="Comments">
-                            <IconButton>
+                            <IconButton onClick={() => selectModal({ owner: 'Comments', context: comments })}>
                                 <IconMessage size="18" stroke={1.3} />
                             </IconButton>
                         </Tooltip>
@@ -116,7 +133,7 @@ export default function RequestConsignDetails({
                     style={{ border: 'none' }}
                 />
             </Box>
-            <Modal open={open} handleClose={handleClose} title="View Logs" content={logs} />
+            <Modal open={open} handleClose={handleClose} title={titleModal} content={content} />
         </>
     );
 }

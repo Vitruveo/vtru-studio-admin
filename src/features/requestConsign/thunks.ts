@@ -8,7 +8,7 @@ import { BASE_URL_API } from '@/constants/api';
 import { toastrActionsCreators } from '../toastr/slice';
 import { consign, eventsByTransaction, updateRequestConsignComments, updateStatusRequestConsign } from './requests';
 import { APIResponse } from '../common/types';
-import { CommentsProps } from '@/app/home/components/apps/requestConsign/RequestConsignDetails';
+import { CommentsProps } from './types';
 
 export function requestConsignUpdateStatusThunk(
     id: string,

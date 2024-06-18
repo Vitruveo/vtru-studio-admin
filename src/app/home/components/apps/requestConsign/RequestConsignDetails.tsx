@@ -11,6 +11,7 @@ import { IconMessage, IconNotes } from '@tabler/icons-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Modal from '../../modal';
 import { requestConsignAddCommentThunk } from '@/features/requestConsign/thunks';
+import { CommentsProps, LogsProps } from '@/features/requestConsign/types';
 
 interface Props {
     requestId: string;
@@ -25,16 +26,6 @@ interface Props {
     handleApprove: () => void;
     handleReject: () => void;
     handleOpenStore: () => void;
-}
-
-export interface LogsProps {
-    status: string;
-    message: string;
-    when: string;
-}
-
-export interface CommentsProps {
-    comment: string;
 }
 
 interface SelectModalProps {
@@ -92,7 +83,7 @@ export const Comments = ({ content, requestId }: CommentsContent) => {
     const handleAddComment = () => {
         const comment = textRef.current?.value;
         if (comment) {
-            const comments = [...content, { comment }];
+            const comments = [...content, { username: 'admin', comment, when: new Date().toISOString() }];
             dispatch(requestConsignAddCommentThunk({ requestId, comments }));
             textRef.current.value = '';
         }

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { apiService } from '@/services/api';
-import {} from './types';
+import { CommentsProps } from './types';
 import { APIResponse } from '../common/types';
 import { BASE_URL_BATCH } from '@/constants/api';
 
@@ -29,6 +29,6 @@ export async function eventsByTransaction(transaction: string) {
     return axios.get(`${BASE_URL_BATCH}/events/${transaction}`);
 }
 
-export async function updateRequestConsignComments({ id, comments }: { id: string; comments: { comment: string }[] }) {
+export async function updateRequestConsignComments({ id, comments }: { id: string; comments: CommentsProps[] }) {
     return apiService.patch(`/requestConsign/comments/${id}`, { comments });
 }

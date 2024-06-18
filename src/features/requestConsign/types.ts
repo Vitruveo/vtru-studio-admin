@@ -18,14 +18,20 @@ export interface RequestConsign {
     when: Date;
     status: string;
     transaction?: string;
-    logs?: {
-        status: string;
-        message: string;
-        when: string;
-    }[];
-    comments?: {
-        comment: string;
-    }[];
+    logs?: LogsProps[];
+    comments?: CommentsProps[];
+}
+
+export interface CommentsProps {
+    username: string;
+    comment: string;
+    when: string;
+}
+
+export interface LogsProps {
+    status: string;
+    message: string;
+    when: string;
 }
 
 export type GetListApiRes = APIResponse<RequestConsign[]>;

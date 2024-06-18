@@ -55,6 +55,20 @@ export const requestConsignSlice = createSlice({
                 logs: action.payload.logs,
             };
         },
+        setComments: (
+            state,
+            action: PayloadAction<{
+                id: string;
+                comments: {
+                    comment: string;
+                }[];
+            }>
+        ) => {
+            state.byId[action.payload.id] = {
+                ...state.byId[action.payload.id],
+                comments: action.payload.comments,
+            };
+        },
         resetConsign: (state, action: PayloadAction<{ id: string }>) => {
             state.byId[action.payload.id] = {
                 ...state.byId[action.payload.id],

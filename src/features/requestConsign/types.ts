@@ -23,6 +23,9 @@ export interface RequestConsign {
         message: string;
         when: string;
     }[];
+    comments?: {
+        comment: string;
+    }[];
 }
 
 export type GetListApiRes = APIResponse<RequestConsign[]>;

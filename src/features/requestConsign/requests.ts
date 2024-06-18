@@ -28,3 +28,7 @@ export async function consign(id: string) {
 export async function eventsByTransaction(transaction: string) {
     return axios.get(`${BASE_URL_BATCH}/events/${transaction}`);
 }
+
+export async function updateRequestConsignComments({ id, comments }: { id: string; comments: { comment: string }[] }) {
+    return apiService.patch(`/requestConsign/comments/${id}`, { comments });
+}

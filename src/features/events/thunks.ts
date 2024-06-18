@@ -1,4 +1,6 @@
 import { fetchEventSource } from '@microsoft/fetch-event-source';
+import cookie from 'cookiejs';
+
 import { ReduxThunkAction } from '@/store';
 import { BASE_URL_API } from '@/constants/api';
 import { requestConsignActionsCreators } from '../requestConsign';
@@ -34,6 +36,11 @@ export function getEventsThunk(): ReduxThunkAction {
     return async function (dispatch, getState) {
         const state = getState();
         const token = state.auth.token;
+
+        const replaceDomain = window.location.hostname.includes('vitruveo.xyz') ? 'studio-admin.' : 'admin.';
+
+        const domain = window.location.hostname.replace(replaceDomain, '');
+        cookie.set('token', token, { path: '/', domain });
 
         const ctrl = new AbortController();
 

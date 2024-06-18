@@ -83,7 +83,7 @@ export const Comments = ({ content, requestId }: CommentsContent) => {
     const handleAddComment = () => {
         const comment = textRef.current?.value;
         if (comment) {
-            const comments = [...content, { username: 'admin', comment, when: new Date().toISOString() }];
+            const comments = [...content, { comment }];
             dispatch(requestConsignAddCommentThunk({ requestId, comments }));
             textRef.current.value = '';
         }

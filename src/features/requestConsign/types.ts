@@ -23,9 +23,9 @@ export interface RequestConsign {
 }
 
 export interface CommentsProps {
-    username: string;
+    username?: string;
     comment: string;
-    when: string;
+    when?: string;
 }
 
 export interface LogsProps {

@@ -1,4 +1,7 @@
-import { Box, Modal as MuiModal, Typography } from '@mui/material';
+import { useRef, useState } from 'react';
+import { Box, Button, Modal as MuiModal, TextareaAutosize, Typography } from '@mui/material';
+import { useDispatch } from '@/store/hooks';
+import { requestConsignActionsCreators } from '@/features/requestConsign';
 import { CommentsProps, LogsProps } from '../apps/requestConsign/RequestConsignDetails';
 
 interface ModalProps {
@@ -6,21 +9,48 @@ interface ModalProps {
     handleClose: () => void;
     title: string;
     content: LogsProps[] | CommentsProps[];
+    requestId: string;
 }
 
-const Comments = ({ content }: { content: CommentsProps[] }) => {
+interface CommentsContent {
+    content: CommentsProps[];
+    requestId: string;
+}
+
+interface LogsContent {
+    content: LogsProps[];
+}
+
+const Comments = ({ content, requestId }: CommentsContent) => {
+    const dispatch = useDispatch();
+    const textRef = useRef<HTMLTextAreaElement>(null);
+    const [comments, setComments] = useState<CommentsProps[]>(content);
+
+    const handleAddComment = () => {
+        const comment = textRef.current?.value;
+        if (comment) {
+            setComments((prevComments) => [...prevComments, { comment }]);
+            dispatch(requestConsignActionsCreators.setComments({ id: requestId, comments }));
+            textRef.current.value = '';
+        }
+    };
+
     return (
         <>
-            {content.map((item, index) => (
+            {comments.map((item, index) => (
                 <Typography key={index} id="modal-modal-description" sx={{ mt: 2 }}>
                     {item.comment}
                 </Typography>
             ))}
+            <TextareaAutosize ref={textRef} aria-label="empty textarea" placeholder="Write a comment" />
+            <Button variant="contained" onClick={handleAddComment}>
+                Update
+            </Button>
         </>
     );
 };
 
-const Logs = ({ content }: { content: LogsProps[] }) => {
+const Logs = ({ content }: LogsContent) => {
     const handleColorStatus = (status: string) => {
         if (status === 'failed') return { color: 'red' };
         if (status === 'pending') return { color: 'orange' };
@@ -54,16 +84,12 @@ const Logs = ({ content }: { content: LogsProps[] }) => {
     );
 };
 
-export default function Modal({ open, handleClose, title, content }: ModalProps) {
-    const isLogsProps = (value: any[]): value is LogsProps[] => {
-        return (value as LogsProps[])[0]?.status !== undefined;
-    };
-
+export default function Modal({ open, handleClose, title, content, requestId }: ModalProps) {
     const renderContent = () => {
-        if (isLogsProps(content)) {
+        if (title.includes('Logs')) {
             return <Logs content={content as LogsProps[]} />;
         } else {
-            return <Comments content={content as CommentsProps[]} />;
+            return <Comments content={content as CommentsProps[]} requestId={requestId} />;
         }
     };
 

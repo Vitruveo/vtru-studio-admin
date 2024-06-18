@@ -133,7 +133,7 @@ export default function RequestConsignDetails({
                     style={{ border: 'none' }}
                 />
             </Box>
-            <Modal open={open} handleClose={handleClose} title={titleModal} content={content} />
+            <Modal open={open} handleClose={handleClose} title={titleModal} content={content} requestId={requestId} />
         </>
     );
 }

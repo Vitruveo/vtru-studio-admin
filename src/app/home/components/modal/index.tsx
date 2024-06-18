@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Modal as MuiModal, Typography } from '@mui/material';
 
 interface ModalProps {
-    open: string | false;
+    open: boolean;
     handleClose: () => void;
     title: string;
     children: React.ReactNode;
@@ -11,7 +11,7 @@ interface ModalProps {
 export default function Modal({ open, handleClose, title, children }: ModalProps) {
     return (
         <MuiModal
-            open={!!open}
+            open={open}
             onClose={handleClose}
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"

@@ -1,6 +1,6 @@
 import { BASE_URL_STORE } from '@/constants/api';
 import { useDispatch, useSelector } from '@/store/hooks';
-import { Button, CircularProgress, Grid, TextareaAutosize } from '@mui/material';
+import { Button, CircularProgress, TextareaAutosize } from '@mui/material';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
@@ -8,7 +8,7 @@ import Stack from '@mui/material/Stack';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { IconMessage, IconNotes } from '@tabler/icons-react';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Modal from '../../modal';
 import { requestConsignAddCommentThunk } from '@/features/requestConsign/thunks';
 
@@ -87,6 +87,8 @@ export const Logs = ({ content }: LogsContent) => {
 export const Comments = ({ content, requestId }: CommentsContent) => {
     const dispatch = useDispatch();
     const textRef = useRef<HTMLTextAreaElement>(null);
+    const commentsEndRef = useRef<HTMLDivElement>(null);
+
     const handleAddComment = () => {
         const comment = textRef.current?.value;
         if (comment) {
@@ -96,15 +98,20 @@ export const Comments = ({ content, requestId }: CommentsContent) => {
         }
     };
 
+    useEffect(() => {
+        commentsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, [content]);
+
     return (
         <Box display="flex" flexDirection="column" justifyContent="space-between" height="100%">
-            <Box>
+            <Box flexGrow={1} overflow="auto">
                 {content.map((item, index) => (
                     <Typography key={index} id="modal-modal-description" sx={{ mt: 2 }}>
                         {item.comment}
                     </Typography>
                 ))}
                 {!content.length && <Typography id="modal-modal-description">No Comments</Typography>}
+                <div ref={commentsEndRef} />
             </Box>
             <Box display="flex" justifyContent="space-between" height={'15%'} alignItems={'end'}>
                 <TextareaAutosize
@@ -131,7 +138,7 @@ export default function RequestConsignDetails({
     handleReject,
     handleOpenStore,
 }: Props) {
-    const [open, setOpen] = useState<string | false>(false);
+    const [open, setOpen] = useState<boolean>(false);
     const [titleModal, setTitleModal] = useState<string>('');
     const handleClose = () => setOpen(false);
 
@@ -141,7 +148,7 @@ export default function RequestConsignDetails({
     const statusRequestConsign = useSelector((state) => state.requestConsign.byId[requestId]?.status || '');
 
     const selectModal = ({ owner }: SelectModalProps) => {
-        setOpen(owner);
+        setOpen(true);
         setTitleModal(owner);
     };
 

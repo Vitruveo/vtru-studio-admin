@@ -56,7 +56,7 @@ const Logs = ({ content }: { content: LogsProps[] }) => {
 
 export default function Modal({ open, handleClose, title, content }: ModalProps) {
     const isLogsProps = (value: any[]): value is LogsProps[] => {
-        return (value as LogsProps[])[0].status !== undefined;
+        return (value as LogsProps[])[0]?.status !== undefined;
     };
 
     const renderContent = () => {

@@ -75,7 +75,7 @@ export default function RequestConsignDetails({
             <Divider />
             <Box p={2}>
                 <Stack gap={0} direction="row" justifyContent="space-between">
-                    <Box display="flex" gap={1}>
+                    <Box display="flex" gap={1} alignItems={'center'}>
                         <Button variant="contained" onClick={handleApprove}>
                             Approve and Consign
                         </Button>
@@ -85,7 +85,6 @@ export default function RequestConsignDetails({
                         <Tooltip title="Logs">
                             <IconButton onClick={() => selectModal({ owner: 'View Logs', context: logs })}>
                                 <IconNotes size="18" stroke={1.3} />
-                                {statusRequestConsign === 'running' && <CircularProgress size={20} />}
                             </IconButton>
                         </Tooltip>
                         <Tooltip title="Comments">
@@ -93,6 +92,7 @@ export default function RequestConsignDetails({
                                 <IconMessage size="18" stroke={1.3} />
                             </IconButton>
                         </Tooltip>
+                        {statusRequestConsign === 'running' && <CircularProgress size={20} />}
                     </Box>
                     <Button
                         variant="contained"

@@ -8,17 +8,14 @@ export async function updateStatusRequestConsign({
     id,
     status,
     logs,
-    comments,
 }: {
     id: string;
     status: 'approved' | 'rejected' | 'running' | 'error';
     logs?: any[];
-    comments?: any[];
 }): Promise<APIResponse> {
     const response = await apiService.patch(`/requestConsign/${id}`, {
         status,
         ...(logs && logs.length > 0 && { logs }),
-        ...(comments && comments.length > 0 && { comments }),
     });
 
     return response;
@@ -30,4 +27,8 @@ export async function consign(id: string) {
 
 export async function eventsByTransaction(transaction: string) {
     return axios.get(`${BASE_URL_BATCH}/events/${transaction}`);
+}
+
+export async function updateRequestConsignComments({ id, comments }: { id: string; comments: { comment: string }[] }) {
+    return apiService.patch(`/requestConsign/comments/${id}`, { comments });
 }

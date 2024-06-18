@@ -1,6 +1,6 @@
 import { BASE_URL_STORE } from '@/constants/api';
-import { useSelector } from '@/store/hooks';
-import { Button, CircularProgress } from '@mui/material';
+import { useDispatch, useSelector } from '@/store/hooks';
+import { Button, CircularProgress, TextareaAutosize } from '@mui/material';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
@@ -8,8 +8,9 @@ import Stack from '@mui/material/Stack';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { IconMessage, IconNotes } from '@tabler/icons-react';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import Modal from '../../modal';
+import { requestConsignAddCommentThunk } from '@/features/requestConsign/thunks';
 
 interface Props {
     requestId: string;
@@ -38,8 +39,77 @@ export interface CommentsProps {
 
 interface SelectModalProps {
     owner: string;
-    context: LogsProps[] | CommentsProps[];
 }
+
+export interface CommentsContent {
+    content: CommentsProps[];
+    requestId: string;
+}
+
+export interface LogsContent {
+    content: LogsProps[];
+}
+
+export const Logs = ({ content }: LogsContent) => {
+    const handleColorStatus = (status: string) => {
+        if (status === 'failed') return { color: 'red' };
+        if (status === 'pending') return { color: 'orange' };
+        if (status === 'running') return { color: 'black' };
+        if (status === 'finished') return { color: 'green' };
+
+        return { color: 'black' };
+    };
+
+    return (
+        <>
+            {content
+                .map((item, index) => (
+                    <Typography
+                        key={index}
+                        id="modal-modal-description"
+                        sx={{ mt: 2, ...handleColorStatus(item.status) }}
+                    >
+                        <b>status:</b>
+                        {item.status} <br />
+                        <b>message:</b>
+                        {item.message} <br />
+                        <b>when:</b>
+                        {item.when} <br />
+                    </Typography>
+                ))
+                .reverse()}
+
+            {!content.length && <Typography id="modal-modal-description">No logs</Typography>}
+        </>
+    );
+};
+
+export const Comments = ({ content, requestId }: CommentsContent) => {
+    const dispatch = useDispatch();
+    const textRef = useRef<HTMLTextAreaElement>(null);
+    const handleAddComment = () => {
+        const comment = textRef.current?.value;
+        if (comment) {
+            const comments = [...content, { comment }];
+            dispatch(requestConsignAddCommentThunk({ requestId, comments }));
+            textRef.current.value = '';
+        }
+    };
+
+    return (
+        <>
+            {content.map((item, index) => (
+                <Typography key={index} id="modal-modal-description" sx={{ mt: 2 }}>
+                    {item.comment}
+                </Typography>
+            ))}
+            <TextareaAutosize ref={textRef} aria-label="empty textarea" placeholder="Write a comment" />
+            <Button variant="contained" onClick={handleAddComment}>
+                Update
+            </Button>
+        </>
+    );
+};
 
 export default function RequestConsignDetails({
     requestId,
@@ -53,7 +123,6 @@ export default function RequestConsignDetails({
 }: Props) {
     const [open, setOpen] = useState<string | false>(false);
     const [titleModal, setTitleModal] = useState<string>('');
-    const [content, setContent] = useState<LogsProps[] | CommentsProps[]>([]);
     const handleClose = () => setOpen(false);
 
     const url = useMemo(() => `${BASE_URL_STORE}/preview/${assetId}/${Date.now()}`, [assetId]);
@@ -61,10 +130,9 @@ export default function RequestConsignDetails({
     const comments: CommentsProps[] = useSelector((state) => state.requestConsign.byId[requestId]?.comments || []);
     const statusRequestConsign = useSelector((state) => state.requestConsign.byId[requestId]?.status || '');
 
-    const selectModal = ({ owner, context }: SelectModalProps) => {
+    const selectModal = ({ owner }: SelectModalProps) => {
         setOpen(owner);
         setTitleModal(owner);
-        setContent(context);
     };
 
     return (
@@ -83,12 +151,12 @@ export default function RequestConsignDetails({
                             Open in New Window
                         </Button>
                         <Tooltip title="Logs">
-                            <IconButton onClick={() => selectModal({ owner: 'View Logs', context: logs })}>
+                            <IconButton onClick={() => selectModal({ owner: 'View Logs' })}>
                                 <IconNotes size="18" stroke={1.3} />
                             </IconButton>
                         </Tooltip>
                         <Tooltip title="Comments">
-                            <IconButton onClick={() => selectModal({ owner: 'Comments', context: comments })}>
+                            <IconButton onClick={() => selectModal({ owner: 'Comments' })}>
                                 <IconMessage size="18" stroke={1.3} />
                             </IconButton>
                         </Tooltip>
@@ -133,7 +201,16 @@ export default function RequestConsignDetails({
                     style={{ border: 'none' }}
                 />
             </Box>
-            <Modal open={open} handleClose={handleClose} title={titleModal} content={content} requestId={requestId} />
+            {titleModal.includes('Logs') && (
+                <Modal open={open} handleClose={handleClose} title={titleModal}>
+                    <Logs content={logs} />
+                </Modal>
+            )}
+            {titleModal.includes('Comments') && (
+                <Modal open={open} handleClose={handleClose} title={titleModal}>
+                    <Comments content={comments} requestId={requestId} />
+                </Modal>
+            )}
         </>
     );
 }

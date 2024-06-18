@@ -8,14 +8,17 @@ export async function updateStatusRequestConsign({
     id,
     status,
     logs,
+    comments,
 }: {
     id: string;
     status: 'approved' | 'rejected' | 'running' | 'error';
     logs?: any[];
+    comments?: any[];
 }): Promise<APIResponse> {
     const response = await apiService.patch(`/requestConsign/${id}`, {
         status,
         ...(logs && logs.length > 0 && { logs }),
+        ...(comments && comments.length > 0 && { comments }),
     });
 
     return response;

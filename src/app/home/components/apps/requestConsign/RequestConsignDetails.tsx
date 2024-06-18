@@ -58,7 +58,7 @@ export default function RequestConsignDetails({
 
     const url = useMemo(() => `${BASE_URL_STORE}/preview/${assetId}/${Date.now()}`, [assetId]);
     const logs: LogsProps[] = useSelector((state) => state.requestConsign.byId[requestId]?.logs || []);
-    const comments: CommentsProps[] = [{ comment: 'Comment 1' }, { comment: 'Comment 2' }];
+    const comments: CommentsProps[] = useSelector((state) => state.requestConsign.byId[requestId]?.comments || []);
     const statusRequestConsign = useSelector((state) => state.requestConsign.byId[requestId]?.status || '');
 
     const selectModal = ({ owner, context }: SelectModalProps) => {

@@ -1,6 +1,6 @@
 import { BASE_URL_STORE } from '@/constants/api';
 import { useDispatch, useSelector } from '@/store/hooks';
-import { Button, CircularProgress, TextareaAutosize } from '@mui/material';
+import { Button, CircularProgress, Grid, TextareaAutosize } from '@mui/material';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
@@ -97,17 +97,27 @@ export const Comments = ({ content, requestId }: CommentsContent) => {
     };
 
     return (
-        <>
-            {content.map((item, index) => (
-                <Typography key={index} id="modal-modal-description" sx={{ mt: 2 }}>
-                    {item.comment}
-                </Typography>
-            ))}
-            <TextareaAutosize ref={textRef} aria-label="empty textarea" placeholder="Write a comment" />
-            <Button variant="contained" onClick={handleAddComment}>
-                Update
-            </Button>
-        </>
+        <Box display="flex" flexDirection="column" justifyContent="space-between" height="100%">
+            <Box>
+                {content.map((item, index) => (
+                    <Typography key={index} id="modal-modal-description" sx={{ mt: 2 }}>
+                        {item.comment}
+                    </Typography>
+                ))}
+                {!content.length && <Typography id="modal-modal-description">No Comments</Typography>}
+            </Box>
+            <Box display="flex" justifyContent="space-between" height={'15%'} alignItems={'end'}>
+                <TextareaAutosize
+                    ref={textRef}
+                    aria-label="empty textarea"
+                    placeholder="Write a comment"
+                    style={{ width: '100%', height: '100%', padding: '10px', resize: 'none' }}
+                />
+                <Button variant="contained" onClick={handleAddComment} sx={{ ml: 2, height: 40 }}>
+                    Update
+                </Button>
+            </Box>
+        </Box>
     );
 };
 

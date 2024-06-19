@@ -8,7 +8,7 @@ import { BASE_URL_API } from '@/constants/api';
 import { toastrActionsCreators } from '../toastr/slice';
 import { consign, eventsByTransaction, updateRequestConsignComments, updateStatusRequestConsign } from './requests';
 import { APIResponse } from '../common/types';
-import { CommentsProps } from '@/app/home/components/apps/requestConsign/RequestConsignDetails';
+import { CommentsProps } from './types';
 
 export function requestConsignUpdateStatusThunk(
     id: string,
@@ -204,15 +204,20 @@ export function eventTransactionThunk({ requestId }: { requestId: string }): Red
 
 export function requestConsignAddCommentThunk({
     requestId,
-    comments,
+    comment,
 }: {
     requestId: string;
-    comments: CommentsProps[];
+    comment: string;
 }): ReduxThunkAction<Promise<void>> {
     return async function (dispatch, getState) {
-        dispatch(requestConsignActionsCreators.setComments({ id: requestId, comments }));
-        updateRequestConsignComments({ id: requestId, comments }).catch(() => {
-            // do nothing
-        });
+        const commentList = getState().requestConsign.byId[requestId].comments || [];
+        updateRequestConsignComments({ id: requestId, comment })
+            .then((res) => {
+                const updatedComments = [...commentList, res.data] as CommentsProps[];
+                dispatch(requestConsignActionsCreators.setComments({ id: requestId, comments: updatedComments }));
+            })
+            .catch(() => {
+                // do nothing
+            });
     };
 }

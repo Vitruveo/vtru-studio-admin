@@ -1,5 +1,5 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
-import type { InitialState, RequestConsign } from './types';
+import type { CommentsProps, InitialState, RequestConsign } from './types';
 
 const initialState: InitialState = {
     byId: {},
@@ -65,9 +65,7 @@ export const requestConsignSlice = createSlice({
             state,
             action: PayloadAction<{
                 id: string;
-                comments: {
-                    comment: string;
-                }[];
+                comments: CommentsProps[];
             }>
         ) => {
             state.byId[action.payload.id] = {

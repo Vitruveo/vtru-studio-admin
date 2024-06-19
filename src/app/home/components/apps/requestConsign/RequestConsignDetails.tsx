@@ -11,6 +11,8 @@ import { IconMessage, IconNotes } from '@tabler/icons-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Modal from '../../modal';
 import { requestConsignAddCommentThunk } from '@/features/requestConsign/thunks';
+import { CommentsProps, LogsProps } from '@/features/requestConsign/types';
+import localeDate from '@/utils/locale/date';
 
 interface Props {
     requestId: string;
@@ -25,16 +27,6 @@ interface Props {
     handleApprove: () => void;
     handleReject: () => void;
     handleOpenStore: () => void;
-}
-
-export interface LogsProps {
-    status: string;
-    message: string;
-    when: string;
-}
-
-export interface CommentsProps {
-    comment: string;
 }
 
 interface SelectModalProps {
@@ -92,8 +84,7 @@ export const Comments = ({ content, requestId }: CommentsContent) => {
     const handleAddComment = () => {
         const comment = textRef.current?.value;
         if (comment) {
-            const comments = [...content, { comment }];
-            dispatch(requestConsignAddCommentThunk({ requestId, comments }));
+            dispatch(requestConsignAddCommentThunk({ requestId, comment }));
             textRef.current.value = '';
         }
     };
@@ -104,11 +95,19 @@ export const Comments = ({ content, requestId }: CommentsContent) => {
 
     return (
         <Box display="flex" flexDirection="column" justifyContent="space-between" height="100%">
-            <Box flexGrow={1} overflow="auto">
+            <Box flexGrow={1} overflow="auto" mb={2}>
                 {content.map((item, index) => (
-                    <Typography key={index} id="modal-modal-description" sx={{ mt: 2 }}>
-                        {item.comment}
-                    </Typography>
+                    <Box key={index} mt={2} border={'1px solid gray'} p={1} borderRadius={1}>
+                        <Box display={'flex'} justifyContent={'space-between'}>
+                            <Typography color="#763EBD">{item.username || ''}</Typography>
+                            <Typography variant="body2" style={{ textAlign: 'right' }}>
+                                {localeDate(item.when || '')}
+                            </Typography>
+                        </Box>
+                        <Typography fontWeight="bold" ml={2} mr={2}>
+                            {item.comment}
+                        </Typography>
+                    </Box>
                 ))}
                 {!content.length && <Typography id="modal-modal-description">No Comments</Typography>}
                 <div ref={commentsEndRef} />
@@ -118,7 +117,7 @@ export const Comments = ({ content, requestId }: CommentsContent) => {
                     ref={textRef}
                     aria-label="empty textarea"
                     placeholder="Write a comment"
-                    style={{ width: '100%', height: '100%', padding: '10px', resize: 'none' }}
+                    style={{ width: '100%', maxHeight: '100%', overflowY: 'auto', padding: '10px', resize: 'none' }}
                 />
                 <Button variant="contained" onClick={handleAddComment} sx={{ ml: 2, height: 40 }}>
                     Update

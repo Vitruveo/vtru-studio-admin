@@ -2,7 +2,7 @@ import Scrollbar from '../../custom-scroll/Scrollbar';
 import RequestConsignListItem from './RequestConsignListItem';
 import { RequestConsign } from '@/features/requestConsign';
 import { Stack, List, IconButton, Tooltip } from '@mui/material';
-import { IconCheck, IconHandOff, IconClock, IconX } from '@tabler/icons-react';
+import { IconCheck, IconHandOff, IconClock, IconX, IconLoader2 } from '@tabler/icons-react';
 
 type Props = {
     requestConsignId: string;
@@ -41,6 +41,11 @@ export default function RequestConsignList({ requestConsignId, data, activeFilte
                 <Tooltip title="Rejected">
                     <IconButton onClick={() => handleFilter('rejected')} sx={styleActive('rejected')}>
                         <IconHandOff size="18" stroke={1.3} />
+                    </IconButton>
+                </Tooltip>
+                <Tooltip title="Running">
+                    <IconButton onClick={() => handleFilter('running')} sx={styleActive('running')}>
+                        <IconLoader2 size="18" stroke={1.3} />
                     </IconButton>
                 </Tooltip>
                 <Tooltip title="Error">

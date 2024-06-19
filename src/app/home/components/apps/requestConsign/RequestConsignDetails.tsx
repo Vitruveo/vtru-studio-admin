@@ -117,7 +117,7 @@ export const Comments = ({ content, requestId }: CommentsContent) => {
                     ref={textRef}
                     aria-label="empty textarea"
                     placeholder="Write a comment"
-                    style={{ width: '100%', height: '100%', padding: '10px', resize: 'none' }}
+                    style={{ width: '100%', maxHeight: '100%', overflowY: 'auto', padding: '10px', resize: 'none' }}
                 />
                 <Button variant="contained" onClick={handleAddComment} sx={{ ml: 2, height: 40 }}>
                     Update

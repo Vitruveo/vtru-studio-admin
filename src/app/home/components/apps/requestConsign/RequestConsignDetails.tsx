@@ -83,8 +83,7 @@ export const Comments = ({ content, requestId }: CommentsContent) => {
     const handleAddComment = () => {
         const comment = textRef.current?.value;
         if (comment) {
-            const comments = [...content, { comment }];
-            dispatch(requestConsignAddCommentThunk({ requestId, comments }));
+            dispatch(requestConsignAddCommentThunk({ requestId, comment }));
             textRef.current.value = '';
         }
     };
@@ -98,7 +97,9 @@ export const Comments = ({ content, requestId }: CommentsContent) => {
             <Box flexGrow={1} overflow="auto">
                 {content.map((item, index) => (
                     <Typography key={index} id="modal-modal-description" sx={{ mt: 2 }}>
-                        {item.comment}
+                        {item.username || ''}
+                        {item.when || ''}
+                        {item.comment || ''}
                     </Typography>
                 ))}
                 {!content.length && <Typography id="modal-modal-description">No Comments</Typography>}
@@ -136,6 +137,7 @@ export default function RequestConsignDetails({
     const url = useMemo(() => `${BASE_URL_STORE}/preview/${assetId}/${Date.now()}`, [assetId]);
     const logs: LogsProps[] = useSelector((state) => state.requestConsign.byId[requestId]?.logs || []);
     const comments: CommentsProps[] = useSelector((state) => state.requestConsign.byId[requestId]?.comments || []);
+    console.log(comments);
     const statusRequestConsign = useSelector((state) => state.requestConsign.byId[requestId]?.status || '');
 
     const selectModal = ({ owner }: SelectModalProps) => {

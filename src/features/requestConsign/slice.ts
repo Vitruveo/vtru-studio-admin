@@ -19,9 +19,15 @@ export const requestConsignSlice = createSlice({
             }, {});
             state.allIds = Object.keys(state.byId);
         },
-        setRequestConsign: (state, action: PayloadAction<RequestConsign>) => {
-            state.byId[action.payload._id] = action.payload;
-            state.allIds = Object.keys(state.byId);
+        setRequestConsign: (state, action: PayloadAction<RequestConsign | { id: string }>) => {
+            if ('_id' in action.payload) {
+                state.byId[action.payload._id] = action.payload;
+                state.allIds = Object.keys(state.byId);
+            }
+            if ('id' in action.payload) {
+                const { id } = action.payload as { id: string };
+                state.allIds = state.allIds.filter((deletedId) => deletedId !== id);
+            }
         },
         setRequestConsignStatus: (state, action: PayloadAction<{ id: string; status: string }>) => {
             state.byId[action.payload.id] = {

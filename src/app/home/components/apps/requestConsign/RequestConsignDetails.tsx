@@ -94,13 +94,15 @@ export const Comments = ({ content, requestId }: CommentsContent) => {
 
     return (
         <Box display="flex" flexDirection="column" justifyContent="space-between" height="100%">
-            <Box flexGrow={1} overflow="auto">
+            <Box flexGrow={1} overflow="auto" mb={2}>
                 {content.map((item, index) => (
-                    <Typography key={index} id="modal-modal-description" sx={{ mt: 2 }}>
-                        {item.username || ''}
-                        {item.when || ''}
-                        {item.comment || ''}
-                    </Typography>
+                    <Box key={index} mt={2} border={'1px solid gray'} p={1} borderRadius={1}>
+                        <Typography color="#763EBD">{item.username || ''}</Typography>
+                        <Typography fontWeight="bold" ml={2} mr={2}>
+                            {item.comment || ''}
+                        </Typography>
+                        <Typography style={{ textAlign: 'right' }}>{item.when || ''}</Typography>
+                    </Box>
                 ))}
                 {!content.length && <Typography id="modal-modal-description">No Comments</Typography>}
                 <div ref={commentsEndRef} />
@@ -137,7 +139,6 @@ export default function RequestConsignDetails({
     const url = useMemo(() => `${BASE_URL_STORE}/preview/${assetId}/${Date.now()}`, [assetId]);
     const logs: LogsProps[] = useSelector((state) => state.requestConsign.byId[requestId]?.logs || []);
     const comments: CommentsProps[] = useSelector((state) => state.requestConsign.byId[requestId]?.comments || []);
-    console.log(comments);
     const statusRequestConsign = useSelector((state) => state.requestConsign.byId[requestId]?.status || '');
 
     const selectModal = ({ owner }: SelectModalProps) => {

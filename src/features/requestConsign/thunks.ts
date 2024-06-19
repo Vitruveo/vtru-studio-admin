@@ -153,6 +153,8 @@ export function eventTransactionThunk({ requestId }: { requestId: string }): Red
             }
 
             const logs = response.data.data.history || [];
+            const logsRedux = getState().requestConsign.byId[requestId].logs || [];
+            const lastLog = logsRedux[logsRedux.length - 1] || { status: 'pending' };
 
             if (!logs.some((item: { status: string }) => item.status === response.data.data.current.status)) {
                 logs.push(response.data.data.current);
@@ -166,7 +168,7 @@ export function eventTransactionThunk({ requestId }: { requestId: string }): Red
                     })
                 );
 
-            if (response.data.data.current.status === CONSIGN_STATUS_MAP.failed) {
+            if (lastLog.status === CONSIGN_STATUS_MAP.failed) {
                 dispatch(
                     requestConsignActionsCreators.setRequestConsignStatus({
                         id: requestId,
@@ -178,7 +180,7 @@ export function eventTransactionThunk({ requestId }: { requestId: string }): Red
                 });
             }
 
-            if (response.data.data.current.status === CONSIGN_STATUS_MAP.finished) {
+            if (lastLog.status === CONSIGN_STATUS_MAP.finished) {
                 dispatch(
                     requestConsignActionsCreators.setRequestConsignStatus({
                         id: requestId,
@@ -190,10 +192,7 @@ export function eventTransactionThunk({ requestId }: { requestId: string }): Red
                 });
             }
 
-            if (
-                response.data.data.current.status === CONSIGN_STATUS_MAP.pending ||
-                response.data.data.current.status === CONSIGN_STATUS_MAP.running
-            ) {
+            if (lastLog.status === CONSIGN_STATUS_MAP.pending || lastLog.status === CONSIGN_STATUS_MAP.running) {
                 setTimeout(() => {
                     dispatch(eventTransactionThunk({ requestId }));
                 }, 1_000);

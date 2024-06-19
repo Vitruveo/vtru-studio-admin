@@ -12,6 +12,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import Modal from '../../modal';
 import { requestConsignAddCommentThunk } from '@/features/requestConsign/thunks';
 import { CommentsProps, LogsProps } from '@/features/requestConsign/types';
+import localeDate from '@/utils/locale/date';
 
 interface Props {
     requestId: string;
@@ -97,11 +98,15 @@ export const Comments = ({ content, requestId }: CommentsContent) => {
             <Box flexGrow={1} overflow="auto" mb={2}>
                 {content.map((item, index) => (
                     <Box key={index} mt={2} border={'1px solid gray'} p={1} borderRadius={1}>
-                        <Typography color="#763EBD">{item.username || ''}</Typography>
+                        <Box display={'flex'} justifyContent={'space-between'}>
+                            <Typography color="#763EBD">{item.username || ''}</Typography>
+                            <Typography variant="body2" style={{ textAlign: 'right' }}>
+                                {localeDate(item.when || '')}
+                            </Typography>
+                        </Box>
                         <Typography fontWeight="bold" ml={2} mr={2}>
-                            {item.comment || ''}
+                            {item.comment}
                         </Typography>
-                        <Typography style={{ textAlign: 'right' }}>{item.when || ''}</Typography>
                     </Box>
                 ))}
                 {!content.length && <Typography id="modal-modal-description">No Comments</Typography>}

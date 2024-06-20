@@ -138,7 +138,12 @@ export function consignThunk({ requestId }: { requestId: string }): ReduxThunkAc
 export function eventTransactionThunk({ requestId }: { requestId: string }): ReduxThunkAction<Promise<void>> {
     return function (dispatch, getState) {
         const transaction = getState().requestConsign.byId[requestId].transaction;
-        if (!transaction) return Promise.resolve();
+        if (!transaction) {
+            const logs = getState().requestConsign.byId[requestId].logs || [];
+            dispatch(requestConsignActionsCreators.setLogs({ id: requestId, logs }));
+            dispatch(requestConsignActionsCreators.setRequestConsignStatus({ id: requestId, status: 'error' }));
+            return Promise.resolve();
+        }
 
         return eventsByTransaction(transaction).then((response) => {
             if (!response.data?.data?.history || !response.data?.data?.current) {
@@ -153,6 +158,7 @@ export function eventTransactionThunk({ requestId }: { requestId: string }): Red
             }
 
             const logs = response.data.data.history || [];
+            const lastLog = logs[logs.length - 1] || { status: 'pending' };
 
             if (!logs.some((item: { status: string }) => item.status === response.data.data.current.status)) {
                 logs.push(response.data.data.current);
@@ -166,7 +172,7 @@ export function eventTransactionThunk({ requestId }: { requestId: string }): Red
                     })
                 );
 
-            if (response.data.data.current.status === CONSIGN_STATUS_MAP.failed) {
+            if (lastLog.status === CONSIGN_STATUS_MAP.failed) {
                 dispatch(
                     requestConsignActionsCreators.setRequestConsignStatus({
                         id: requestId,
@@ -178,7 +184,7 @@ export function eventTransactionThunk({ requestId }: { requestId: string }): Red
                 });
             }
 
-            if (response.data.data.current.status === CONSIGN_STATUS_MAP.finished) {
+            if (lastLog.status === CONSIGN_STATUS_MAP.finished) {
                 dispatch(
                     requestConsignActionsCreators.setRequestConsignStatus({
                         id: requestId,
@@ -190,10 +196,7 @@ export function eventTransactionThunk({ requestId }: { requestId: string }): Red
                 });
             }
 
-            if (
-                response.data.data.current.status === CONSIGN_STATUS_MAP.pending ||
-                response.data.data.current.status === CONSIGN_STATUS_MAP.running
-            ) {
+            if (lastLog.status === CONSIGN_STATUS_MAP.pending || lastLog.status === CONSIGN_STATUS_MAP.running) {
                 setTimeout(() => {
                     dispatch(eventTransactionThunk({ requestId }));
                 }, 1_000);

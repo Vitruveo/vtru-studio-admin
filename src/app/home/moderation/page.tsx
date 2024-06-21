@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
@@ -12,16 +12,11 @@ import RequestConsignSearch from '@/app/home/components/apps/requestConsign/Requ
 import AppCard from '@/app/home/components/shared/AppCard';
 import { Button, Modal, Theme, Typography, useMediaQuery } from '@mui/material';
 import { useSelector, useDispatch } from '@/store/hooks';
-import {
-    consignThunk,
-    requestConsignGetThunk,
-    requestConsignUpdateStatusThunk,
-} from '@/features/requestConsign/thunks';
+import { consignThunk, requestConsignUpdateStatusThunk } from '@/features/requestConsign/thunks';
 import { RequestConsign } from '@/features/requestConsign';
 import { BASE_URL_STORE } from '@/constants/api';
 import { toastrActionsCreators } from '@/features/toastr/slice';
 
-const drawerWidth = 240;
 const secdrawerWidth = 320;
 
 const ModerationPage = () => {
@@ -39,11 +34,10 @@ const ModerationPage = () => {
     const requestConsigns = useSelector((state) =>
         state.requestConsign.allIds.map((id) => state.requestConsign.byId[id])
     );
+
     const requestConsignById = useSelector((state) => state.requestConsign.byId);
 
-    const handleSelect = (id: string) => {
-        setSelected(requestConsignById[id]);
-    };
+    const handleSelect = (id: string) => setSelected(requestConsignById[id]);
 
     const handleFilter = (status: string) => {
         if (status === filtered) {

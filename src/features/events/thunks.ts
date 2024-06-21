@@ -3,13 +3,14 @@ import cookie from 'cookiejs';
 
 import { ReduxThunkAction } from '@/store';
 import { BASE_URL_API } from '@/constants/api';
-import { requestConsignActionsCreators } from '../requestConsign';
+import { RequestConsign, requestConsignActionsCreators } from '../requestConsign';
 import { assetActionsCreators } from '../assets';
 import { userActionsCreators } from '../user/slice';
 import { creatorActionsCreators } from '../creator';
 import { waitingListActionsCreators } from '../waitingList';
 import { roleActionsCreators } from '../role/slice';
 import { allowListActionsCreators } from '../allowList/slice';
+import { updateStatusRequestConsign } from '../requestConsign/requests';
 
 const rolesAll = ['roles'];
 const rolesOne = ['createdRole', 'updatedRole', 'deletedRole'];
@@ -44,10 +45,13 @@ export function getEventsThunk(): ReduxThunkAction {
 
         const ctrl = new AbortController();
 
-        const url = `${BASE_URL_API}/events`;
+        const url = `${BASE_URL_API}/events?timestamp=${new Date().getTime()}`;
+
         const headers = {
             Accept: 'text/event-stream',
             Authorization: `Bearer ${token}`,
+            'Cache-Control': 'no-cache',
+            Pragma: 'no-cache',
         };
 
         fetchEventSource(url, {
@@ -58,8 +62,22 @@ export function getEventsThunk(): ReduxThunkAction {
                 // request consign events
                 if (requestConsignEventsOne.includes(message.event))
                     dispatch(requestConsignActionsCreators.setRequestConsign(parsed));
-                if (requestConsignEventsAll.includes(message.event))
-                    dispatch(requestConsignActionsCreators.setRequestConsigns(parsed));
+                if (requestConsignEventsAll.includes(message.event)) {
+                    const requests = parsed.map((v: RequestConsign) => {
+                        if (v.status === 'running') {
+                            return {
+                                ...v,
+                                status: 'error',
+                                logs: v.logs?.length
+                                    ? v.logs
+                                    : [{ status: 'error', message: 'Did not wait for the consignment' }],
+                            };
+                        }
+                        return v;
+                    });
+
+                    dispatch(requestConsignActionsCreators.setRequestConsigns(requests));
+                }
 
                 // assets events
                 if (assetsOne.includes(message.event)) dispatch(assetActionsCreators.setAsset(parsed));

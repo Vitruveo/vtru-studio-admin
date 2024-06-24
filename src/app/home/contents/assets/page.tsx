@@ -67,7 +67,17 @@ const AssetsPage = () => {
         });
     }, [dataRaw, searchText]);
 
-    const data = dataFiltered.length > 0 ? dataFiltered : dataRaw;
+    const selectData = () => {
+        if (dataFiltered.length > 0) {
+            return dataFiltered;
+        }
+        if (searchText) {
+            return [];
+        }
+        return dataRaw;
+    };
+
+    const data = selectData();
 
     const itemsPerPage = 12;
     const totalPages = Math.ceil(data.length / itemsPerPage);

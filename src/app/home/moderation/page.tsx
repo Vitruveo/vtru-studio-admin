@@ -86,7 +86,10 @@ const ModerationPage = () => {
                                   ? requestConsigns.filter(
                                         (item) =>
                                             item.creator.username.toLowerCase().includes(search.toLowerCase()) ||
-                                            item.asset.title.toLowerCase().includes(search.toLowerCase())
+                                            item.asset.title.toLowerCase().includes(search.toLowerCase()) ||
+                                            item.creator.emails.some((email) =>
+                                                email.email.toLowerCase().includes(search.toLowerCase())
+                                            )
                                     )
                                   : requestConsigns
                         }

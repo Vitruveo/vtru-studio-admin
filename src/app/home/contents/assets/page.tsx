@@ -21,7 +21,15 @@ const AssetsPage = () => {
     const [searchText, setSearchText] = useState('');
 
     const assets = useSelector((state) => state.asset.allIds.map((id) => state.asset.byId[id]));
+    const creators = useSelector((state) => state.creator.allIds.map((id) => state.creator.byId[id]));
     const filter = useSelector((state) => state.asset.filter);
+
+    const assetsWithCreators = useMemo(() => {
+        return assets.map((asset) => {
+            const creator = creators.find((item) => item._id === asset.framework.createdBy);
+            return { ...asset, creator };
+        });
+    }, [assets, creators]);
 
     const onPaginationChange: UsePaginationProps['onChange'] = (_event, page) => {
         setCurrentPage(page);
@@ -37,7 +45,7 @@ const AssetsPage = () => {
     };
 
     const dataRaw = useMemo(() => {
-        return assets.filter((asset) => {
+        return assetsWithCreators.filter((asset) => {
             if (filter === 'blocked') {
                 return asset?.consignArtwork?.status === 'blocked';
             }
@@ -55,13 +63,20 @@ const AssetsPage = () => {
             }
             return asset;
         });
-    }, [filter, assets]);
+    }, [assetsWithCreators, filter]);
 
     const dataFiltered = useMemo(() => {
         if (!searchText) return [];
-        return dataRaw.filter((asset) => {
+        return dataRaw.filter((item) => {
             if (searchText) {
-                return asset.assetMetadata?.context?.formData?.title?.toLowerCase().includes(searchText.toLowerCase());
+                return (
+                    item.assetMetadata?.context?.formData?.title?.toLowerCase().includes(searchText.toLowerCase()) ||
+                    item.creator?.name?.toLowerCase().includes(searchText.toLowerCase()) ||
+                    item.creator?.username?.toLowerCase().includes(searchText.toLowerCase()) ||
+                    item.creator?.emails?.some((emails) =>
+                        emails.email.toLowerCase().includes(searchText.toLowerCase())
+                    )
+                );
             }
             return true;
         });

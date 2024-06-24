@@ -6,8 +6,9 @@ import { ReduxThunkAction } from '@/store';
 import { requestConsignActionsCreators } from './slice';
 import { BASE_URL_API } from '@/constants/api';
 import { toastrActionsCreators } from '../toastr/slice';
-import { consign, eventsByTransaction, updateStatusRequestConsign } from './requests';
+import { consign, eventsByTransaction, updateRequestConsignComments, updateStatusRequestConsign } from './requests';
 import { APIResponse } from '../common/types';
+import { CommentsProps } from './types';
 
 export function requestConsignUpdateStatusThunk(
     id: string,
@@ -137,7 +138,12 @@ export function consignThunk({ requestId }: { requestId: string }): ReduxThunkAc
 export function eventTransactionThunk({ requestId }: { requestId: string }): ReduxThunkAction<Promise<void>> {
     return function (dispatch, getState) {
         const transaction = getState().requestConsign.byId[requestId].transaction;
-        if (!transaction) return Promise.resolve();
+        if (!transaction) {
+            const logs = getState().requestConsign.byId[requestId].logs || [];
+            dispatch(requestConsignActionsCreators.setLogs({ id: requestId, logs }));
+            dispatch(requestConsignActionsCreators.setRequestConsignStatus({ id: requestId, status: 'error' }));
+            return Promise.resolve();
+        }
 
         return eventsByTransaction(transaction).then((response) => {
             if (!response.data?.data?.history || !response.data?.data?.current) {
@@ -157,6 +163,8 @@ export function eventTransactionThunk({ requestId }: { requestId: string }): Red
                 logs.push(response.data.data.current);
             }
 
+            const lastLog = logs[logs.length - 1] || { status: 'pending' };
+
             if (logs.length > 0)
                 dispatch(
                     requestConsignActionsCreators.setLogs({
@@ -165,7 +173,7 @@ export function eventTransactionThunk({ requestId }: { requestId: string }): Red
                     })
                 );
 
-            if (response.data.data.current.status === CONSIGN_STATUS_MAP.failed) {
+            if (lastLog.status === CONSIGN_STATUS_MAP.failed) {
                 dispatch(
                     requestConsignActionsCreators.setRequestConsignStatus({
                         id: requestId,
@@ -177,7 +185,7 @@ export function eventTransactionThunk({ requestId }: { requestId: string }): Red
                 });
             }
 
-            if (response.data.data.current.status === CONSIGN_STATUS_MAP.finished) {
+            if (lastLog.status === CONSIGN_STATUS_MAP.finished) {
                 dispatch(
                     requestConsignActionsCreators.setRequestConsignStatus({
                         id: requestId,
@@ -189,14 +197,31 @@ export function eventTransactionThunk({ requestId }: { requestId: string }): Red
                 });
             }
 
-            if (
-                response.data.data.current.status === CONSIGN_STATUS_MAP.pending ||
-                response.data.data.current.status === CONSIGN_STATUS_MAP.running
-            ) {
+            if (lastLog.status === CONSIGN_STATUS_MAP.pending || lastLog.status === CONSIGN_STATUS_MAP.running) {
                 setTimeout(() => {
                     dispatch(eventTransactionThunk({ requestId }));
                 }, 1_000);
             }
         });
+    };
+}
+
+export function requestConsignAddCommentThunk({
+    requestId,
+    comment,
+}: {
+    requestId: string;
+    comment: string;
+}): ReduxThunkAction<Promise<void>> {
+    return async function (dispatch, getState) {
+        const commentList = getState().requestConsign.byId[requestId].comments || [];
+        updateRequestConsignComments({ id: requestId, comment })
+            .then((res) => {
+                const updatedComments = [...commentList, res.data] as CommentsProps[];
+                dispatch(requestConsignActionsCreators.setComments({ id: requestId, comments: updatedComments }));
+            })
+            .catch(() => {
+                // do nothing
+            });
     };
 }

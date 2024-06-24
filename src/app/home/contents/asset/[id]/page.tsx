@@ -26,7 +26,10 @@ interface Props {
 const AssetsOnePage = ({ params }: Props) => {
     const dispatch = useDispatch();
     const asset = useSelector((state) => state.asset.byId[params.id]);
-    const creator = useSelector((state) => state.asset.creator);
+    const creatorName = useSelector((state) => state.asset.creator);
+
+    const { byId } = useSelector((state) => state.creator);
+    const creator = byId[asset.framework.createdBy];
 
     const handleChangeAssetBlocked = ({ status }: { status: 'active' | 'blocked' }) => {
         if (!asset) return;
@@ -39,7 +42,9 @@ const AssetsOnePage = ({ params }: Props) => {
     }, []);
 
     const handleClickPreview = () => {
-        const URL = `${BASE_URL_STORE}/${creator}/${asset._id}/${Date.now()}`;
+        const URL = `${BASE_URL_STORE}/${asset?.consignArtwork?.status === 'active' ? creatorName : 'preview'}/${
+            asset._id
+        }/${Date.now()}`;
         window.open(URL, '_blank');
     };
 
@@ -68,6 +73,19 @@ const AssetsOnePage = ({ params }: Props) => {
                     </Box>
                     <Box>
                         <Typography variant="h2">{asset.assetMetadata?.context?.formData.title}</Typography>
+                        <Typography variant="h6" mt={2}>
+                            Username
+                        </Typography>
+                        <Typography variant="body1">{creator?.username}</Typography>
+                        <Typography variant="h6" mt={2}>
+                            Creator name
+                        </Typography>
+                        {(asset?.assetMetadata?.creators?.formData || []).map((v) => (
+                            <Typography key={v.name} variant="body1">
+                                {v.name}{' '}
+                            </Typography>
+                        ))}
+
                         <Typography variant="h6" mt={2}>
                             Description
                         </Typography>

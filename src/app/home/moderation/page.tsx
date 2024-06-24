@@ -85,7 +85,8 @@ const ModerationPage = () => {
                                 : search
                                   ? requestConsigns.filter(
                                         (item) =>
-                                            item.creator.username.includes(search) || item.asset.title.includes(search)
+                                            item.creator.username.toLowerCase().includes(search.toLowerCase()) ||
+                                            item.asset.title.toLowerCase().includes(search.toLowerCase())
                                     )
                                   : requestConsigns
                         }

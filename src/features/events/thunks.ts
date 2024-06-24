@@ -68,9 +68,7 @@ export function getEventsThunk(): ReduxThunkAction {
                             return {
                                 ...v,
                                 status: 'error',
-                                logs: v.logs?.length
-                                    ? v.logs
-                                    : [{ status: 'error', message: 'Did not wait for the consignment' }],
+                                logs: v.logs,
                             };
                         }
                         return v;

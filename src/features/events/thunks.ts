@@ -68,7 +68,6 @@ export function getEventsThunk(): ReduxThunkAction {
                             return {
                                 ...v,
                                 status: 'error',
-                                logs: v.logs,
                             };
                         }
                         return v;

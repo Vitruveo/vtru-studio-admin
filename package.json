@@ -1,6 +1,6 @@
 {
   "name": "vtru-admin",
-  "version": "0.1.73",
+  "version": "0.1.76",
   "private": true,
   "scripts": {
     "dev": "next dev",

@@ -9,17 +9,30 @@ import emailIcon from 'public/images/breadcrumb/emailSv.png';
 import { websocketSelector } from '@/features/ws';
 import { useDispatch, useSelector } from '@/store/hooks';
 import { updateVaultStatethunk } from '@/features/creator/thunks';
+import { AppState } from '@/store';
+
+const creatorSelector = (state: AppState, creatorId: string) => {
+    const creator = state.creator.byId[creatorId];
+    if (!creator) {
+        return null;
+    }
+    const asset = Object.values(state.asset?.byId || {}).find((v) => v.framework.createdBy === creatorId) || null;
+    return {
+        ...creator,
+        asset,
+    };
+};
 
 interface Props {
     creatorId: string;
     onDeleteClick(params: { id: string; email: string }): void;
 }
 
-export default function CreatorDetails({ creatorId }: Props) {
+export default function CreatorDetails({ creatorId, onDeleteClick }: Props) {
     const dispatch = useDispatch();
     const { creatorsOnline = [] } = useSelector(websocketSelector(['creatorsOnline']));
     const { byId, status } = useSelector((state) => state.creator);
-    const creator = byId[creatorId];
+    const creator = useSelector((state) => creatorSelector(state, creatorId));
 
     return (
         <>
@@ -78,7 +91,7 @@ export default function CreatorDetails({ creatorId }: Props) {
                                         Email address
                                     </Typography>
                                     <Typography variant="subtitle1" fontWeight={600} mb={0.5}>
-                                        {creator.emails.map((item) => (
+                                        {creator.emails.map((item: any) => (
                                             <span key={item.email}>
                                                 {item.email}
                                                 <br />
@@ -115,6 +128,22 @@ export default function CreatorDetails({ creatorId }: Props) {
                                 </Typography>
                                 {status === 'loading' && <CircularProgress size={20} />}
                             </Box>
+                        </Box>
+                    </Box>
+
+                    {/* Adiciona a referência do asset relacionado ao criador */}
+                    <Box>
+                        <Divider />
+                        <Typography variant="h5" p={3} pb={1}>
+                            Creator Asset
+                        </Typography>
+                        <Box p={3} pt={0}>
+                            <Typography variant="body2" color="text.secondary">
+                                Asset Name
+                            </Typography>
+                            <Typography variant="subtitle1" fontWeight={600} mb={0.5}>
+                                {creator?.asset?.framework?.createdBy ?? 'N/A'}
+                            </Typography>
                         </Box>
                     </Box>
                 </>

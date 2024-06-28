@@ -121,7 +121,7 @@ const ModerationPage = () => {
                             handleApprove={handleApprove}
                             handleReject={() => setConfirmRejectModal(true)}
                             handleOpenStore={() =>
-                                window.open(`${BASE_URL_STORE}/preview/${selected.asset._id}/${Date.now()}`, '_blank')
+                                window.open(`${BASE_URL_STORE}/preview/${selected.asset._id}`, '_blank')
                             }
                         />
                     ) : null}

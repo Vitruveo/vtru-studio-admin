@@ -42,9 +42,9 @@ const AssetsOnePage = ({ params }: Props) => {
     }, []);
 
     const handleClickPreview = () => {
-        const URL = `${BASE_URL_STORE}/${asset?.consignArtwork?.status === 'active' ? creatorName : 'preview'}/${
-            asset._id
-        }/${Date.now()}`;
+        const isActive = asset?.consignArtwork?.status === 'active';
+        const path = isActive ? creatorName : 'preview';
+        const URL = `${BASE_URL_STORE}/${path}/${asset._id}`;
         window.open(URL, '_blank');
     };
 

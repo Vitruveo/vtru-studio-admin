@@ -164,7 +164,7 @@ export default function CreatorDetails({ creatorId }: Props) {
                                 <Typography variant="subtitle1" fontWeight={600} mb={0.5}>
                                     {creator.title}
                                 </Typography>
-                                <Button onClick={handleClickPreview}>
+                                <Button onClick={handleClickPreview} disabled={creator.title === 'N/A'}>
                                     <Typography>Preview</Typography>
                                 </Button>
                             </Box>

@@ -46,9 +46,9 @@ export default function CreatorDetails({ creatorId }: Props) {
 
     const handleClickPreview = () => {
         if (asset) {
-            const URL = `${BASE_URL_STORE}/${asset.consignArtwork?.status === 'active' ? creatorName : 'preview'}/${
-                asset._id
-            }/${Date.now()}`;
+            const URL = `${BASE_URL_STORE}/${
+                creatorName && asset.consignArtwork?.status === 'active' ? creatorName : 'preview'
+            }/${asset._id}/${Date.now()}`;
             window.open(URL, '_blank');
         }
     };

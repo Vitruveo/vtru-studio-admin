@@ -46,9 +46,9 @@ export default function CreatorDetails({ creatorId }: Props) {
 
     const handleClickPreview = () => {
         if (asset) {
-            const URL = `${BASE_URL_STORE}/${asset.consignArtwork?.status === 'active' ? creatorName : 'preview'}/${
-                asset._id
-            }/${Date.now()}`;
+            const URL = `${BASE_URL_STORE}/${
+                asset.consignArtwork?.status === 'active' ? creator?.username : 'preview'
+            }/${asset._id}`;
             window.open(URL, '_blank');
         }
     };
@@ -164,7 +164,7 @@ export default function CreatorDetails({ creatorId }: Props) {
                                 <Typography variant="subtitle1" fontWeight={600} mb={0.5}>
                                     {creator.title}
                                 </Typography>
-                                <Button onClick={handleClickPreview}>
+                                <Button onClick={handleClickPreview} disabled={creator.title === 'N/A'}>
                                     <Typography>Preview</Typography>
                                 </Button>
                             </Box>

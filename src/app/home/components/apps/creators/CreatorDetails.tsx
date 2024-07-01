@@ -1,4 +1,4 @@
-import { CircularProgress, Grid, Switch } from '@mui/material';
+import { Button, CircularProgress, Grid, Switch } from '@mui/material';
 import Avatar from '@mui/material/Avatar';
 import Image from 'next/image';
 import Box from '@mui/material/Box';
@@ -10,6 +10,9 @@ import { websocketSelector } from '@/features/ws';
 import { useDispatch, useSelector } from '@/store/hooks';
 import { updateVaultStatethunk } from '@/features/creator/thunks';
 import { AppState } from '@/store';
+import { BASE_URL_STORE } from '@/constants/api';
+import { useEffect } from 'react';
+import { getCreatorNameByAssetIdThunk } from '@/features/assets/thunks';
 
 const creatorSelector = (state: AppState, creatorId: string) => {
     const creator = state.creator.byId[creatorId];
@@ -17,9 +20,12 @@ const creatorSelector = (state: AppState, creatorId: string) => {
         return null;
     }
     const asset = Object.values(state.asset?.byId || {}).find((v) => v.framework.createdBy === creatorId) || null;
+    const title = asset?.assetMetadata?.context?.formData?.title ?? 'N/A';
+
     return {
         ...creator,
         asset,
+        title,
     };
 };
 
@@ -28,11 +34,24 @@ interface Props {
     onDeleteClick(params: { id: string; email: string }): void;
 }
 
-export default function CreatorDetails({ creatorId, onDeleteClick }: Props) {
+export default function CreatorDetails({ creatorId }: Props) {
     const dispatch = useDispatch();
     const { creatorsOnline = [] } = useSelector(websocketSelector(['creatorsOnline']));
-    const { byId, status } = useSelector((state) => state.creator);
+    const { status } = useSelector((state) => state.creator);
+    const { byId: assetById } = useSelector((state) => state.asset);
     const creator = useSelector((state) => creatorSelector(state, creatorId));
+    const asset = Object.values(assetById || {}).find((v) => v.framework.createdBy === creatorId) || null;
+
+    const creatorName = useSelector((state) => state.asset.creator);
+
+    const handleClickPreview = () => {
+        if (asset) {
+            const URL = `${BASE_URL_STORE}/${asset.consignArtwork?.status === 'active' ? creatorName : 'preview'}/${
+                asset._id
+            }/${Date.now()}`;
+            window.open(URL, '_blank');
+        }
+    };
 
     return (
         <>
@@ -141,9 +160,14 @@ export default function CreatorDetails({ creatorId, onDeleteClick }: Props) {
                             <Typography variant="body2" color="text.secondary">
                                 Asset Name
                             </Typography>
-                            <Typography variant="subtitle1" fontWeight={600} mb={0.5}>
-                                {creator?.asset?.framework?.createdBy ?? 'N/A'}
-                            </Typography>
+                            <Box display="flex" alignItems="center" justifyContent="space-between">
+                                <Typography variant="subtitle1" fontWeight={600} mb={0.5}>
+                                    {creator.title}
+                                </Typography>
+                                <Button onClick={handleClickPreview}>
+                                    <Typography>Preview</Typography>
+                                </Button>
+                            </Box>
                         </Box>
                     </Box>
                 </>

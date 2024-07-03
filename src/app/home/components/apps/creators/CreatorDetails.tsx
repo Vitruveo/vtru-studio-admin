@@ -1,4 +1,4 @@
-import { CircularProgress, Grid, Switch } from '@mui/material';
+import { Button, CircularProgress, Grid, Switch } from '@mui/material';
 import Avatar from '@mui/material/Avatar';
 import Image from 'next/image';
 import Box from '@mui/material/Box';
@@ -9,6 +9,25 @@ import emailIcon from 'public/images/breadcrumb/emailSv.png';
 import { websocketSelector } from '@/features/ws';
 import { useDispatch, useSelector } from '@/store/hooks';
 import { updateVaultStatethunk } from '@/features/creator/thunks';
+import { AppState } from '@/store';
+import { BASE_URL_STORE } from '@/constants/api';
+import { useEffect } from 'react';
+import { getCreatorNameByAssetIdThunk } from '@/features/assets/thunks';
+
+const creatorSelector = (state: AppState, creatorId: string) => {
+    const creator = state.creator.byId[creatorId];
+    if (!creator) {
+        return null;
+    }
+    const asset = Object.values(state.asset?.byId || {}).find((v) => v.framework.createdBy === creatorId) || null;
+    const title = asset?.assetMetadata?.context?.formData?.title ?? 'N/A';
+
+    return {
+        ...creator,
+        asset,
+        title,
+    };
+};
 
 interface Props {
     creatorId: string;
@@ -18,8 +37,21 @@ interface Props {
 export default function CreatorDetails({ creatorId }: Props) {
     const dispatch = useDispatch();
     const { creatorsOnline = [] } = useSelector(websocketSelector(['creatorsOnline']));
-    const { byId, status } = useSelector((state) => state.creator);
-    const creator = byId[creatorId];
+    const { status } = useSelector((state) => state.creator);
+    const { byId: assetById } = useSelector((state) => state.asset);
+    const creator = useSelector((state) => creatorSelector(state, creatorId));
+    const asset = Object.values(assetById || {}).find((v) => v.framework.createdBy === creatorId) || null;
+
+    const creatorName = useSelector((state) => state.asset.creator);
+
+    const handleClickPreview = () => {
+        if (asset) {
+            const URL = `${BASE_URL_STORE}/${
+                asset.consignArtwork?.status === 'active' ? creator?.username : 'preview'
+            }/${asset._id}`;
+            window.open(URL, '_blank');
+        }
+    };
 
     return (
         <>
@@ -78,7 +110,7 @@ export default function CreatorDetails({ creatorId }: Props) {
                                         Email address
                                     </Typography>
                                     <Typography variant="subtitle1" fontWeight={600} mb={0.5}>
-                                        {creator.emails.map((item) => (
+                                        {creator.emails.map((item: any) => (
                                             <span key={item.email}>
                                                 {item.email}
                                                 <br />
@@ -114,6 +146,27 @@ export default function CreatorDetails({ creatorId }: Props) {
                                     {creator?.vault?.isBlocked ? 'Blocked' : 'Active'}
                                 </Typography>
                                 {status === 'loading' && <CircularProgress size={20} />}
+                            </Box>
+                        </Box>
+                    </Box>
+
+                    {/* Adiciona a referência do asset relacionado ao criador */}
+                    <Box>
+                        <Divider />
+                        <Typography variant="h5" p={3} pb={1}>
+                            Creator Asset
+                        </Typography>
+                        <Box p={3} pt={0}>
+                            <Typography variant="body2" color="text.secondary">
+                                Asset Name
+                            </Typography>
+                            <Box display="flex" alignItems="center" justifyContent="space-between">
+                                <Typography variant="subtitle1" fontWeight={600} mb={0.5}>
+                                    {creator.title}
+                                </Typography>
+                                <Button onClick={handleClickPreview} disabled={creator.title === 'N/A'}>
+                                    <Typography>Preview</Typography>
+                                </Button>
                             </Box>
                         </Box>
                     </Box>

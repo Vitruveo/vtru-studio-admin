@@ -146,7 +146,7 @@ export default function Creators() {
                             </Button>
                         </Box>
                     )}
-                    <CreatorDetails creatorId={creatorId} onDeleteClick={onDeleteClick} />
+                    <CreatorDetails creatorId={creatorId} onDeleteClick={onDeleteClick} hiddenCreatorName />
                 </Drawer>
             </AppCard>
 

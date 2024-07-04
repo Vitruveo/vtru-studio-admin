@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Typography, Box, Grid, Switch, Button } from '@mui/material';
 
 import Breadcrumb from '@/app/home/layout/shared/breadcrumb/Breadcrumb';
@@ -11,6 +11,8 @@ import { useDispatch, useSelector } from '@/store/hooks';
 import { buildAssetSource } from '@/utils/assets';
 import { getCreatorNameByAssetIdThunk, updateAssetStatusByIdThunk } from '@/features/assets/thunks';
 import { BASE_URL_STORE } from '@/constants/api';
+import Modal from '@/app/home/components/modal';
+import CreatorDetails from '@/app/home/components/apps/creators/CreatorDetails';
 
 const BCrumb = [
     { title: 'Home' },
@@ -25,11 +27,12 @@ interface Props {
 
 const AssetsOnePage = ({ params }: Props) => {
     const dispatch = useDispatch();
+    const [open, setOpen] = useState<boolean>(false);
     const asset = useSelector((state) => state.asset.byId[params.id]);
-    const creatorName = useSelector((state) => state.asset.creator);
-
+    const creator = useSelector((state) => state.asset.creator);
     const { byId } = useSelector((state) => state.creator);
-    const creator = byId[asset.framework.createdBy];
+    const createdBy = byId[asset.framework.createdBy];
+    const creatorsFormData = asset?.assetMetadata?.creators?.formData || [];
 
     const handleChangeAssetBlocked = ({ status }: { status: 'active' | 'blocked' }) => {
         if (!asset) return;
@@ -43,7 +46,7 @@ const AssetsOnePage = ({ params }: Props) => {
 
     const handleClickPreview = () => {
         const isActive = asset?.consignArtwork?.status === 'active';
-        const path = isActive ? creatorName : 'preview';
+        const path = isActive ? creator : 'preview';
         const URL = `${BASE_URL_STORE}/${path}/${asset._id}`;
         window.open(URL, '_blank');
     };
@@ -76,11 +79,21 @@ const AssetsOnePage = ({ params }: Props) => {
                         <Typography variant="h6" mt={2}>
                             Username
                         </Typography>
-                        <Typography variant="body1">{creator?.username}</Typography>
+                        <Typography
+                            variant="body1"
+                            onClick={() => setOpen(true)}
+                            style={{
+                                color: '#763EBD',
+                                cursor: 'pointer',
+                                display: 'inline-block',
+                            }}
+                        >
+                            {createdBy?.username}
+                        </Typography>
                         <Typography variant="h6" mt={2}>
                             Creator name
                         </Typography>
-                        {(asset?.assetMetadata?.creators?.formData || []).map((v) => (
+                        {creatorsFormData.map((v) => (
                             <Typography key={v.name} variant="body1">
                                 {v.name}{' '}
                             </Typography>
@@ -111,12 +124,15 @@ const AssetsOnePage = ({ params }: Props) => {
                             </Grid>
                         </Grid>
 
-                        <Button disabled={!asset || !creator} onClick={handleClickPreview}>
+                        <Button disabled={!asset || !createdBy} onClick={handleClickPreview}>
                             <Typography>Preview</Typography>
                         </Button>
                     </Box>
                 </Box>
             </AppCard>
+            <Modal open={open} handleClose={() => setOpen(false)} title="">
+                {createdBy?._id && <CreatorDetails creatorId={createdBy._id} hiddenPreview />}
+            </Modal>
         </PageContainer>
     );
 };

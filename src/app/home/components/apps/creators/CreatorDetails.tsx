@@ -31,18 +31,18 @@ const creatorSelector = (state: AppState, creatorId: string) => {
 
 interface Props {
     creatorId: string;
-    onDeleteClick(params: { id: string; email: string }): void;
+    onDeleteClick?(params: { id: string; email: string }): void;
+    hiddenPreview?: boolean;
+    hiddenCreatorName?: boolean;
 }
 
-export default function CreatorDetails({ creatorId }: Props) {
+export default function CreatorDetails({ creatorId, hiddenPreview = false, hiddenCreatorName = false }: Props) {
     const dispatch = useDispatch();
     const { creatorsOnline = [] } = useSelector(websocketSelector(['creatorsOnline']));
     const { status } = useSelector((state) => state.creator);
     const { byId: assetById } = useSelector((state) => state.asset);
     const creator = useSelector((state) => creatorSelector(state, creatorId));
     const asset = Object.values(assetById || {}).find((v) => v.framework.createdBy === creatorId) || null;
-
-    const creatorName = useSelector((state) => state.asset.creator);
 
     const handleClickPreview = () => {
         if (asset) {
@@ -74,11 +74,7 @@ export default function CreatorDetails({ creatorId }: Props) {
                                             height: '72px',
                                         }}
                                     >
-                                        {(
-                                            creator.name ||
-                                            (creator.emails?.length > 0 && creator.emails[0]?.email) ||
-                                            ''
-                                        )
+                                        {((creator.emails?.length > 0 && creator.emails[0]?.email) || '')
                                             .slice(0, 2)
                                             .toUpperCase()}
                                     </Avatar>
@@ -104,7 +100,7 @@ export default function CreatorDetails({ creatorId }: Props) {
                                 </Box>
                             </Box>
 
-                            <Grid container>
+                            <Grid container display={'flex'} flexDirection={'column'}>
                                 <Grid item lg={6} xs={12} mt={4}>
                                     <Typography variant="body2" color="text.secondary">
                                         Email address
@@ -118,6 +114,16 @@ export default function CreatorDetails({ creatorId }: Props) {
                                         ))}
                                     </Typography>
                                 </Grid>
+                                {asset?.assetMetadata?.creators?.formData[0] && !hiddenCreatorName && (
+                                    <Grid item lg={6} xs={12} mt={4}>
+                                        <Typography variant="body2" color="text.secondary">
+                                            Creator name
+                                        </Typography>
+                                        <Typography variant="subtitle1" fontWeight={600} mb={0.5}>
+                                            {asset.assetMetadata.creators.formData[0].name}
+                                        </Typography>
+                                    </Grid>
+                                )}
                             </Grid>
                         </Box>
                     </Box>
@@ -151,25 +157,27 @@ export default function CreatorDetails({ creatorId }: Props) {
                     </Box>
 
                     {/* Adiciona a referência do asset relacionado ao criador */}
-                    <Box>
-                        <Divider />
-                        <Typography variant="h5" p={3} pb={1}>
-                            Creator Asset
-                        </Typography>
-                        <Box p={3} pt={0}>
-                            <Typography variant="body2" color="text.secondary">
-                                Asset Name
+                    {!hiddenPreview && (
+                        <Box>
+                            <Divider />
+                            <Typography variant="h5" p={3} pb={1}>
+                                Creator Asset
                             </Typography>
-                            <Box display="flex" alignItems="center" justifyContent="space-between">
-                                <Typography variant="subtitle1" fontWeight={600} mb={0.5}>
-                                    {creator.title}
+                            <Box p={3} pt={0}>
+                                <Typography variant="body2" color="text.secondary">
+                                    Asset Name
                                 </Typography>
-                                <Button onClick={handleClickPreview} disabled={creator.title === 'N/A'}>
-                                    <Typography>Preview</Typography>
-                                </Button>
+                                <Box display="flex" alignItems="center" justifyContent="space-between">
+                                    <Typography variant="subtitle1" fontWeight={600} mb={0.5}>
+                                        {creator.title}
+                                    </Typography>
+                                    <Button onClick={handleClickPreview} disabled={creator.title === 'N/A'}>
+                                        <Typography>Preview</Typography>
+                                    </Button>
+                                </Box>
                             </Box>
                         </Box>
-                    </Box>
+                    )}
                 </>
             ) : (
                 <Box p={3} height="50vh" display={'flex'} justifyContent="center" alignItems={'center'}>

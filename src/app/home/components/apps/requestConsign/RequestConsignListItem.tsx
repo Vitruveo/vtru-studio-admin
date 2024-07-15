@@ -44,7 +44,7 @@ export default function RequestConsignListItem({ onClick, creator, asset, active
             <ListItemAvatar>
                 <Box position="relative">
                     <Avatar alt="" src="" sx={{ fontSize: 14 }}>
-                        {creator.username.slice(0, 2).toUpperCase()}
+                        {creator.username?.slice(0, 2).toUpperCase()}
                     </Avatar>
                 </Box>
             </ListItemAvatar>

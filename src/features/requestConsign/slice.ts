@@ -21,7 +21,11 @@ export const requestConsignSlice = createSlice({
         },
         setRequestConsign: (state, action: PayloadAction<RequestConsign | { id: string }>) => {
             if ('_id' in action.payload) {
-                state.byId[action.payload._id] = action.payload;
+                const transaction = state.byId[action.payload._id]?.transaction;
+                state.byId[action.payload._id] = {
+                    ...action.payload,
+                    ...(transaction ? { transaction } : {}),
+                };
                 state.allIds = Object.keys(state.byId);
             }
             if ('id' in action.payload) {

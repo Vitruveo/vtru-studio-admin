@@ -10,4 +10,14 @@ const localeDate = (value: string) => {
     });
 };
 
-export default localeDate;
+const localePrice = (value?: number) => {
+    if (!value) return '';
+    const language = navigator.language || 'en-US';
+    const formatedPrice = value.toLocaleString(language, {
+        style: 'currency',
+        currency: 'USD',
+    });
+    return formatedPrice.replace('US', '');
+};
+
+export { localeDate, localePrice };

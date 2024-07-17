@@ -12,12 +12,19 @@ import { updateVaultStatethunk } from '@/features/creator/thunks';
 import { AppState } from '@/store';
 import { BASE_URL_STORE } from '@/constants/api';
 import { AssetType } from '@/app/home/types/apps/asset';
+import { localePrice } from '@/utils/locale/date';
 
 const creatorSelector = (state: AppState, creatorId: string) => {
     const creator = state.creator.byId[creatorId];
     if (!creator) return null;
 
-    const assets = Object.values(state.asset?.byId || {}).filter((v) => v.framework.createdBy === creatorId);
+    const assets = Object.values(state.asset?.byId || {})
+        .filter((v) => v.framework.createdBy === creatorId)
+        .sort((a, b) => {
+            if (a?.assetMetadata?.context?.formData?.title && !b?.assetMetadata?.context?.formData?.title) return -1;
+            if (!a?.assetMetadata?.context?.formData?.title && b?.assetMetadata?.context?.formData?.title) return 1;
+            return 0;
+        });
 
     return {
         ...creator,
@@ -161,13 +168,15 @@ export default function CreatorDetails({ creatorId, hiddenPreview = false, hidde
                             <Box maxHeight={300} overflow={'auto'} mb={2}>
                                 {creator.assets.map((item, index) => (
                                     <Box p={3} pt={0} key={index}>
-                                        <Typography variant="body2" color="text.secondary">
-                                            Asset Name
-                                        </Typography>
                                         <Box display="flex" alignItems="center" justifyContent="space-between">
-                                            <Typography variant="subtitle1" fontWeight={600} mb={0.5}>
-                                                {item.assetMetadata?.context?.formData?.title || 'N/A'}
-                                            </Typography>
+                                            <Box>
+                                                <Typography variant="subtitle1" fontWeight={600}>
+                                                    {item.assetMetadata?.context?.formData?.title || 'N/A'}
+                                                </Typography>
+                                                <Typography variant="caption" fontWeight={600}>
+                                                    {localePrice(item.licenses?.nft?.single?.editionPrice)}
+                                                </Typography>
+                                            </Box>
                                             <Button
                                                 onClick={() => handleClickPreview(item)}
                                                 disabled={!item.assetMetadata?.context?.formData?.title}

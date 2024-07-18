@@ -18,7 +18,19 @@ const creatorSelector = (state: AppState, creatorId: string) => {
     const creator = state.creator.byId[creatorId];
     if (!creator) return null;
 
-    const assets = Object.values(state.asset?.byId || {}).filter((v) => v.framework.createdBy === creatorId);
+    const assets = Object.values(state.asset?.byId || {})
+        .filter((v) => v.framework.createdBy === creatorId)
+        .sort((a, b) => {
+            if (!a.assetMetadata.context?.formData.title || !b.assetMetadata.context?.formData.title) return 0;
+            return a.assetMetadata.context?.formData.title.localeCompare(
+                b.assetMetadata.context?.formData.title,
+                'en',
+                {
+                    numeric: true,
+                    sensitivity: 'base',
+                }
+            );
+        });
 
     return {
         ...creator,

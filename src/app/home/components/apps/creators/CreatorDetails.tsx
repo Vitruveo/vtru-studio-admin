@@ -18,13 +18,7 @@ const creatorSelector = (state: AppState, creatorId: string) => {
     const creator = state.creator.byId[creatorId];
     if (!creator) return null;
 
-    const assets = Object.values(state.asset?.byId || {})
-        .filter((v) => v.framework.createdBy === creatorId)
-        .sort((a, b) => {
-            if (a?.assetMetadata?.context?.formData?.title && !b?.assetMetadata?.context?.formData?.title) return -1;
-            if (!a?.assetMetadata?.context?.formData?.title && b?.assetMetadata?.context?.formData?.title) return 1;
-            return 0;
-        });
+    const assets = Object.values(state.asset?.byId || {}).filter((v) => v.framework.createdBy === creatorId);
 
     return {
         ...creator,
@@ -177,10 +171,7 @@ export default function CreatorDetails({ creatorId, hiddenPreview = false, hidde
                                                     {localePrice(item.licenses?.nft?.single?.editionPrice)}
                                                 </Typography>
                                             </Box>
-                                            <Button
-                                                onClick={() => handleClickPreview(item)}
-                                                disabled={!item.assetMetadata?.context?.formData?.title}
-                                            >
+                                            <Button onClick={() => handleClickPreview(item)}>
                                                 <Typography>Preview</Typography>
                                             </Button>
                                         </Box>

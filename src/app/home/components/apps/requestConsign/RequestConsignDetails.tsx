@@ -12,7 +12,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import Modal from '../../modal';
 import { requestConsignAddCommentThunk } from '@/features/requestConsign/thunks';
 import { CommentsProps, LogsProps } from '@/features/requestConsign/types';
-import localeDate from '@/utils/locale/date';
+import { localeDate } from '@/utils/locale/date';
 
 interface Props {
     requestId: string;

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
@@ -40,12 +40,7 @@ const ModerationPage = () => {
     const handleSelect = (id: string) => setSelected(requestConsignById[id]);
 
     const handleFilter = (status: string) => {
-        if (status === filtered) {
-            setFiltered('');
-            return;
-        }
-
-        setFiltered(status);
+        setFiltered((prevStatus) => (prevStatus === status ? '' : status));
     };
 
     const handleApprove = () => {
@@ -55,6 +50,7 @@ const ModerationPage = () => {
             dispatch(toastrActionsCreators.displayToastr({ message: 'No Asset selected', type: 'error' }));
         }
     };
+
     const handleReject = () => {
         if (selected) {
             dispatch(requestConsignUpdateStatusThunk(selected._id, 'rejected'));
@@ -64,6 +60,18 @@ const ModerationPage = () => {
 
         setConfirmRejectModal(false);
     };
+
+    const filteredAndSearchedConsigns = useMemo(() => {
+        return requestConsigns.filter((item) => {
+            const matchesFilter = filtered ? item.status === filtered : true;
+            const matchesSearch = search
+                ? [item.creator.username, item.asset.title, ...item.creator.emails.map((email) => email.email)]
+                      .filter(Boolean)
+                      .some((field) => field.toLowerCase().includes(search.toLowerCase()))
+                : true;
+            return matchesFilter && matchesSearch;
+        });
+    }, [requestConsigns, filtered, search]);
 
     return (
         <PageContainer title="Request Consign" description="this is requests">
@@ -79,20 +87,7 @@ const ModerationPage = () => {
                     <RequestConsignSearch search={search} setSearch={setSearch} />
                     <RequestConsignList
                         requestConsignId={selected ? selected._id : ''}
-                        data={
-                            filtered
-                                ? requestConsigns.filter((item) => item.status === filtered)
-                                : search
-                                  ? requestConsigns.filter(
-                                        (item) =>
-                                            item.creator.username.toLowerCase().includes(search.toLowerCase()) ||
-                                            item.asset.title.toLowerCase().includes(search.toLowerCase()) ||
-                                            item.creator.emails.some((email) =>
-                                                email.email.toLowerCase().includes(search.toLowerCase())
-                                            )
-                                    )
-                                  : requestConsigns
-                        }
+                        data={filteredAndSearchedConsigns}
                         onClick={({ _id }) => handleSelect(_id)}
                         handleFilter={handleFilter}
                         activeFilter={filtered}

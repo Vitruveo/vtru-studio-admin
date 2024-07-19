@@ -11,21 +11,30 @@ import { useDispatch, useSelector } from '@/store/hooks';
 import { updateVaultStatethunk } from '@/features/creator/thunks';
 import { AppState } from '@/store';
 import { BASE_URL_STORE } from '@/constants/api';
-import { useEffect } from 'react';
-import { getCreatorNameByAssetIdThunk } from '@/features/assets/thunks';
+import { AssetType } from '@/app/home/types/apps/asset';
+import { localePrice } from '@/utils/locale/date';
 
 const creatorSelector = (state: AppState, creatorId: string) => {
     const creator = state.creator.byId[creatorId];
-    if (!creator) {
-        return null;
-    }
-    const asset = Object.values(state.asset?.byId || {}).find((v) => v.framework.createdBy === creatorId) || null;
-    const title = asset?.assetMetadata?.context?.formData?.title ?? 'N/A';
+    if (!creator) return null;
+
+    const assets = Object.values(state.asset?.byId || {})
+        .filter((v) => v.framework.createdBy === creatorId)
+        .sort((a, b) => {
+            if (!a.assetMetadata.context?.formData.title || !b.assetMetadata.context?.formData.title) return 0;
+            return a.assetMetadata.context?.formData.title.localeCompare(
+                b.assetMetadata.context?.formData.title,
+                'en',
+                {
+                    numeric: true,
+                    sensitivity: 'base',
+                }
+            );
+        });
 
     return {
         ...creator,
-        asset,
-        title,
+        assets,
     };
 };
 
@@ -44,11 +53,11 @@ export default function CreatorDetails({ creatorId, hiddenPreview = false, hidde
     const creator = useSelector((state) => creatorSelector(state, creatorId));
     const asset = Object.values(assetById || {}).find((v) => v.framework.createdBy === creatorId) || null;
 
-    const handleClickPreview = () => {
-        if (asset) {
+    const handleClickPreview = (item: AssetType) => {
+        if (item) {
             const URL = `${BASE_URL_STORE}/${
-                asset.consignArtwork?.status === 'active' ? creator?.username : 'preview'
-            }/${asset._id}`;
+                item.consignArtwork?.status === 'active' ? creator?.username : 'preview'
+            }/${item._id}`;
             window.open(URL, '_blank');
         }
     };
@@ -156,25 +165,30 @@ export default function CreatorDetails({ creatorId, hiddenPreview = false, hidde
                         </Box>
                     </Box>
 
-                    {/* Adiciona a referência do asset relacionado ao criador */}
-                    {!hiddenPreview && (
+                    {!hiddenPreview && creator.assets.length > 0 && (
                         <Box>
                             <Divider />
                             <Typography variant="h5" p={3} pb={1}>
-                                Creator Asset
+                                Creator Assets
                             </Typography>
-                            <Box p={3} pt={0}>
-                                <Typography variant="body2" color="text.secondary">
-                                    Asset Name
-                                </Typography>
-                                <Box display="flex" alignItems="center" justifyContent="space-between">
-                                    <Typography variant="subtitle1" fontWeight={600} mb={0.5}>
-                                        {creator.title}
-                                    </Typography>
-                                    <Button onClick={handleClickPreview} disabled={creator.title === 'N/A'}>
-                                        <Typography>Preview</Typography>
-                                    </Button>
-                                </Box>
+                            <Box maxHeight={300} overflow={'auto'} mb={2}>
+                                {creator.assets.map((item, index) => (
+                                    <Box p={3} pt={0} key={index}>
+                                        <Box display="flex" alignItems="center" justifyContent="space-between">
+                                            <Box>
+                                                <Typography variant="subtitle1" fontWeight={600}>
+                                                    {item.assetMetadata?.context?.formData?.title || 'N/A'}
+                                                </Typography>
+                                                <Typography variant="caption" fontWeight={600}>
+                                                    {localePrice(item.licenses?.nft?.single?.editionPrice)}
+                                                </Typography>
+                                            </Box>
+                                            <Button onClick={() => handleClickPreview(item)}>
+                                                <Typography>Preview</Typography>
+                                            </Button>
+                                        </Box>
+                                    </Box>
+                                ))}
                             </Box>
                         </Box>
                     )}

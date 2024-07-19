@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
@@ -61,15 +61,17 @@ const ModerationPage = () => {
         setConfirmRejectModal(false);
     };
 
-    const filteredAndSearchedConsigns = requestConsigns.filter((item) => {
-        const matchesFilter = filtered ? item.status === filtered : true;
-        const matchesSearch = search
-            ? [item.creator.username, item.asset.title, ...item.creator.emails.map((email) => email.email)]
-                  .filter(Boolean)
-                  .some((field) => field.toLowerCase().includes(search.toLowerCase()))
-            : true;
-        return matchesFilter && matchesSearch;
-    });
+    const filteredAndSearchedConsigns = useMemo(() => {
+        return requestConsigns.filter((item) => {
+            const matchesFilter = filtered ? item.status === filtered : true;
+            const matchesSearch = search
+                ? [item.creator.username, item.asset.title, ...item.creator.emails.map((email) => email.email)]
+                      .filter(Boolean)
+                      .some((field) => field.toLowerCase().includes(search.toLowerCase()))
+                : true;
+            return matchesFilter && matchesSearch;
+        });
+    }, [requestConsigns, filtered, search]);
 
     return (
         <PageContainer title="Request Consign" description="this is requests">

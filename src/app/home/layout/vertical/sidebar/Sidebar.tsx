@@ -5,7 +5,6 @@ import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import Logo from '../../shared/logo/Logo';
 import SidebarItems from './SidebarItems';
-// import { AppState } from '@/store';
 
 const Sidebar = () => {
     const lgUp = useMediaQuery((theme: any) => theme.breakpoints.up('lg'));
@@ -27,19 +26,7 @@ const Sidebar = () => {
     };
     const theme = useTheme();
     const toggleWidth =
-        customizer.isCollapse && !customizer.isSidebarHover
-            ? customizer.MiniSidebarWidth
-            : customizer.SidebarWidth;
-
-    const onHoverEnter = () => {
-        if (customizer.isCollapse) {
-            // dispatch(hoverSidebar(true));
-        }
-    };
-
-    const onHoverLeave = () => {
-        // dispatch(hoverSidebar(false));
-    };
+        customizer.isCollapse && !customizer.isSidebarHover ? customizer.MiniSidebarWidth : customizer.SidebarWidth;
 
     if (lgUp) {
         return (
@@ -59,8 +46,6 @@ const Sidebar = () => {
                 <Drawer
                     anchor="left"
                     open
-                    onMouseEnter={onHoverEnter}
-                    onMouseLeave={onHoverLeave}
                     variant="permanent"
                     PaperProps={{
                         sx: {
@@ -102,17 +87,11 @@ const Sidebar = () => {
         <Drawer
             anchor="left"
             open={customizer.isMobileSidebar}
-            // onClose={() => dispatch(toggleMobileSidebar())}
             variant="temporary"
             PaperProps={{
                 sx: {
                     width: customizer.SidebarWidth,
 
-                    // backgroundColor:
-                    //   customizer.activeMode === 'dark'
-                    //     ? customizer.darkBackground900
-                    //     : customizer.activeSidebarBg,
-                    // color: customizer.activeSidebarBg === '#ffffff' ? '' : 'white',
                     border: '0 !important',
                     boxShadow: (th) => th.shadows[8],
                 },

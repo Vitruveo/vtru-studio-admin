@@ -19,7 +19,7 @@ import { toastrActionsCreators } from '@/features/toastr/slice';
 
 const secdrawerWidth = 320;
 
-const ModerationPage = () => {
+const PendingModerationPage = () => {
     const dispatch = useDispatch();
 
     const lgUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('lg'));
@@ -28,20 +28,17 @@ const ModerationPage = () => {
     const [isRightSidebarOpen, setRightSidebarOpen] = useState(false);
     const [search, setSearch] = useState('');
     const [selected, setSelected] = useState<RequestConsign | undefined>(undefined);
-    const [filtered, setFiltered] = useState('');
     const [confirmRejectModal, setConfirmRejectModal] = useState(false);
 
     const requestConsigns = useSelector((state) =>
-        state.requestConsign.allIds.map((id) => state.requestConsign.byId[id])
+        state.requestConsign.allIds
+            .map((id) => state.requestConsign.byId[id])
+            .filter((item) => item.status === 'pending')
     );
 
     const requestConsignById = useSelector((state) => state.requestConsign.byId);
 
     const handleSelect = (id: string) => setSelected(requestConsignById[id]);
-
-    const handleFilter = (status: string) => {
-        setFiltered((prevStatus) => (prevStatus === status ? '' : status));
-    };
 
     const handleApprove = () => {
         if (selected) {
@@ -63,19 +60,18 @@ const ModerationPage = () => {
 
     const filteredAndSearchedConsigns = useMemo(() => {
         return requestConsigns.filter((item) => {
-            const matchesFilter = filtered ? item.status === filtered : true;
             const matchesSearch = search
                 ? [item.creator.username, item.asset.title, ...item.creator.emails.map((email) => email.email)]
                       .filter(Boolean)
                       .some((field) => field.toLowerCase().includes(search.toLowerCase()))
                 : true;
-            return matchesFilter && matchesSearch;
+            return matchesSearch;
         });
-    }, [requestConsigns, filtered, search]);
+    }, [requestConsigns, search]);
 
     return (
         <PageContainer title="Request Consign" description="this is requests">
-            <Breadcrumb title="Request Consign Application" subtitle="List creators requests" />
+            <Breadcrumb title="Request Consign Application" subtitle="List pending requests" />
             <AppCard>
                 <Box
                     sx={{
@@ -146,7 +142,7 @@ const ModerationPage = () => {
     );
 };
 
-export default ModerationPage;
+export default PendingModerationPage;
 
 const style = {
     position: 'absolute',

@@ -10,6 +10,7 @@ export interface CreatorType {
     vault: {
         vaultAddress: string;
         isBlocked: boolean;
+        isTrusted: boolean;
     };
 }
 

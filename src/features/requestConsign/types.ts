@@ -14,6 +14,10 @@ export interface RequestConsign {
             codeHash: string | null;
             checkedAt: Date | null;
         }[];
+        vault: {
+            isBlocked: boolean;
+            isTrusted: boolean;
+        };
     };
     when: Date;
     status: string;

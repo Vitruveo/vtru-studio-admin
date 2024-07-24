@@ -14,6 +14,7 @@ export interface RequestConsign {
             codeHash: string | null;
             checkedAt: Date | null;
         }[];
+        isTrusted: boolean;
     };
     when: Date;
     status: string;

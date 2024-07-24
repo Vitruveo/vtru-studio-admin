@@ -14,8 +14,9 @@ import {
     IconHandOff,
     IconClock,
     IconX,
+    IconUserCheck,
+    IconUserOff,
     IconAlertTriangle,
-    IconShieldCheckFilled,
 } from '@tabler/icons-react';
 import { RequestConsign } from '@/features/requestConsign';
 import { CircularProgress } from '@mui/material';
@@ -29,7 +30,15 @@ interface Props extends RequestConsign {
 export default function RequestConsignListItem({ onClick, creator, asset, active, status }: Props) {
     const theme = useTheme();
 
-    const handleIcon = () => {
+    const handleVaultIcon = () => {
+        if (creator?.vault?.isBlocked) return <IconUserOff />;
+
+        if (creator?.vault?.isTrusted) return <IconUserCheck />;
+
+        return <IconAlertTriangle />;
+    };
+
+    const handleStatusIcon = () => {
         if (status === 'error') return <IconX size="18" stroke={1.3} color="red" />;
 
         if (status === 'running') {
@@ -63,7 +72,7 @@ export default function RequestConsignListItem({ onClick, creator, asset, active
                             {asset?.title}
                         </Typography>
                         <Box mr="auto" display="flex" alignItems="center">
-                            {handleIcon()}
+                            {handleStatusIcon()}
                             <Typography variant="body2" noWrap color={theme.palette.grey[600]} sx={{ marginLeft: 0.5 }}>
                                 {creator?.username}
                             </Typography>
@@ -71,7 +80,7 @@ export default function RequestConsignListItem({ onClick, creator, asset, active
                     </Box>
                 </Stack>
             </ListItemText>
-            <ListItemIcon>{creator?.isTrusted ? <IconShieldCheckFilled /> : <IconAlertTriangle />}</ListItemIcon>
+            <ListItemIcon>{handleVaultIcon()}</ListItemIcon>
         </ListItemButton>
     );
 }

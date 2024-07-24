@@ -16,7 +16,17 @@ interface MenuitemsType {
     external?: boolean;
     permission?: string;
 }
-import { IconPackage, IconChartDonut3, IconAperture, IconList } from '@tabler/icons-react';
+import {
+    IconPackage,
+    IconChartDonut3,
+    IconAperture,
+    IconList,
+    IconClock,
+    IconCheck,
+    IconHandOff,
+    IconLoader2,
+    IconX,
+} from '@tabler/icons-react';
 
 const Menuitems: MenuitemsType[] = [
     {
@@ -40,6 +50,38 @@ const Menuitems: MenuitemsType[] = [
         icon: IconAperture,
         href: '/home/moderation',
         permission: 'moderator',
+        children: [
+            {
+                id: uniqueId(),
+                title: 'Pending',
+                icon: IconClock,
+                href: '/home/moderation',
+            },
+            {
+                id: uniqueId(),
+                title: 'Approved',
+                icon: IconCheck,
+                href: '/home/moderation',
+            },
+            {
+                id: uniqueId(),
+                title: 'Rejected',
+                icon: IconHandOff,
+                href: '/home/moderation',
+            },
+            {
+                id: uniqueId(),
+                title: 'Running',
+                icon: IconLoader2,
+                href: '/home/moderation',
+            },
+            {
+                id: uniqueId(),
+                title: 'Error',
+                icon: IconX,
+                href: '/home/moderation',
+            },
+        ],
     },
     {
         id: uniqueId(),

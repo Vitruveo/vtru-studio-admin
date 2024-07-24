@@ -89,8 +89,6 @@ const ModerationPage = () => {
                         requestConsignId={selected ? selected._id : ''}
                         data={filteredAndSearchedConsigns}
                         onClick={({ _id }) => handleSelect(_id)}
-                        handleFilter={handleFilter}
-                        activeFilter={filtered}
                     />
                 </Box>
 

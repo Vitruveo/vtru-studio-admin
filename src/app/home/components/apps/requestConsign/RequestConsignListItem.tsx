@@ -9,15 +9,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { useTheme } from '@mui/material/styles';
-import {
-    IconCheck,
-    IconHandOff,
-    IconClock,
-    IconX,
-    IconUserCheck,
-    IconUserOff,
-    IconAlertTriangle,
-} from '@tabler/icons-react';
+import { IconCheck, IconHandOff, IconClock, IconX, IconUserCheck, IconUserOff } from '@tabler/icons-react';
 import { RequestConsign } from '@/features/requestConsign';
 import { CircularProgress } from '@mui/material';
 
@@ -29,14 +21,6 @@ interface Props extends RequestConsign {
 
 export default function RequestConsignListItem({ onClick, creator, asset, active, status }: Props) {
     const theme = useTheme();
-
-    const handleVaultIcon = () => {
-        if (creator?.vault?.isBlocked) return <IconUserOff />;
-
-        if (creator?.vault?.isTrusted) return <IconUserCheck />;
-
-        return <IconAlertTriangle />;
-    };
 
     const handleStatusIcon = () => {
         if (status === 'error') return <IconX size="18" stroke={1.3} color="red" />;
@@ -80,7 +64,10 @@ export default function RequestConsignListItem({ onClick, creator, asset, active
                     </Box>
                 </Stack>
             </ListItemText>
-            <ListItemIcon>{handleVaultIcon()}</ListItemIcon>
+            <ListItemIcon>
+                {creator.vault?.isBlocked && <IconUserOff />}
+                {creator.vault?.isTrusted && <IconUserCheck />}
+            </ListItemIcon>
         </ListItemButton>
     );
 }

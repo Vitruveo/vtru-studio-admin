@@ -15,7 +15,7 @@ export default function RequestConsignList({ requestConsignId, data, loading, on
         <Scrollbar
             sx={{
                 height: {
-                    lg: 'calc(100vh - 360px)',
+                    lg: 'calc(100vh - 300px)',
                     md: '100vh',
                 },
             }}

@@ -10,8 +10,8 @@ import RequestConsignDetails from '@/app/home/components/apps/requestConsign/Req
 import RequestConsignList from '@/app/home/components/apps/requestConsign/RequestConsignList';
 import RequestConsignSearch from '@/app/home/components/apps/requestConsign/RequestConsignSearch';
 import AppCard from '@/app/home/components/shared/AppCard';
-import { Button, CircularProgress, Modal, Theme, Typography, useMediaQuery } from '@mui/material';
-import { useSelector, useDispatch } from '@/store/hooks';
+import { Button, Modal, Theme, Typography, useMediaQuery } from '@mui/material';
+import { useDispatch } from '@/store/hooks';
 import { consignThunk, requestConsignUpdateStatusThunk } from '@/features/requestConsign/thunks';
 import { RequestConsign } from '@/features/requestConsign';
 import { BASE_URL_STORE } from '@/constants/api';
@@ -38,12 +38,6 @@ const PendingModerationPage = () => {
     const [selected, setSelected] = useState<RequestConsign | undefined>(undefined);
     const [confirmRejectModal, setConfirmRejectModal] = useState(false);
 
-    // const requestConsigns = useSelector((state) =>
-    //     state.requestConsign.allIds
-    //         .map((id) => state.requestConsign.byId[id])
-    //         .filter((item) => item.status === 'pending')
-    // );
-
     const { chunk: rawRequestConsigns, loading } = useLiveStream<RequestConsign>({
         event: {
             list: LIST_REQUEST_CONSIGNS,
@@ -57,9 +51,6 @@ const PendingModerationPage = () => {
         () => rawRequestConsigns.filter((item) => item.status === 'pending'),
         [rawRequestConsigns]
     );
-
-    // const requestConsignById = useSelector((state) => state.requestConsign.byId);
-    // const handleSelect = (id: string) => setSelected(requestConsignById[id]);
 
     const handleSelect = (id: string) => {
         const selectedRequestConsigns = requestConsigns.find((item) => item._id === id);

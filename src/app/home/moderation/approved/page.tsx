@@ -11,7 +11,6 @@ import RequestConsignList from '@/app/home/components/apps/requestConsign/Reques
 import RequestConsignSearch from '@/app/home/components/apps/requestConsign/RequestConsignSearch';
 import AppCard from '@/app/home/components/shared/AppCard';
 import { Theme, useMediaQuery } from '@mui/material';
-import { useSelector } from '@/store/hooks';
 import { RequestConsign } from '@/features/requestConsign';
 import { BASE_URL_STORE } from '@/constants/api';
 import { useLiveStream } from '../../components/liveStream';
@@ -33,11 +32,6 @@ const ApprovedModerationPage = () => {
     const [search, setSearch] = useState('');
     const [selected, setSelected] = useState<RequestConsign | undefined>(undefined);
 
-    // const requestConsigns = useSelector((state) =>
-    //     state.requestConsign.allIds
-    //         .map((id) => state.requestConsign.byId[id])
-    //         .filter((item) => item.status === 'approved')
-    // );
     const { chunk: rawRequestConsigns, loading } = useLiveStream<RequestConsign>({
         event: {
             list: LIST_REQUEST_CONSIGNS,
@@ -51,9 +45,6 @@ const ApprovedModerationPage = () => {
         () => rawRequestConsigns.filter((item) => item.status === 'approved'),
         [rawRequestConsigns]
     );
-
-    // const requestConsignById = useSelector((state) => state.requestConsign.byId);
-    // const handleSelect = (id: string) => setSelected(requestConsignById[id]);
 
     const handleSelect = (id: string) => {
         const selectedRequestConsign = requestConsigns.find((item) => item._id === id);

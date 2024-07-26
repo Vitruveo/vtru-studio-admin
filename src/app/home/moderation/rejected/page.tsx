@@ -11,11 +11,19 @@ import RequestConsignList from '@/app/home/components/apps/requestConsign/Reques
 import RequestConsignSearch from '@/app/home/components/apps/requestConsign/RequestConsignSearch';
 import AppCard from '@/app/home/components/shared/AppCard';
 import { Theme, useMediaQuery } from '@mui/material';
-import { useSelector, useDispatch } from '@/store/hooks';
+import { useDispatch } from '@/store/hooks';
 import { consignThunk } from '@/features/requestConsign/thunks';
 import { RequestConsign } from '@/features/requestConsign';
 import { BASE_URL_STORE } from '@/constants/api';
 import { toastrActionsCreators } from '@/features/toastr/slice';
+import { useLiveStream } from '../../components/liveStream';
+import {
+    CREATED_REQUEST_CONSIGN,
+    DELETED_REQUEST_CONSIGN,
+    EVENTS_REQUEST_CONSIGNS,
+    LIST_REQUEST_CONSIGNS,
+    UPDATED_REQUEST_CONSIGN,
+} from '../../components/liveStream/events';
 
 const secdrawerWidth = 320;
 
@@ -29,15 +37,26 @@ const RejectedModerationPage = () => {
     const [search, setSearch] = useState('');
     const [selected, setSelected] = useState<RequestConsign | undefined>(undefined);
 
-    const requestConsigns = useSelector((state) =>
-        state.requestConsign.allIds
-            .map((id) => state.requestConsign.byId[id])
-            .filter((item) => item.status === 'rejected')
+    const { chunk: rawRequestConsings, loading } = useLiveStream<RequestConsign>({
+        event: {
+            list: LIST_REQUEST_CONSIGNS,
+            update: UPDATED_REQUEST_CONSIGN,
+            delete: DELETED_REQUEST_CONSIGN,
+            create: CREATED_REQUEST_CONSIGN,
+        },
+        listemEvents: EVENTS_REQUEST_CONSIGNS,
+    });
+
+    const requestConsigns = useMemo(
+        () => rawRequestConsings.filter((item) => item.status === 'rejected'),
+        [rawRequestConsings]
     );
 
-    const requestConsignById = useSelector((state) => state.requestConsign.byId);
+    const handleSelect = (id: string) => {
+        const selectedRequestConsign = requestConsigns.find((item) => item._id === id);
 
-    const handleSelect = (id: string) => setSelected(requestConsignById[id]);
+        if (selectedRequestConsign) setSelected(selectedRequestConsign);
+    };
 
     const handleApprove = () => {
         if (selected) {
@@ -74,6 +93,7 @@ const RejectedModerationPage = () => {
                         requestConsignId={selected ? selected._id : ''}
                         data={filteredAndSearchedConsigns}
                         onClick={({ _id }) => handleSelect(_id)}
+                        loading={loading}
                     />
                 </Box>
 

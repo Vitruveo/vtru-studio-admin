@@ -63,17 +63,7 @@ export function getEventsThunk(): ReduxThunkAction {
                 if (requestConsignEventsOne.includes(message.event))
                     dispatch(requestConsignActionsCreators.setRequestConsign(parsed));
                 if (requestConsignEventsAll.includes(message.event)) {
-                    const requests = parsed.map((v: RequestConsign) => {
-                        if (v.status === 'running') {
-                            return {
-                                ...v,
-                                status: 'error',
-                            };
-                        }
-                        return v;
-                    });
-
-                    dispatch(requestConsignActionsCreators.setRequestConsigns(requests));
+                    dispatch(requestConsignActionsCreators.setRequestConsigns(parsed));
                 }
 
                 // assets events

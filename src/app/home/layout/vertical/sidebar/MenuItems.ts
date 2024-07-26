@@ -48,7 +48,6 @@ const Menuitems: MenuitemsType[] = [
         id: uniqueId(),
         title: 'Moderation',
         icon: IconAperture,
-        href: '/home/moderation',
         permission: 'moderator',
         children: [
             {

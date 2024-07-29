@@ -143,7 +143,7 @@ const AssetsPage = () => {
                         assets={getAssets}
                         onClick={onFabClick}
                         onChangeSearch={(value) => setSearchText(value)}
-                        isLoading={loadingAssets || loadingCreators}
+                        loading={loadingAssets || loadingCreators}
                     />
 
                     <Box mt={8} mx="auto">

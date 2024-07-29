@@ -4,12 +4,14 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 
 import { CreatorType } from '@/features/creator';
 import CreatorListItem from './CreatorListItem';
+import { Box, CircularProgress } from '@mui/material';
 
 type Props = {
     creatorId: string;
     data: CreatorType[];
     onCreatorClick(params: CreatorType): void;
     onDeleteClick(params: { id: string; email: string }): void;
+    loading: boolean;
 };
 
 type PaginatedData = {
@@ -19,7 +21,7 @@ type PaginatedData = {
 
 const PER_PAGE = 30;
 
-export default function CreatorList({ creatorId, data, onCreatorClick, onDeleteClick }: Props) {
+export default function CreatorList({ creatorId, data, loading, onCreatorClick, onDeleteClick }: Props) {
     const [dataPaginated, setDataPaginated] = useState<PaginatedData>({
         page: 1,
         data: data.slice(0, PER_PAGE),
@@ -36,6 +38,11 @@ export default function CreatorList({ creatorId, data, onCreatorClick, onDeleteC
 
     return (
         <List>
+            {loading && (
+                <Box display="flex" justifyContent="center">
+                    <CircularProgress />
+                </Box>
+            )}
             <InfiniteScroll
                 dataLength={dataPaginated.data.length}
                 next={() => {

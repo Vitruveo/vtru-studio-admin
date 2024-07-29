@@ -143,6 +143,7 @@ export default function Users() {
                         data={(search.length > 0 && usersFiltered) || users}
                         onDeleteClick={onDeleteClick}
                         onUserClick={({ id }) => setUserId(id)}
+                        loading={loadingCreators || loadingRoles}
                     />
                 </Box>
 

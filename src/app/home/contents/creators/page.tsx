@@ -137,6 +137,7 @@ export default function Creators() {
                             dispatch(creatorActionsCreators.setCreator(creator));
                             setCreatorId(creator._id);
                         }}
+                        loading={loadingCreators}
                     />
                 </Box>
 

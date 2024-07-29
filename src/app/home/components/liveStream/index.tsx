@@ -29,7 +29,6 @@ export const useLiveStream = <T,>({ event, listemEvents }: Props) => {
     };
 
     const fetchData = useCallback(() => {
-        console.log('Fetch data');
         const url = `${BASE_URL_API}/events?timestamp=${new Date().getTime()}&events=${listemEvents.join(',')}`;
 
         fetchEventSource(url, {
@@ -38,8 +37,6 @@ export const useLiveStream = <T,>({ event, listemEvents }: Props) => {
             signal: ctrl.signal,
             onmessage(message) {
                 const parsed = JSON.parse(message.data);
-
-                console.log(message);
 
                 if (message.event === event.list) {
                     setChunk(parsed);
@@ -80,7 +77,6 @@ export const useLiveStream = <T,>({ event, listemEvents }: Props) => {
         fetchData();
 
         return () => {
-            console.log('Abort');
             ctrl.abort();
         };
     }, []);

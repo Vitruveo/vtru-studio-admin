@@ -31,7 +31,7 @@ const AssetsOnePage = ({ params }: Props) => {
     const asset = useSelector((state) => state.asset.byId[params.id]);
     const creator = useSelector((state) => state.asset.creator);
     const { byId } = useSelector((state) => state.creator);
-    const createdBy = byId[asset.framework.createdBy];
+    const createdBy = byId[asset?.framework?.createdBy] || '';
     const creatorsFormData = asset?.assetMetadata?.creators?.formData || [];
 
     const handleChangeAssetBlocked = ({ status }: { status: 'active' | 'blocked' }) => {
@@ -131,7 +131,7 @@ const AssetsOnePage = ({ params }: Props) => {
                 </Box>
             </AppCard>
             <Modal open={open} handleClose={() => setOpen(false)} title="">
-                {createdBy?._id && <CreatorDetails creatorId={createdBy._id} hiddenPreview />}
+                {createdBy?._id && <CreatorDetails creatorId={createdBy?._id} />}
             </Modal>
         </PageContainer>
     );

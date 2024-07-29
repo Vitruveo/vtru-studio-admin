@@ -7,14 +7,14 @@ import CreatorListItem from './CreatorListItem';
 
 type Props = {
     creatorId: string;
-    data: Omit<CreatorType, 'roles'>[];
-    onCreatorClick(params: { id: string }): void;
+    data: CreatorType[];
+    onCreatorClick(params: CreatorType): void;
     onDeleteClick(params: { id: string; email: string }): void;
 };
 
 type PaginatedData = {
     page: number;
-    data: Omit<CreatorType, 'roles'>[];
+    data: CreatorType[];
 };
 
 const PER_PAGE = 30;
@@ -58,7 +58,7 @@ export default function CreatorList({ creatorId, data, onCreatorClick, onDeleteC
                         active={creator._id === creatorId}
                         image=""
                         {...creator}
-                        onCreatorClick={() => onCreatorClick({ id: creator._id })}
+                        onCreatorClick={() => onCreatorClick(creator)}
                         onDeleteClick={() => onDeleteClick({ id: creator._id, email: creator.emails[0].email })}
                         onStarredClick={() => {}}
                     />

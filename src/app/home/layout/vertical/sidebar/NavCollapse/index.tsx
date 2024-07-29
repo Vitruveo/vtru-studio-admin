@@ -20,6 +20,7 @@ import { isNull } from 'lodash';
 // plugins
 import { IconChevronDown, IconChevronUp } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
+import { Box } from '@mui/material';
 
 type NavGroupProps = {
     [x: string]: any;
@@ -115,14 +116,20 @@ export default function NavCollapse({
             );
         } else {
             return (
-                <NavItem
+                <Box
+                    sx={{
+                        marginLeft: 3,
+                    }}
                     key={item.id}
-                    item={item}
-                    level={level}
-                    pathDirect={pathDirect}
-                    hideMenu={hideMenu}
-                    onClick={lgDown ? onClick : isNull}
-                />
+                >
+                    <NavItem
+                        item={item}
+                        level={level}
+                        pathDirect={pathDirect}
+                        hideMenu={hideMenu}
+                        onClick={lgDown ? onClick : isNull}
+                    />
+                </Box>
             );
         }
     });

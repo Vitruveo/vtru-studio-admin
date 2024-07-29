@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import Box from '@mui/material/Box';
 import Breadcrumb from '@/app/home/layout/shared/breadcrumb/Breadcrumb';
 import PageContainer from '@/app/home/components/container/PageContainer';
@@ -11,6 +11,21 @@ import { Pagination } from '@mui/material';
 import { UsePaginationProps } from '@mui/lab';
 import { useDispatch, useSelector } from '@/store/hooks';
 import { setCurrentPageThunk } from '@/features/assets/thunks';
+import { useLiveStream } from '../../components/liveStream';
+import {
+    CREATED_ASSET,
+    CREATED_CREATOR,
+    DELETED_ASSET,
+    DELETED_CREATOR,
+    EVENTS_ASSETS,
+    EVENTS_CREATORS,
+    LIST_ASSETS,
+    LIST_CREATORS,
+    UPDATED_ASSET,
+    UPDATED_CREATOR,
+} from '../../components/liveStream/events';
+import { AssetType } from '../../types/apps/asset';
+import { CreatorType } from '@/features/creator';
 
 const AssetsPage = () => {
     const dispatch = useDispatch();
@@ -20,8 +35,28 @@ const AssetsPage = () => {
     const [currentPage, setCurrentPage] = useState(cachePage || 1);
     const [searchText, setSearchText] = useState('');
 
-    const assets = useSelector((state) => state.asset.allIds.map((id) => state.asset.byId[id]));
-    const creators = useSelector((state) => state.creator.allIds.map((id) => state.creator.byId[id]));
+    const { chunk: assets, loading: loadingAssets } = useLiveStream<AssetType>({
+        event: {
+            list: LIST_ASSETS,
+            update: UPDATED_ASSET,
+            delete: DELETED_ASSET,
+            create: CREATED_ASSET,
+        },
+        listemEvents: EVENTS_ASSETS,
+    });
+
+    const { chunk: creators, loading: loadingCreators } = useLiveStream<CreatorType>({
+        event: {
+            list: LIST_CREATORS,
+            update: UPDATED_CREATOR,
+            delete: DELETED_CREATOR,
+            create: CREATED_CREATOR,
+        },
+        listemEvents: EVENTS_CREATORS,
+    });
+
+    // const assets = useSelector((state) => state.asset.allIds.map((id) => state.asset.byId[id]));
+    // const creators = useSelector((state) => state.creator.allIds.map((id) => state.creator.byId[id]));
     const filter = useSelector((state) => state.asset.filter);
 
     const assetsWithCreators = useMemo(() => {
@@ -108,7 +143,9 @@ const AssetsPage = () => {
                         assets={getAssets}
                         onClick={onFabClick}
                         onChangeSearch={(value) => setSearchText(value)}
+                        isLoading={loadingAssets || loadingCreators}
                     />
+
                     <Box mt={8} mx="auto">
                         <Pagination
                             count={totalPages}

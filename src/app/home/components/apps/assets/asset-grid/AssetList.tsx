@@ -16,15 +16,17 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import emptyCart from 'public/images/products/empty-shopping-cart.svg';
 import { useDispatch, useSelector } from '@/store/hooks';
 import { updateManyAssetsStatusByIdsThunk } from '@/features/assets/thunks';
+import { assetActionsCreators } from '@/features/assets';
+import { creatorActionsCreators } from '@/features/creator';
 
 interface Props {
     onClick: (event: React.SyntheticEvent | Event) => void;
     onChangeSearch: (value: string) => void;
     assets: AssetType[];
-    isLoading?: boolean;
+    isLoading: boolean;
 }
 
-const AssetList = ({ onClick, onChangeSearch, assets, isLoading = false }: Props) => {
+const AssetList = ({ onClick, onChangeSearch, assets, isLoading }: Props) => {
     const lgUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('lg'));
     const router = useRouter();
     const dispatch = useDispatch();
@@ -50,6 +52,10 @@ const AssetList = ({ onClick, onChangeSearch, assets, isLoading = false }: Props
             selectedAssetsIds.removeByValue(asset._id);
             return;
         }
+
+        dispatch(assetActionsCreators.setAsset(asset));
+        if (asset?.creator) dispatch(creatorActionsCreators.setCreator(asset.creator));
+
         router.push(`asset/${asset._id}`);
     };
 
@@ -171,11 +177,11 @@ const AssetList = ({ onClick, onChangeSearch, assets, isLoading = false }: Props
                             return (
                                 <Grid item display="flex" flexWrap={'wrap'} alignItems="stretch" key={asset._id}>
                                     <AssetCard
-                                        creator={asset.assetMetadata?.creators?.formData?.[0]?.name}
+                                        creator={asset?.assetMetadata?.creators?.formData?.[0]?.name}
                                         onClick={() => onCardClick(asset, assetsStatus)}
                                         isLoading={isLoading}
-                                        title={asset.assetMetadata?.context?.formData?.title ?? 'Untitled'}
-                                        media={buildAssetSource(asset.formats?.preview?.path)}
+                                        title={asset?.assetMetadata?.context?.formData?.title ?? 'Untitled'}
+                                        media={buildAssetSource(asset?.formats?.preview?.path)}
                                         status={assetsStatus}
                                         variant={isSelecting && assetsStatus != undefined ? 'selectable' : 'default'}
                                         isSelected={isAssetSelected(asset._id)}

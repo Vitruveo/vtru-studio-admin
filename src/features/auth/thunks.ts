@@ -1,10 +1,21 @@
+import cookie from 'cookiejs';
 import { userLoginReq, userOTPConfimReq } from './requests';
 import { UserLoginApiRes, UserLoginReq, UserOTPConfirmApiRes, UserOTPConfirmReq } from './types';
 import { ReduxThunkAction } from '@/store';
 import { userActionsCreators } from './slice';
 import { connectWebSocketThunk, loginWebSocketThunk } from '../ws';
 import { toastrActionsCreators } from '../toastr/slice';
-import { getEventsThunk } from '../events/thunks';
+
+export function setCookieThunk(): ReduxThunkAction {
+    return async function (dispatch, getState) {
+        const state = getState();
+        const token = state.auth.token;
+        const replaceDomain = window.location.hostname.includes('vitruveo.xyz') ? 'studio-admin.' : 'admin.';
+
+        const domain = window.location.hostname.replace(replaceDomain, '');
+        cookie.set('token', token, { path: '/', domain });
+    };
+}
 
 export function userLoginThunk(payload: UserLoginReq): ReduxThunkAction<Promise<UserLoginApiRes>> {
     return async function (dispatch, getState) {
@@ -30,6 +41,8 @@ export function userOTPConfirmThunk(payload: UserOTPConfirmReq): ReduxThunkActio
                         type: 'success',
                     })
                 );
+
+                dispatch(setCookieThunk());
 
                 return response;
             })

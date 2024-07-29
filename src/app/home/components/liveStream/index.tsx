@@ -39,7 +39,7 @@ export const useLiveStream = <T,>({ event, listemEvents }: Props) => {
                 const parsed = JSON.parse(message.data);
 
                 if (message.event === event.list) {
-                    setChunk(parsed);
+                    setChunk((prevState) => [...prevState, parsed]);
                     setLoading(false);
                 }
 

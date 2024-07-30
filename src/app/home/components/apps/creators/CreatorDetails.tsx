@@ -19,7 +19,7 @@ const creatorSelector = (state: AppState, creatorId: string) => {
     if (!creator) return null;
 
     const assets = Object.values(state.asset?.byId || {})
-        .filter((v) => v.framework.createdBy === creatorId)
+        .filter((v) => v?.framework?.createdBy === creatorId)
         .sort((a, b) => {
             if (!a.assetMetadata?.context?.formData.title || !b.assetMetadata?.context?.formData.title) return 0;
             return a.assetMetadata?.context?.formData.title.localeCompare(
@@ -51,7 +51,7 @@ export default function CreatorDetails({ creatorId, hiddenPreview = false, hidde
     const { status } = useSelector((state) => state.creator);
     const { byId: assetById } = useSelector((state) => state.asset);
     const creator = useSelector((state) => creatorSelector(state, creatorId));
-    const asset = Object.values(assetById || {}).find((v) => v.framework.createdBy === creatorId) || null;
+    const asset = Object.values(assetById || {}).find((v) => v?.framework?.createdBy === creatorId) || null;
 
     const handleClickPreview = (item: AssetType) => {
         if (item) {

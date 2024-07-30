@@ -61,7 +61,9 @@ const AssetsPage = () => {
 
     const assetsWithCreators = useMemo(() => {
         return assets.map((asset) => {
-            const creator = creators.find((item) => item._id === asset.framework.createdBy);
+            const creator = asset?.framework?.createdBy
+                ? creators.find((item) => item._id === asset.framework.createdBy)
+                : undefined;
             return { ...asset, creator };
         });
     }, [assets, creators]);

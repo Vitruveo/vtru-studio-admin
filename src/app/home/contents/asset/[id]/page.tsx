@@ -30,13 +30,16 @@ const AssetsOnePage = ({ params }: Props) => {
     const dispatch = useDispatch();
 
     const asset = useSelector((state) => state.asset.byId[params.id]);
-    const creator = useSelector((state) => state.creator.byId[asset.framework.createdBy]);
+    const creator = useSelector((state) =>
+        asset?.framework?.createdBy ? state.creator.byId[asset.framework.createdBy] : null
+    );
+
     const creatorsFormData = asset?.assetMetadata?.creators?.formData || [];
 
     const [open, setOpen] = useState<boolean>(false);
 
     useEffect(() => {
-        if (asset?.framework?.createdAt) dispatch(getCreatorByIdThunk(asset.framework.createdBy));
+        if (asset?.framework?.createdBy) dispatch(getCreatorByIdThunk(asset.framework.createdBy));
     }, [asset]);
 
     const handleChangeAssetBlocked = ({ status }: { status: 'active' | 'blocked' }) => {
@@ -142,7 +145,7 @@ const AssetsOnePage = ({ params }: Props) => {
                 </Box>
             </AppCard>
             <Modal open={open} handleClose={() => setOpen(false)} title="">
-                {creator._id && <CreatorDetails creatorId={creator._id} />}
+                {creator?._id && <CreatorDetails creatorId={creator._id} />}
             </Modal>
         </PageContainer>
     );

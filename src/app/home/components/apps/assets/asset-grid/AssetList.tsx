@@ -4,7 +4,7 @@ import { IconChecklist, IconDeselect, IconLock, IconMenu2 } from '@tabler/icons-
 import { AssetType } from '@/app/home/types/apps/asset';
 import { AssetCard } from '@/app/home/components/apps/assets/asset-card/assetCard';
 import { buildAssetSource } from '@/utils/assets';
-import { Checkbox, FormControlLabel, Box, Button, Fab, Grid, Stack } from '@mui/material';
+import { Checkbox, FormControlLabel, Box, Button, Fab, Grid, Stack, CircularProgress } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useArray } from '@/app/hooks/use-array';
 import { ConfirmationDialog } from './ConfirmationDialog';
@@ -16,15 +16,17 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import emptyCart from 'public/images/products/empty-shopping-cart.svg';
 import { useDispatch, useSelector } from '@/store/hooks';
 import { updateManyAssetsStatusByIdsThunk } from '@/features/assets/thunks';
+import { assetActionsCreators } from '@/features/assets';
+import { creatorActionsCreators } from '@/features/creator';
 
 interface Props {
     onClick: (event: React.SyntheticEvent | Event) => void;
     onChangeSearch: (value: string) => void;
     assets: AssetType[];
-    isLoading?: boolean;
+    loading: boolean;
 }
 
-const AssetList = ({ onClick, onChangeSearch, assets, isLoading = false }: Props) => {
+const AssetList = ({ onClick, onChangeSearch, assets, loading }: Props) => {
     const lgUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('lg'));
     const router = useRouter();
     const dispatch = useDispatch();
@@ -50,6 +52,10 @@ const AssetList = ({ onClick, onChangeSearch, assets, isLoading = false }: Props
             selectedAssetsIds.removeByValue(asset._id);
             return;
         }
+
+        dispatch(assetActionsCreators.setAsset(asset));
+        if (asset?.creator) dispatch(creatorActionsCreators.setCreator(asset.creator));
+
         router.push(`asset/${asset._id}`);
     };
 
@@ -162,46 +168,56 @@ const AssetList = ({ onClick, onChangeSearch, assets, isLoading = false }: Props
                 <AssetSearch onChange={(event) => onChangeSearch(event.target.value)} />
             </Stack>
 
-            <Grid container spacing={8} justifyContent="center">
-                {assets.length > 0 ? (
-                    <>
-                        {assets.map((asset) => {
-                            const assetsStatus = getAssetStatus(asset);
+            {loading && (
+                <Box display="flex" justifyContent="center">
+                    <CircularProgress />
+                </Box>
+            )}
 
-                            return (
-                                <Grid item display="flex" flexWrap={'wrap'} alignItems="stretch" key={asset._id}>
-                                    <AssetCard
-                                        creator={asset.assetMetadata?.creators?.formData?.[0]?.name}
-                                        onClick={() => onCardClick(asset, assetsStatus)}
-                                        isLoading={isLoading}
-                                        title={asset.assetMetadata?.context?.formData?.title ?? 'Untitled'}
-                                        media={buildAssetSource(asset.formats?.preview?.path)}
-                                        status={assetsStatus}
-                                        variant={isSelecting && assetsStatus != undefined ? 'selectable' : 'default'}
-                                        isSelected={isAssetSelected(asset._id)}
-                                        isConsigned={asset?.contractExplorer?.explorer?.length > 0}
-                                    />
-                                </Grid>
-                            );
-                        })}
-                    </>
-                ) : (
-                    <>
-                        <Grid item xs={12} lg={12} md={12} sm={12}>
-                            <Box textAlign="center" mt={6}>
-                                <Image src={emptyCart} alt="cart" width={200} />
-                                <Typography variant="h2">There is no Asset</Typography>
-                                <Typography variant="h6" mb={3}>
-                                    The Asset you are searching is no longer available.
-                                </Typography>
-                                <Button variant="contained" onClick={() => {}}>
-                                    Try Again
-                                </Button>
-                            </Box>
-                        </Grid>
-                    </>
-                )}
-            </Grid>
+            {!loading && (
+                <Grid container spacing={8} justifyContent="center">
+                    {assets.length > 0 ? (
+                        <>
+                            {assets.map((asset) => {
+                                const assetsStatus = getAssetStatus(asset);
+
+                                return (
+                                    <Grid item display="flex" flexWrap={'wrap'} alignItems="stretch" key={asset._id}>
+                                        <AssetCard
+                                            creator={asset?.assetMetadata?.creators?.formData?.[0]?.name}
+                                            onClick={() => onCardClick(asset, assetsStatus)}
+                                            isLoading={loading}
+                                            title={asset?.assetMetadata?.context?.formData?.title ?? 'Untitled'}
+                                            media={buildAssetSource(asset?.formats?.preview?.path)}
+                                            status={assetsStatus}
+                                            variant={
+                                                isSelecting && assetsStatus != undefined ? 'selectable' : 'default'
+                                            }
+                                            isSelected={isAssetSelected(asset._id)}
+                                            isConsigned={asset?.contractExplorer?.explorer?.length > 0}
+                                        />
+                                    </Grid>
+                                );
+                            })}
+                        </>
+                    ) : (
+                        <>
+                            <Grid item xs={12} lg={12} md={12} sm={12}>
+                                <Box textAlign="center" mt={6}>
+                                    <Image src={emptyCart} alt="cart" width={200} />
+                                    <Typography variant="h2">There is no Asset</Typography>
+                                    <Typography variant="h6" mb={3}>
+                                        The Asset you are searching is no longer available.
+                                    </Typography>
+                                    <Button variant="contained" onClick={() => {}}>
+                                        Try Again
+                                    </Button>
+                                </Box>
+                            </Grid>
+                        </>
+                    )}
+                </Grid>
+            )}
         </Box>
     );
 };

@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Drawer from '@mui/material/Drawer';
@@ -20,8 +20,22 @@ import { userDeleteThunk } from '@/features/user/slice';
 import UserAdd from '../../components/apps/users/UserAdd';
 
 import { UserDialogDelete } from '../../components/apps/users/UserDialogDelete';
-import { userAddThunk, userGetThunk, userUpdateThunk } from '@/features/user/thunks';
-import { roleGetThunk } from '@/features/role/thunks';
+import { userAddThunk, userUpdateThunk } from '@/features/user/thunks';
+import {
+    CREATED_ROLE,
+    CREATED_USER,
+    DELETED_ROLE,
+    DELETED_USER,
+    EVENTS_ROLES,
+    EVENTS_USERS,
+    LIST_ROLES,
+    LIST_USERS,
+    UPDATED_ROLE,
+    UPDATED_USER,
+} from '../../components/liveStream/events';
+import { useLiveStream } from '../../components/liveStream';
+import { UserType } from '@/mock/users';
+import { RoleType } from '@/mock/roles';
 
 const drawerWidth = 240;
 const secdrawerWidth = 320;
@@ -34,9 +48,27 @@ export default function Users() {
     const lgUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('lg'));
     const mdUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
 
-    const users = useSelector((state) => state.user.allIds.map((id) => state.user.byId[id]));
     const usersById = useSelector((state) => state.user.byId);
-    const roles = useSelector((state) => state.role.allIds.map((id) => state.role.byId[id]));
+
+    const { chunk: users, loading: loadingCreators } = useLiveStream<UserType>({
+        event: {
+            list: LIST_USERS,
+            update: UPDATED_USER,
+            delete: DELETED_USER,
+            create: CREATED_USER,
+        },
+        listemEvents: EVENTS_USERS,
+    });
+
+    const { chunk: roles, loading: loadingRoles } = useLiveStream<RoleType>({
+        event: {
+            list: LIST_ROLES,
+            update: UPDATED_ROLE,
+            delete: DELETED_ROLE,
+            create: CREATED_ROLE,
+        },
+        listemEvents: EVENTS_ROLES,
+    });
 
     const [search, setSearch] = useState('');
     const [userId, setUserId] = useState('');
@@ -111,6 +143,7 @@ export default function Users() {
                         data={(search.length > 0 && usersFiltered) || users}
                         onDeleteClick={onDeleteClick}
                         onUserClick={({ id }) => setUserId(id)}
+                        loading={loadingCreators || loadingRoles}
                     />
                 </Box>
 

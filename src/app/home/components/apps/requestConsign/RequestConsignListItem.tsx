@@ -5,10 +5,11 @@ import Box from '@mui/material/Box';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
+import ListItemIcon from '@mui/material/ListItemIcon';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { useTheme } from '@mui/material/styles';
-import { IconCheck, IconHandOff, IconClock, IconX } from '@tabler/icons-react';
+import { IconCheck, IconHandOff, IconClock, IconX, IconUserCheck, IconUserOff } from '@tabler/icons-react';
 import { RequestConsign } from '@/features/requestConsign';
 import { CircularProgress } from '@mui/material';
 
@@ -21,7 +22,7 @@ interface Props extends RequestConsign {
 export default function RequestConsignListItem({ onClick, creator, asset, active, status }: Props) {
     const theme = useTheme();
 
-    const handleIcon = () => {
+    const handleStatusIcon = () => {
         if (status === 'error') return <IconX size="18" stroke={1.3} color="red" />;
 
         if (status === 'running') {
@@ -44,7 +45,7 @@ export default function RequestConsignListItem({ onClick, creator, asset, active
             <ListItemAvatar>
                 <Box position="relative">
                     <Avatar alt="" src="" sx={{ fontSize: 14 }}>
-                        {creator.username?.slice(0, 2).toUpperCase()}
+                        {creator?.username?.slice(0, 2).toUpperCase()}
                     </Avatar>
                 </Box>
             </ListItemAvatar>
@@ -52,17 +53,21 @@ export default function RequestConsignListItem({ onClick, creator, asset, active
                 <Stack direction="row" gap="10px" alignItems="center">
                     <Box mr="auto">
                         <Typography variant="subtitle1" noWrap fontWeight={600} sx={{ maxWidth: '150px' }}>
-                            {asset.title}
+                            {asset?.title}
                         </Typography>
                         <Box mr="auto" display="flex" alignItems="center">
-                            {handleIcon()}
+                            {handleStatusIcon()}
                             <Typography variant="body2" noWrap color={theme.palette.grey[600]} sx={{ marginLeft: 0.5 }}>
-                                {creator.username}
+                                {creator?.username}
                             </Typography>
                         </Box>
                     </Box>
                 </Stack>
             </ListItemText>
+            <ListItemIcon>
+                {creator.vault?.isBlocked && <IconUserOff />}
+                {creator.vault?.isTrusted && <IconUserCheck />}
+            </ListItemIcon>
         </ListItemButton>
     );
 }

@@ -9,10 +9,11 @@ import AppCard from '@/app/home/components/shared/AppCard';
 import { AssetPreview } from '@/app/home/components/apps/assets/asset-preview/assetPreview';
 import { useDispatch, useSelector } from '@/store/hooks';
 import { buildAssetSource } from '@/utils/assets';
-import { getCreatorNameByAssetIdThunk, updateAssetStatusByIdThunk } from '@/features/assets/thunks';
+import { updateAssetStatusByIdThunk } from '@/features/assets/thunks';
 import { BASE_URL_STORE } from '@/constants/api';
 import Modal from '@/app/home/components/modal';
 import CreatorDetails from '@/app/home/components/apps/creators/CreatorDetails';
+import { getCreatorByIdThunk } from '@/features/creator/thunks';
 
 const BCrumb = [
     { title: 'Home' },
@@ -27,12 +28,16 @@ interface Props {
 
 const AssetsOnePage = ({ params }: Props) => {
     const dispatch = useDispatch();
-    const [open, setOpen] = useState<boolean>(false);
+
     const asset = useSelector((state) => state.asset.byId[params.id]);
-    const creator = useSelector((state) => state.asset.creator);
-    const { byId } = useSelector((state) => state.creator);
-    const createdBy = byId[asset.framework.createdBy];
+    const creator = useSelector((state) => state.creator.byId[asset.framework.createdBy]);
     const creatorsFormData = asset?.assetMetadata?.creators?.formData || [];
+
+    const [open, setOpen] = useState<boolean>(false);
+
+    useEffect(() => {
+        if (asset?.framework?.createdAt) dispatch(getCreatorByIdThunk(asset.framework.createdBy));
+    }, [asset]);
 
     const handleChangeAssetBlocked = ({ status }: { status: 'active' | 'blocked' }) => {
         if (!asset) return;
@@ -40,16 +45,22 @@ const AssetsOnePage = ({ params }: Props) => {
         dispatch(updateAssetStatusByIdThunk({ id: asset._id, status }));
     };
 
-    useEffect(() => {
-        dispatch(getCreatorNameByAssetIdThunk({ id: asset._id }));
-    }, []);
-
     const handleClickPreview = () => {
         const isActive = asset?.consignArtwork?.status === 'active';
-        const path = isActive ? creator : 'preview';
+        const path = isActive ? creator?.username : 'preview';
         const URL = `${BASE_URL_STORE}/${path}/${asset._id}`;
         window.open(URL, '_blank');
     };
+
+    if (!creator) {
+        <PageContainer title="Asset" description="List one asset">
+            <Breadcrumb title="Asset" subtitle="List one asset" items={BCrumb} />
+
+            <AppCard>
+                <Typography variant="h2">Creator not found</Typography>
+            </AppCard>
+        </PageContainer>;
+    }
 
     if (!asset) {
         return (
@@ -88,7 +99,7 @@ const AssetsOnePage = ({ params }: Props) => {
                                 display: 'inline-block',
                             }}
                         >
-                            {createdBy?.username}
+                            {creator?.username}
                         </Typography>
                         <Typography variant="h6" mt={2}>
                             Creator name
@@ -124,14 +135,14 @@ const AssetsOnePage = ({ params }: Props) => {
                             </Grid>
                         </Grid>
 
-                        <Button disabled={!asset || !createdBy} onClick={handleClickPreview}>
+                        <Button disabled={!asset || !creator} onClick={handleClickPreview}>
                             <Typography>Preview</Typography>
                         </Button>
                     </Box>
                 </Box>
             </AppCard>
             <Modal open={open} handleClose={() => setOpen(false)} title="">
-                {createdBy?._id && <CreatorDetails creatorId={createdBy._id} hiddenPreview />}
+                {creator._id && <CreatorDetails creatorId={creator._id} />}
             </Modal>
         </PageContainer>
     );

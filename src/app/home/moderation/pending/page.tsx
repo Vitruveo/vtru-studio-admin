@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
@@ -11,15 +11,23 @@ import RequestConsignList from '@/app/home/components/apps/requestConsign/Reques
 import RequestConsignSearch from '@/app/home/components/apps/requestConsign/RequestConsignSearch';
 import AppCard from '@/app/home/components/shared/AppCard';
 import { Button, Modal, Theme, Typography, useMediaQuery } from '@mui/material';
-import { useSelector, useDispatch } from '@/store/hooks';
+import { useDispatch } from '@/store/hooks';
 import { consignThunk, requestConsignUpdateStatusThunk } from '@/features/requestConsign/thunks';
 import { RequestConsign } from '@/features/requestConsign';
 import { BASE_URL_STORE } from '@/constants/api';
 import { toastrActionsCreators } from '@/features/toastr/slice';
+import { useLiveStream } from '../../components/liveStream';
+import {
+    CREATED_REQUEST_CONSIGN,
+    DELETED_REQUEST_CONSIGN,
+    EVENTS_REQUEST_CONSIGNS,
+    LIST_REQUEST_CONSIGNS,
+    UPDATED_REQUEST_CONSIGN,
+} from '../../components/liveStream/events';
 
 const secdrawerWidth = 320;
 
-const ModerationPage = () => {
+const PendingModerationPage = () => {
     const dispatch = useDispatch();
 
     const lgUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('lg'));
@@ -28,24 +36,26 @@ const ModerationPage = () => {
     const [isRightSidebarOpen, setRightSidebarOpen] = useState(false);
     const [search, setSearch] = useState('');
     const [selected, setSelected] = useState<RequestConsign | undefined>(undefined);
-    const [filtered, setFiltered] = useState('');
     const [confirmRejectModal, setConfirmRejectModal] = useState(false);
 
-    const requestConsigns = useSelector((state) =>
-        state.requestConsign.allIds.map((id) => state.requestConsign.byId[id])
+    const { chunk: rawRequestConsigns, loading } = useLiveStream<RequestConsign>({
+        event: {
+            list: LIST_REQUEST_CONSIGNS,
+            update: UPDATED_REQUEST_CONSIGN,
+            delete: DELETED_REQUEST_CONSIGN,
+            create: CREATED_REQUEST_CONSIGN,
+        },
+        listemEvents: EVENTS_REQUEST_CONSIGNS,
+    });
+    const requestConsigns = useMemo(
+        () => rawRequestConsigns.filter((item) => item.status === 'pending'),
+        [rawRequestConsigns]
     );
 
-    const requestConsignById = useSelector((state) => state.requestConsign.byId);
+    const handleSelect = (id: string) => {
+        const selectedRequestConsigns = requestConsigns.find((item) => item._id === id);
 
-    const handleSelect = (id: string) => setSelected(requestConsignById[id]);
-
-    const handleFilter = (status: string) => {
-        if (status === filtered) {
-            setFiltered('');
-            return;
-        }
-
-        setFiltered(status);
+        if (selectedRequestConsigns) setSelected(selectedRequestConsigns);
     };
 
     const handleApprove = () => {
@@ -55,6 +65,7 @@ const ModerationPage = () => {
             dispatch(toastrActionsCreators.displayToastr({ message: 'No Asset selected', type: 'error' }));
         }
     };
+
     const handleReject = () => {
         if (selected) {
             dispatch(requestConsignUpdateStatusThunk(selected._id, 'rejected'));
@@ -65,9 +76,20 @@ const ModerationPage = () => {
         setConfirmRejectModal(false);
     };
 
+    const filteredAndSearchedConsigns = useMemo(() => {
+        return requestConsigns.filter((item) => {
+            const matchesSearch = search
+                ? [item.creator.username, item.asset.title, ...item.creator.emails.map((email) => email.email)]
+                      .filter(Boolean)
+                      .some((field) => field.toLowerCase().includes(search.toLowerCase()))
+                : true;
+            return matchesSearch;
+        });
+    }, [requestConsigns, search]);
+
     return (
         <PageContainer title="Request Consign" description="this is requests">
-            <Breadcrumb title="Request Consign Application" subtitle="List creators requests" />
+            <Breadcrumb title="Request Consign Application" subtitle="List pending requests" />
             <AppCard>
                 <Box
                     sx={{
@@ -77,25 +99,12 @@ const ModerationPage = () => {
                     }}
                 >
                     <RequestConsignSearch search={search} setSearch={setSearch} />
+
                     <RequestConsignList
                         requestConsignId={selected ? selected._id : ''}
-                        data={
-                            filtered
-                                ? requestConsigns.filter((item) => item.status === filtered)
-                                : search
-                                  ? requestConsigns.filter(
-                                        (item) =>
-                                            item.creator.username.toLowerCase().includes(search.toLowerCase()) ||
-                                            item.asset.title.toLowerCase().includes(search.toLowerCase()) ||
-                                            item.creator.emails.some((email) =>
-                                                email.email.toLowerCase().includes(search.toLowerCase())
-                                            )
-                                    )
-                                  : requestConsigns
-                        }
+                        data={filteredAndSearchedConsigns}
                         onClick={({ _id }) => handleSelect(_id)}
-                        handleFilter={handleFilter}
-                        activeFilter={filtered}
+                        loading={loading}
                     />
                 </Box>
 
@@ -153,7 +162,7 @@ const ModerationPage = () => {
     );
 };
 
-export default ModerationPage;
+export default PendingModerationPage;
 
 const style = {
     position: 'absolute',

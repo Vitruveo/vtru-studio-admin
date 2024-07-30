@@ -20,15 +20,7 @@ export default function Modal({ open, handleClose, title, children }: ModalProps
                 <Typography id="modal-modal-title" variant="h6" component="h2">
                     {title}
                 </Typography>
-                <Box
-                    sx={{
-                        width: '100%',
-                        height: 500,
-                        overflowY: 'auto',
-                    }}
-                >
-                    {children}
-                </Box>
+                <Box>{children}</Box>
             </Box>
         </MuiModal>
     );

@@ -1,3 +1,5 @@
+import { CreatorType } from '@/features/creator';
+
 export interface AssetType {
     _id: string;
     formats: Formats;
@@ -16,6 +18,7 @@ export interface AssetType {
     contractExplorer: {
         explorer: string;
     };
+    creator?: CreatorType;
 }
 
 export interface Formats {

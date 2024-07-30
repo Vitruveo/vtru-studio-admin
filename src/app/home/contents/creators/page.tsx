@@ -17,14 +17,22 @@ import AppCard from '@/app/home/components/shared/AppCard';
 import { CreatorDialogDelete } from '../../components/apps/creators/CreatorDialogDelete';
 
 import { subscribeWebSocketThunk, unsubscribeWebSocketThunk, websocketSelector } from '@/features/ws';
-import { deleteCreatorThunk } from '@/features/creator';
+import { CreatorType, creatorActionsCreators, deleteCreatorThunk } from '@/features/creator';
+import { useLiveStream } from '../../components/liveStream';
+import {
+    CREATED_CREATOR,
+    DELETED_CREATOR,
+    EVENTS_CREATORS,
+    LIST_CREATORS,
+    UPDATED_CREATOR,
+} from '../../components/liveStream/events';
 
 const drawerWidth = 240;
 const secdrawerWidth = 320;
 
 export default function Creators() {
     const dispatch = useDispatch();
-    const creators = useSelector((state) => state.creator.allIds.map((id) => state.creator.byId[id]));
+    // const creators = useSelector((state) => state.creator.allIds.map((id) => state.creator.byId[id]));
     const { creatorsOnline } = useSelector(websocketSelector(['creatorsOnline']));
     const [isLeftSidebarOpen, setLeftSidebarOpen] = useState(false);
     const [isRightSidebarOpen, setRightSidebarOpen] = useState(false);
@@ -37,6 +45,16 @@ export default function Creators() {
     const [isOpenDialogDelete, setIsOpenDialogDelete] = useState(false);
     const [isBlocked, setIsBlocked] = useState(false);
     const [creatorDelete, setCreatorDelete] = useState({ email: '', id: '' });
+
+    const { chunk: creators, loading: loadingCreators } = useLiveStream<CreatorType>({
+        event: {
+            list: LIST_CREATORS,
+            update: UPDATED_CREATOR,
+            delete: DELETED_CREATOR,
+            create: CREATED_CREATOR,
+        },
+        listemEvents: EVENTS_CREATORS,
+    });
 
     useEffect(() => {
         dispatch(subscribeWebSocketThunk());
@@ -115,7 +133,11 @@ export default function Creators() {
                             creators
                         }
                         onDeleteClick={onDeleteClick}
-                        onCreatorClick={({ id }) => setCreatorId(id)}
+                        onCreatorClick={(creator) => {
+                            dispatch(creatorActionsCreators.setCreator(creator));
+                            setCreatorId(creator._id);
+                        }}
+                        loading={loadingCreators}
                     />
                 </Box>
 
@@ -146,7 +168,7 @@ export default function Creators() {
                             </Button>
                         </Box>
                     )}
-                    <CreatorDetails creatorId={creatorId} onDeleteClick={onDeleteClick} hiddenCreatorName />
+                    <CreatorDetails creatorId={creatorId} onDeleteClick={onDeleteClick} />
                 </Drawer>
             </AppCard>
 

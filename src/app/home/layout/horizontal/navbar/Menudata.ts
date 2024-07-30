@@ -4,7 +4,6 @@ import {
     IconBorderAll,
     IconClipboard,
     IconFileDescription,
-    IconHome,
     IconLogin,
     IconPoint,
     IconRotate,

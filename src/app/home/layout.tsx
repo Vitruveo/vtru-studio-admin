@@ -41,11 +41,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         if (!hasToken) router.push('/login');
     }, []);
 
-    useEffect(() => {
-        if (persistor.getState().bootstrapped) {
-            dispatch(getEventsThunk());
-        }
-    }, [persistor]);
+    // useEffect(() => {
+    //     if (persistor.getState().bootstrapped) {
+    //         dispatch(getEventsThunk());
+    //     }
+    // }, [persistor]);
 
     const customizer = {
         activeDir: 'ltr',

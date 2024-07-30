@@ -16,7 +16,17 @@ interface MenuitemsType {
     external?: boolean;
     permission?: string;
 }
-import { IconPackage, IconChartDonut3, IconAperture, IconList } from '@tabler/icons-react';
+import {
+    IconPackage,
+    IconChartDonut3,
+    IconAperture,
+    IconList,
+    IconClock,
+    IconCheck,
+    IconHandOff,
+    IconLoader2,
+    IconX,
+} from '@tabler/icons-react';
 
 const Menuitems: MenuitemsType[] = [
     {
@@ -38,23 +48,54 @@ const Menuitems: MenuitemsType[] = [
         id: uniqueId(),
         title: 'Moderation',
         icon: IconAperture,
-        href: '/home/moderation',
         permission: 'moderator',
+        children: [
+            {
+                id: uniqueId(),
+                title: 'Pending',
+                icon: IconClock,
+                href: '/home/moderation/pending',
+            },
+            {
+                id: uniqueId(),
+                title: 'Approved',
+                icon: IconCheck,
+                href: '/home/moderation/approved',
+            },
+            {
+                id: uniqueId(),
+                title: 'Rejected',
+                icon: IconHandOff,
+                href: '/home/moderation/rejected',
+            },
+            {
+                id: uniqueId(),
+                title: 'Running',
+                icon: IconLoader2,
+                href: '/home/moderation/running',
+            },
+            {
+                id: uniqueId(),
+                title: 'Error',
+                icon: IconX,
+                href: '/home/moderation/error',
+            },
+        ],
     },
-    {
-        id: uniqueId(),
-        title: 'Allow List',
-        icon: IconList,
-        href: '/home/allowList',
-        permission: 'allow-list',
-    },
-    {
-        id: uniqueId(),
-        title: 'Waiting List',
-        icon: IconList,
-        href: '/home/waitingList',
-        permission: 'waiting-list',
-    },
+    // {
+    //     id: uniqueId(),
+    //     title: 'Allow List',
+    //     icon: IconList,
+    //     href: '/home/allowList',
+    //     permission: 'allow-list',
+    // },
+    // {
+    //     id: uniqueId(),
+    //     title: 'Waiting List',
+    //     icon: IconList,
+    //     href: '/home/waitingList',
+    //     permission: 'waiting-list',
+    // },
     {
         id: uniqueId(),
         title: 'Users',

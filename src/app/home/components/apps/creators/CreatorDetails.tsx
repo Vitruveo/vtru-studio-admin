@@ -11,21 +11,30 @@ import { useDispatch, useSelector } from '@/store/hooks';
 import { updateVaultStatethunk } from '@/features/creator/thunks';
 import { AppState } from '@/store';
 import { BASE_URL_STORE } from '@/constants/api';
-import { useEffect } from 'react';
-import { getCreatorNameByAssetIdThunk } from '@/features/assets/thunks';
+import { AssetType } from '@/app/home/types/apps/asset';
+import { localePrice } from '@/utils/locale/date';
 
 const creatorSelector = (state: AppState, creatorId: string) => {
     const creator = state.creator.byId[creatorId];
-    if (!creator) {
-        return null;
-    }
-    const asset = Object.values(state.asset?.byId || {}).find((v) => v.framework.createdBy === creatorId) || null;
-    const title = asset?.assetMetadata?.context?.formData?.title ?? 'N/A';
+    if (!creator) return null;
+
+    const assets = Object.values(state.asset?.byId || {})
+        .filter((v) => v.framework.createdBy === creatorId)
+        .sort((a, b) => {
+            if (!a.assetMetadata?.context?.formData.title || !b.assetMetadata?.context?.formData.title) return 0;
+            return a.assetMetadata?.context?.formData.title.localeCompare(
+                b.assetMetadata?.context?.formData.title,
+                'en',
+                {
+                    numeric: true,
+                    sensitivity: 'base',
+                }
+            );
+        });
 
     return {
         ...creator,
-        asset,
-        title,
+        assets,
     };
 };
 
@@ -44,150 +53,154 @@ export default function CreatorDetails({ creatorId, hiddenPreview = false, hidde
     const creator = useSelector((state) => creatorSelector(state, creatorId));
     const asset = Object.values(assetById || {}).find((v) => v.framework.createdBy === creatorId) || null;
 
-    const handleClickPreview = () => {
-        if (asset) {
+    const handleClickPreview = (item: AssetType) => {
+        if (item) {
             const URL = `${BASE_URL_STORE}/${
-                asset.consignArtwork?.status === 'active' ? creator?.username : 'preview'
-            }/${asset._id}`;
+                item.consignArtwork?.status === 'active' ? creator?.username : 'preview'
+            }/${item._id}`;
             window.open(URL, '_blank');
         }
     };
 
+    if (!creator) {
+        return (
+            <Box p={3} height="50vh" display={'flex'} justifyContent="center" alignItems={'center'}>
+                <Box>
+                    <Typography variant="h4">Please Select a Creator</Typography>
+                    <br />
+                    <Image src={emailIcon} alt={'emailIcon'} width="250" />
+                </Box>
+            </Box>
+        );
+    }
+
     return (
-        <>
-            {creator ? (
-                <>
-                    <Box p={3} py={2} display={'flex'} alignItems="center">
-                        <Typography variant="h5">Creator Details</Typography>
-                    </Box>
-                    <Divider />
+        <Box p={2}>
+            <Box p={1} display={'flex'} alignItems="center">
+                <Typography variant="h5">Creator Details</Typography>
+            </Box>
 
-                    <Box sx={{ overflow: 'auto' }}>
-                        <Box p={3}>
-                            <Box display="flex" alignItems="center">
-                                <Box position="relative">
-                                    <Avatar
-                                        alt=""
-                                        src=""
-                                        sx={{
-                                            width: '72px',
-                                            height: '72px',
-                                        }}
-                                    >
-                                        {((creator.emails?.length > 0 && creator.emails[0]?.email) || '')
-                                            .slice(0, 2)
-                                            .toUpperCase()}
-                                    </Avatar>
-                                    <Box
-                                        position="absolute"
-                                        width="25px"
-                                        height="25px"
-                                        borderRadius="50%"
-                                        border="2px solid #fff"
-                                        bgcolor={
-                                            creatorsOnline.some((item) => item._id === creatorId)
-                                                ? '#13DEB9'
-                                                : '#f3704d'
-                                        }
-                                        bottom={-2}
-                                        right={4}
-                                    ></Box>
-                                </Box>
-                                <Box pl={1}>
-                                    <Typography variant="h6" mb={0.5}>
-                                        {creator.username}
-                                    </Typography>
-                                </Box>
-                            </Box>
-
-                            <Grid container display={'flex'} flexDirection={'column'}>
-                                <Grid item lg={6} xs={12} mt={4}>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Email address
-                                    </Typography>
-                                    <Typography variant="subtitle1" fontWeight={600} mb={0.5}>
-                                        {creator.emails.map((item: any) => (
-                                            <span key={item.email}>
-                                                {item.email}
-                                                <br />
-                                            </span>
-                                        ))}
-                                    </Typography>
-                                </Grid>
-                                {asset?.assetMetadata?.creators?.formData[0] && !hiddenCreatorName && (
-                                    <Grid item lg={6} xs={12} mt={4}>
-                                        <Typography variant="body2" color="text.secondary">
-                                            Creator name
-                                        </Typography>
-                                        <Typography variant="subtitle1" fontWeight={600} mb={0.5}>
-                                            {asset.assetMetadata.creators.formData[0].name}
-                                        </Typography>
-                                    </Grid>
-                                )}
-                            </Grid>
-                        </Box>
+            <Box p={1}>
+                <Box display="flex" alignItems="center">
+                    <Box position="relative">
+                        <Avatar
+                            alt=""
+                            src=""
+                            sx={{
+                                width: '72px',
+                                height: '72px',
+                            }}
+                        >
+                            {((creator.emails?.length > 0 && creator.emails[0]?.email) || '').slice(0, 2).toUpperCase()}
+                        </Avatar>
+                        <Box
+                            position="absolute"
+                            width="25px"
+                            height="25px"
+                            borderRadius="50%"
+                            border="2px solid #fff"
+                            bgcolor={creatorsOnline.some((item) => item._id === creatorId) ? '#13DEB9' : '#f3704d'}
+                            bottom={-2}
+                            right={4}
+                        ></Box>
                     </Box>
-                    <Box>
-                        <Divider />
-                        <Typography variant="h5" p={3} pb={1}>
-                            Creator Vault
+                    <Box pl={1}>
+                        <Typography variant="h6" mb={0.5}>
+                            {creator.username}
                         </Typography>
-                        <Box p={3} pt={0}>
+                    </Box>
+                </Box>
+
+                <Grid container display={'flex'} flexDirection={'column'}>
+                    <Grid item lg={6} xs={12} mt={2}>
+                        <Typography variant="body2" color="text.secondary">
+                            Email address
+                        </Typography>
+                        <Typography variant="subtitle1" fontWeight={600} mb={0.5}>
+                            {creator.emails.map((item: any) => (
+                                <span key={item.email}>
+                                    {item.email}
+                                    <br />
+                                </span>
+                            ))}
+                        </Typography>
+                    </Grid>
+                    {asset?.assetMetadata?.creators?.formData[0] && !hiddenCreatorName && (
+                        <Grid item lg={6} xs={12} mt={1}>
                             <Typography variant="body2" color="text.secondary">
-                                Vault Address
+                                Creator name
                             </Typography>
                             <Typography variant="subtitle1" fontWeight={600} mb={0.5}>
-                                {creator?.vault?.vaultAddress ?? 'N/A'}
+                                {asset.assetMetadata.creators.formData[0].name}
                             </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                                State
-                            </Typography>
-                            <Box display="flex" alignItems="center" gap={1}>
-                                <Switch
-                                    checked={!creator?.vault?.isBlocked}
-                                    onChange={() => dispatch(updateVaultStatethunk({ id: creatorId }))}
-                                    disabled={!creator?.vault?.vaultAddress || status === 'loading'}
-                                />
-                                <Typography variant="subtitle1" fontWeight={600} mb={0.5}>
-                                    {creator?.vault?.isBlocked ? 'Blocked' : 'Active'}
-                                </Typography>
-                                {status === 'loading' && <CircularProgress size={20} />}
-                            </Box>
-                        </Box>
-                    </Box>
-
-                    {/* Adiciona a referência do asset relacionado ao criador */}
-                    {!hiddenPreview && (
-                        <Box>
-                            <Divider />
-                            <Typography variant="h5" p={3} pb={1}>
-                                Creator Asset
-                            </Typography>
-                            <Box p={3} pt={0}>
-                                <Typography variant="body2" color="text.secondary">
-                                    Asset Name
-                                </Typography>
-                                <Box display="flex" alignItems="center" justifyContent="space-between">
-                                    <Typography variant="subtitle1" fontWeight={600} mb={0.5}>
-                                        {creator.title}
-                                    </Typography>
-                                    <Button onClick={handleClickPreview} disabled={creator.title === 'N/A'}>
-                                        <Typography>Preview</Typography>
-                                    </Button>
-                                </Box>
-                            </Box>
-                        </Box>
+                        </Grid>
                     )}
-                </>
-            ) : (
-                <Box p={3} height="50vh" display={'flex'} justifyContent="center" alignItems={'center'}>
-                    <Box>
-                        <Typography variant="h4">Please Select a Creator</Typography>
-                        <br />
-                        <Image src={emailIcon} alt={'emailIcon'} width="250" />
+                </Grid>
+                <Divider />
+            </Box>
+
+            <Box>
+                <Typography variant="h5" p={1} pb={1}>
+                    Creator Vault
+                </Typography>
+                <Box p={1} pt={0}>
+                    <Typography variant="body2" color="text.secondary">
+                        Vault Address
+                    </Typography>
+                    <Typography variant="subtitle1" fontWeight={600} mb={0.5}>
+                        {creator?.vault?.vaultAddress ?? 'N/A'}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                        State
+                    </Typography>
+                    <Box display="flex" alignItems="center" gap={1}>
+                        <Switch
+                            checked={!creator?.vault?.isBlocked}
+                            onChange={() => dispatch(updateVaultStatethunk({ id: creatorId }))}
+                            disabled={!creator?.vault?.vaultAddress || status === 'loading'}
+                        />
+                        <Typography variant="subtitle1" fontWeight={600} mb={0.5}>
+                            {creator?.vault?.isBlocked ? 'Blocked' : 'Active'}
+                        </Typography>
+                        {status === 'loading' && <CircularProgress size={20} />}
+                    </Box>
+                </Box>
+                <Divider />
+            </Box>
+
+            {!hiddenPreview && creator.assets.length > 0 && (
+                <Box p={1}>
+                    <Typography variant="h5">Creator Assets</Typography>
+
+                    <Box
+                        sx={{
+                            width: '100%',
+                            height: 170,
+                            overflowY: 'auto',
+                        }}
+                    >
+                        <Box maxHeight={300} overflow={'auto'}>
+                            {creator.assets.map((item, index) => (
+                                <Box pt={1} key={index}>
+                                    <Box display="flex" alignItems="center" justifyContent="space-between">
+                                        <Box>
+                                            <Typography variant="subtitle1" fontWeight={600}>
+                                                {item.assetMetadata?.context?.formData?.title || 'N/A'}
+                                            </Typography>
+                                            <Typography variant="caption" fontWeight={600}>
+                                                {localePrice(item.licenses?.nft?.single?.editionPrice)}
+                                            </Typography>
+                                        </Box>
+                                        <Button onClick={() => handleClickPreview(item)}>
+                                            <Typography>Preview</Typography>
+                                        </Button>
+                                    </Box>
+                                </Box>
+                            ))}
+                        </Box>
                     </Box>
                 </Box>
             )}
-        </>
+        </Box>
     );
 }

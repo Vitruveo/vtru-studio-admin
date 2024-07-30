@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -14,10 +14,13 @@ import RoleList from '@/app/home/components/apps/roles/RoleList';
 import RoleSearch from '@/app/home/components/apps/roles/RoleSearch';
 import RoleFilter from '@/app/home/components/apps/roles/RoleFilter';
 import AppCard from '@/app/home/components/shared/AppCard';
-import { useDispatch, useSelector } from '@/store/hooks';
-import { roleDeleteThunk, roleGetThunk } from '@/features/role/thunks';
+import { useDispatch } from '@/store/hooks';
+import { roleDeleteThunk } from '@/features/role/thunks';
 import RoleAdd from '../../components/apps/roles/RoleAdd';
 import { RoleDialogDelete } from '../../components/apps/roles/RoleDialogDelete';
+import { useLiveStream } from '../../components/liveStream';
+import { RoleType } from '@/mock/roles';
+import { CREATED_ROLE, DELETED_ROLE, EVENTS_ROLES, LIST_ROLES, UPDATED_ROLE } from '../../components/liveStream/events';
 
 const drawerWidth = 240;
 const secdrawerWidth = 320;
@@ -27,8 +30,6 @@ export default function Roles() {
     const mdUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
     const dispatch = useDispatch();
 
-    const roles = useSelector((state) => state.role.allIds.map((id) => state.role.byId[id]));
-
     const [roleId, setRoleId] = useState('');
     const [search, setSearch] = useState('');
     const [category, setCategory] = useState('');
@@ -36,6 +37,16 @@ export default function Roles() {
     const [roleDelete, setRoleDelete] = useState({ name: '', id: '' });
     const [isLeftSidebarOpen, setLeftSidebarOpen] = useState(false);
     const [isRightSidebarOpen, setRightSidebarOpen] = useState(false);
+
+    const { chunk: roles, loading: loadingRoles } = useLiveStream<RoleType>({
+        event: {
+            list: LIST_ROLES,
+            update: UPDATED_ROLE,
+            delete: DELETED_ROLE,
+            create: CREATED_ROLE,
+        },
+        listemEvents: EVENTS_ROLES,
+    });
 
     useEffect(() => {
         if (!roleId && roles.length >= 1) {

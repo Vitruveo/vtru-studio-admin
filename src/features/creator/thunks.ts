@@ -3,7 +3,7 @@ import { ReduxThunkAction } from '@/store';
 import { BASE_URL_API } from '@/constants/api';
 import { creatorActionsCreators } from './slice';
 import { toastrActionsCreators } from '../toastr/slice';
-import { updateVaultState } from './requests';
+import { getCreatorById, updateVaultState } from './requests';
 
 export function getCreatorsThunk(): ReduxThunkAction {
     return async function (dispatch, getState) {
@@ -73,5 +73,13 @@ export function updateVaultStatethunk({ id }: { id: string }): ReduxThunkAction 
             .finally(() => {
                 dispatch(creatorActionsCreators.setStatus(''));
             });
+    };
+}
+
+export function getCreatorByIdThunk(id: string): ReduxThunkAction {
+    return async function (dispatch, getState) {
+        const response = await getCreatorById(id);
+
+        if (response.data) dispatch(creatorActionsCreators.setCreator(response.data));
     };
 }

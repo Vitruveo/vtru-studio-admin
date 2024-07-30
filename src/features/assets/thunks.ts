@@ -1,7 +1,12 @@
 import { AxiosError } from 'axios';
 
 import { ReduxThunkAction } from '@/store';
-import { getCreatorNameByAssetId, updateAssetStatusById, updateManyAssetsStatusByIds } from './requests';
+import {
+    getCreatorNameByAssetId,
+    getGetAssetById,
+    updateAssetStatusById,
+    updateManyAssetsStatusByIds,
+} from './requests';
 import type {
     ChangeFilterParams,
     GetCreatorNameByAssetIdParams,
@@ -83,5 +88,13 @@ export function getCreatorNameByAssetIdThunk(payload: GetCreatorNameByAssetIdPar
 export function setCurrentPageThunk(payload: number): ReduxThunkAction {
     return function (dispatch) {
         dispatch(assetActionsCreators.setCurrentPage(payload));
+    };
+}
+
+export function getAssetByIdThunk(id: string): ReduxThunkAction {
+    return async function (dispatch, getState) {
+        const response = await getGetAssetById(id);
+
+        if (response.data) dispatch(assetActionsCreators.setAsset(response.data));
     };
 }

@@ -195,6 +195,8 @@ const AssetList = ({ onClick, onChangeSearch, assets, loading }: Props) => {
                                             }
                                             isSelected={isAssetSelected(asset._id)}
                                             isConsigned={asset?.contractExplorer?.explorer?.length > 0}
+                                            price={asset?.licenses?.nft?.single?.editionPrice}
+                                            isMinted={!!asset.mintExplorer}
                                         />
                                     </Grid>
                                 );

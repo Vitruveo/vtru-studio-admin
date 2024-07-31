@@ -14,6 +14,10 @@ export function updateManyAssetsStatusByIds({ ids, status }: { ids: string[]; st
     return apiService.put(`/assets/status`, { ids, status });
 }
 
-export const getGetAssetById = (id: string) => {
+export const getAssetById = (id: string) => {
     return apiService.get<AssetType>(`/assets/${id}`);
+};
+
+export const getAssetsByCreatorId = (creatorId: string) => {
+    return apiService.get<AssetType[]>(`/assets?creatorId=${creatorId}`);
 };

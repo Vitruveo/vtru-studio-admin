@@ -98,7 +98,7 @@ export const AssetCard = ({
                             </Typography>
                         </Box>
                     </Stack>
-                    <Stack direction="row" justifyContent="space-between" mt={1}>
+                    <Stack direction="row" justifyContent="space-between" mt={1} alignItems="flex-end">
                         <Typography variant="caption" fontWeight={600}>
                             {localePrice(price)}
                         </Typography>

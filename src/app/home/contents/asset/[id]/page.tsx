@@ -87,7 +87,7 @@ const AssetsOnePage = ({ params }: Props) => {
                     <Box>
                         <Box width={250}>
                             <AssetPreview media={buildAssetSource(asset?.formats?.preview?.path)} />
-                            <Stack direction="row" justifyContent="space-between" mt={1} p={1}>
+                            <Stack direction="row" justifyContent="space-between" mt={1} p={1} alignItems="flex-end">
                                 <Typography variant="caption" fontWeight={600}>
                                     {localePrice(asset.licenses.nft.single.editionPrice)}
                                 </Typography>

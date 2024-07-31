@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Typography, Box, Grid, Switch, Button } from '@mui/material';
+import { Typography, Box, Grid, Switch, Button, Stack } from '@mui/material';
 
 import Breadcrumb from '@/app/home/layout/shared/breadcrumb/Breadcrumb';
 import PageContainer from '@/app/home/components/container/PageContainer';
@@ -14,6 +14,7 @@ import { BASE_URL_STORE } from '@/constants/api';
 import Modal from '@/app/home/components/modal';
 import CreatorDetails from '@/app/home/components/apps/creators/CreatorDetails';
 import { getCreatorByIdThunk } from '@/features/creator/thunks';
+import { localePrice } from '@/utils/locale/date';
 
 const BCrumb = [
     { title: 'Home' },
@@ -30,13 +31,16 @@ const AssetsOnePage = ({ params }: Props) => {
     const dispatch = useDispatch();
 
     const asset = useSelector((state) => state.asset.byId[params.id]);
-    const creator = useSelector((state) => state.creator.byId[asset.framework.createdBy]);
+    const creator = useSelector((state) =>
+        asset?.framework?.createdBy ? state.creator.byId[asset.framework.createdBy] : null
+    );
+
     const creatorsFormData = asset?.assetMetadata?.creators?.formData || [];
 
     const [open, setOpen] = useState<boolean>(false);
 
     useEffect(() => {
-        if (asset?.framework?.createdAt) dispatch(getCreatorByIdThunk(asset.framework.createdBy));
+        if (asset?.framework?.createdBy) dispatch(getCreatorByIdThunk(asset.framework.createdBy));
     }, [asset]);
 
     const handleChangeAssetBlocked = ({ status }: { status: 'active' | 'blocked' }) => {
@@ -83,6 +87,21 @@ const AssetsOnePage = ({ params }: Props) => {
                     <Box>
                         <Box width={250}>
                             <AssetPreview media={buildAssetSource(asset?.formats?.preview?.path)} />
+                            <Stack direction="row" justifyContent="space-between" mt={1} p={1} alignItems="flex-end">
+                                <Typography variant="caption" fontWeight={600}>
+                                    {localePrice(asset.licenses.nft.single.editionPrice)}
+                                </Typography>
+                                {!!asset.mintExplorer && (
+                                    <Box
+                                        sx={{
+                                            width: 30,
+                                            height: 30,
+                                            borderRadius: '50%',
+                                            backgroundColor: 'red',
+                                        }}
+                                    />
+                                )}
+                            </Stack>
                         </Box>
                     </Box>
                     <Box>
@@ -142,7 +161,7 @@ const AssetsOnePage = ({ params }: Props) => {
                 </Box>
             </AppCard>
             <Modal open={open} handleClose={() => setOpen(false)} title="">
-                {creator._id && <CreatorDetails creatorId={creator._id} />}
+                {creator?._id && <CreatorDetails creatorId={creator._id} />}
             </Modal>
         </PageContainer>
     );

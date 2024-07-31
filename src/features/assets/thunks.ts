@@ -2,8 +2,9 @@ import { AxiosError } from 'axios';
 
 import { ReduxThunkAction } from '@/store';
 import {
+    getAssetsByCreatorId,
     getCreatorNameByAssetId,
-    getGetAssetById,
+    getAssetById,
     updateAssetStatusById,
     updateManyAssetsStatusByIds,
 } from './requests';
@@ -93,8 +94,16 @@ export function setCurrentPageThunk(payload: number): ReduxThunkAction {
 
 export function getAssetByIdThunk(id: string): ReduxThunkAction {
     return async function (dispatch, getState) {
-        const response = await getGetAssetById(id);
+        const response = await getAssetById(id);
 
         if (response.data) dispatch(assetActionsCreators.setAsset(response.data));
     };
 }
+
+export const getAssetsByCreatorIdThunk =
+    (creatorId: string): ReduxThunkAction =>
+    async (dispatch) => {
+        const response = await getAssetsByCreatorId(creatorId);
+
+        if (response.data) dispatch(assetActionsCreators.setAssets(response.data));
+    };

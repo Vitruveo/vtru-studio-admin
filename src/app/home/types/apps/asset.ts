@@ -18,6 +18,9 @@ export interface AssetType {
     contractExplorer: {
         explorer: string;
     };
+    mintExplorer?: {
+        explorer: string;
+    };
     creator?: CreatorType;
 }
 

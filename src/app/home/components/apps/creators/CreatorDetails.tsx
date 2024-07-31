@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Button, CircularProgress, Grid, Switch } from '@mui/material';
 import Avatar from '@mui/material/Avatar';
 import Image from 'next/image';
@@ -9,34 +10,10 @@ import emailIcon from 'public/images/breadcrumb/emailSv.png';
 import { websocketSelector } from '@/features/ws';
 import { useDispatch, useSelector } from '@/store/hooks';
 import { updateVaultStatethunk } from '@/features/creator/thunks';
-import { AppState } from '@/store';
 import { BASE_URL_STORE } from '@/constants/api';
 import { AssetType } from '@/app/home/types/apps/asset';
 import { localePrice } from '@/utils/locale/date';
-
-const creatorSelector = (state: AppState, creatorId: string) => {
-    const creator = state.creator.byId[creatorId];
-    if (!creator) return null;
-
-    const assets = Object.values(state.asset?.byId || {})
-        .filter((v) => v.framework.createdBy === creatorId)
-        .sort((a, b) => {
-            if (!a.assetMetadata?.context?.formData.title || !b.assetMetadata?.context?.formData.title) return 0;
-            return a.assetMetadata?.context?.formData.title.localeCompare(
-                b.assetMetadata?.context?.formData.title,
-                'en',
-                {
-                    numeric: true,
-                    sensitivity: 'base',
-                }
-            );
-        });
-
-    return {
-        ...creator,
-        assets,
-    };
-};
+import { getAssetsByCreatorIdThunk } from '@/features/assets/thunks';
 
 interface Props {
     creatorId: string;
@@ -45,13 +22,20 @@ interface Props {
     hiddenCreatorName?: boolean;
 }
 
-export default function CreatorDetails({ creatorId, hiddenPreview = false, hiddenCreatorName = false }: Props) {
+export default function CreatorDetails({ creatorId, hiddenPreview = false }: Props) {
     const dispatch = useDispatch();
     const { creatorsOnline = [] } = useSelector(websocketSelector(['creatorsOnline']));
     const { status } = useSelector((state) => state.creator);
-    const { byId: assetById } = useSelector((state) => state.asset);
-    const creator = useSelector((state) => creatorSelector(state, creatorId));
-    const asset = Object.values(assetById || {}).find((v) => v.framework.createdBy === creatorId) || null;
+    const creator = useSelector((state) => state.creator.byId[creatorId]);
+    const assets = useSelector((state) =>
+        state.asset.allIds
+            .map((id) => state.asset.byId[id])
+            .filter((asset) => asset?.framework?.createdBy === creatorId)
+    );
+
+    useEffect(() => {
+        dispatch(getAssetsByCreatorIdThunk(creatorId));
+    }, [creatorId]);
 
     const handleClickPreview = (item: AssetType) => {
         if (item) {
@@ -125,16 +109,6 @@ export default function CreatorDetails({ creatorId, hiddenPreview = false, hidde
                             ))}
                         </Typography>
                     </Grid>
-                    {asset?.assetMetadata?.creators?.formData[0] && !hiddenCreatorName && (
-                        <Grid item lg={6} xs={12} mt={1}>
-                            <Typography variant="body2" color="text.secondary">
-                                Creator name
-                            </Typography>
-                            <Typography variant="subtitle1" fontWeight={600} mb={0.5}>
-                                {asset.assetMetadata.creators.formData[0].name}
-                            </Typography>
-                        </Grid>
-                    )}
                 </Grid>
                 <Divider />
             </Box>
@@ -168,7 +142,7 @@ export default function CreatorDetails({ creatorId, hiddenPreview = false, hidde
                 <Divider />
             </Box>
 
-            {!hiddenPreview && creator.assets.length > 0 && (
+            {!hiddenPreview && assets.length > 0 && (
                 <Box p={1}>
                     <Typography variant="h5">Creator Assets</Typography>
 
@@ -179,8 +153,8 @@ export default function CreatorDetails({ creatorId, hiddenPreview = false, hidde
                             overflowY: 'auto',
                         }}
                     >
-                        <Box maxHeight={300} overflow={'auto'}>
-                            {creator.assets.map((item, index) => (
+                        <Box>
+                            {assets.map((item, index) => (
                                 <Box pt={1} key={index}>
                                     <Box display="flex" alignItems="center" justifyContent="space-between">
                                         <Box>

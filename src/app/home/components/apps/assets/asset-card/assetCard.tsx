@@ -1,8 +1,9 @@
 'use client';
 import { IconLock, IconChecklist, IconFileUnknown } from '@tabler/icons-react';
-import { Typography, CardContent, Skeleton, Box, Checkbox, Stack } from '@mui/material';
+import { Typography, Skeleton, Box, Checkbox, Stack } from '@mui/material';
 import BlankCard from '../../../shared/BlankCard';
 import { AssetPreview } from '../asset-preview/assetPreview';
+import { localePrice } from '@/utils/locale/date';
 
 interface AssetCardProps {
     media?: string;
@@ -14,6 +15,8 @@ interface AssetCardProps {
     status?: 'active' | 'blocked';
     creator?: string;
     isConsigned?: boolean;
+    price?: number;
+    isMinted?: boolean;
 }
 
 const AssetSkeleton = () => (
@@ -35,8 +38,10 @@ export const AssetCard = ({
     variant,
     isSelected,
     creator,
-    onClick,
     isConsigned,
+    price,
+    isMinted,
+    onClick,
 }: AssetCardProps) => {
     if (isLoading) return <AssetSkeleton />;
 
@@ -44,8 +49,8 @@ export const AssetCard = ({
         <Box onClick={onClick} minWidth={250} maxWidth={250} sx={{ cursor: 'pointer' }}>
             <BlankCard className="hoverCard">
                 <AssetPreview media={media} />
-                <CardContent>
-                    <Box mb={2}>{variant === 'selectable' && <Checkbox checked={isSelected} sx={{ p: 0 }} />}</Box>
+                <Box padding={1} pt={0}>
+                    <Box>{variant === 'selectable' && <Checkbox checked={isSelected} sx={{ p: 0 }} />}</Box>
                     <Stack direction="row" justifyContent="space-between" alignItems="center">
                         <Box display="flex" alignItems="center" gap={1}>
                             {status == 'blocked' && (
@@ -75,7 +80,7 @@ export const AssetCard = ({
                             )}
                         </Stack>
                     </Stack>
-                    <Stack gap={1}>
+                    <Stack>
                         <Box title={title}>
                             <Typography overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap" variant="h6">
                                 {title}
@@ -93,7 +98,22 @@ export const AssetCard = ({
                             </Typography>
                         </Box>
                     </Stack>
-                </CardContent>
+                    <Stack direction="row" justifyContent="space-between" mt={1} alignItems="flex-end">
+                        <Typography variant="caption" fontWeight={600}>
+                            {localePrice(price)}
+                        </Typography>
+                        {isMinted && (
+                            <Box
+                                sx={{
+                                    width: 30,
+                                    height: 30,
+                                    borderRadius: '50%',
+                                    backgroundColor: 'red',
+                                }}
+                            />
+                        )}
+                    </Stack>
+                </Box>
             </BlankCard>
         </Box>
     );

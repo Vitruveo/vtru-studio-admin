@@ -16,7 +16,7 @@ interface Props {
 
 export const useLiveStream = <T,>({ event, listemEvents }: Props) => {
     const token = useSelector((state) => state.auth.token);
-    const [chunk, setChunk] = useState<T[]>([]);
+    const [chunk, setChunk] = useState<Record<string, T>>({});
     const [loading, setLoading] = useState(true);
 
     const ctrl = new AbortController();
@@ -39,28 +39,29 @@ export const useLiveStream = <T,>({ event, listemEvents }: Props) => {
                 const parsed = JSON.parse(message.data);
 
                 if (message.event === event.list) {
-                    setChunk((prevState) => [...prevState, parsed]);
-                    setLoading(false);
+                    setChunk((prevState) => {
+                        if (prevState[parsed._id]) return prevState;
+
+                        return {
+                            ...prevState,
+                            [parsed._id]: parsed,
+                        };
+                    });
+                    if (loading) setLoading(false);
                 }
 
-                if (message.event === event.update) {
-                    setChunk((prev) => {
-                        const index = prev.findIndex((item: any) => item._id === parsed._id);
-
-                        if (index !== -1) {
-                            return [...prev.slice(0, index), parsed, ...prev.slice(index + 1)];
-                        }
-
-                        return prev;
-                    });
+                if (message.event === event.update || message.event === event.create) {
+                    setChunk((prev) => ({
+                        ...prev,
+                        [parsed._id]: parsed,
+                    }));
                 }
 
                 if (message.event === event.delete) {
-                    setChunk((prev) => prev.filter((item: any) => item._id !== parsed._id));
-                }
-
-                if (message.event === event.create) {
-                    setChunk((prev) => [parsed, ...prev]);
+                    setChunk((prev) => {
+                        delete prev[parsed._id];
+                        return prev;
+                    });
                 }
             },
             onerror() {
@@ -82,7 +83,7 @@ export const useLiveStream = <T,>({ event, listemEvents }: Props) => {
     }, []);
 
     return {
-        chunk,
+        chunk: Object.values(chunk),
         loading,
     };
 };

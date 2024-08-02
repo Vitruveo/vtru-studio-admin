@@ -13,7 +13,7 @@ import AppCard from '@/app/home/components/shared/AppCard';
 import { Button, Modal, Theme, Typography, useMediaQuery } from '@mui/material';
 import { useDispatch } from '@/store/hooks';
 import { consignThunk, requestConsignUpdateStatusThunk } from '@/features/requestConsign/thunks';
-import { RequestConsign } from '@/features/requestConsign';
+import { RequestConsign, requestConsignActionsCreators } from '@/features/requestConsign';
 import { BASE_URL_STORE } from '@/constants/api';
 import { toastrActionsCreators } from '@/features/toastr/slice';
 import { useLiveStream } from '../../components/liveStream';
@@ -60,6 +60,7 @@ const PendingModerationPage = () => {
 
     const handleApprove = () => {
         if (selected) {
+            dispatch(requestConsignActionsCreators.setRequestConsign(selected));
             dispatch(consignThunk({ requestId: selected._id }));
         } else {
             dispatch(toastrActionsCreators.displayToastr({ message: 'No Asset selected', type: 'error' }));
@@ -68,6 +69,7 @@ const PendingModerationPage = () => {
 
     const handleReject = () => {
         if (selected) {
+            dispatch(requestConsignActionsCreators.setRequestConsign(selected));
             dispatch(requestConsignUpdateStatusThunk(selected._id, 'rejected'));
         } else {
             dispatch(toastrActionsCreators.displayToastr({ message: 'No Asset selected', type: 'error' }));

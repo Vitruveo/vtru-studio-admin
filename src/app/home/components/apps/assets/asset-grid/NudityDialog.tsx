@@ -69,7 +69,7 @@ export const NudityDialog = ({ onConfirm, children, assets }: NudityDialogProps)
                                 <Typography key={asset}>{asset}</Typography>
                             ))}
                         </Box>
-                        <Typography>What do you want to do?</Typography>
+                        <Typography>Set NUDITY Taxonomy value to:</Typography>
                         <RadioGroup
                             aria-labelledby="demo-radio-buttons-group-label"
                             defaultValue="female"
@@ -86,7 +86,7 @@ export const NudityDialog = ({ onConfirm, children, assets }: NudityDialogProps)
                     <Button variant="contained" color="error" onClick={onClose}>
                         Cancel
                     </Button>
-                    <Button variant="outlined" disabled={!option.length} onClick={handleConfirm}>
+                    <Button variant="outlined" disabled={!option.length || assets.length === 0} onClick={handleConfirm}>
                         Confirm
                     </Button>
                 </DialogActions>

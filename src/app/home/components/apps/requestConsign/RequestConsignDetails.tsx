@@ -1,6 +1,6 @@
 import { BASE_URL_STORE } from '@/constants/api';
 import { useDispatch, useSelector } from '@/store/hooks';
-import { Button, CircularProgress, TextareaAutosize } from '@mui/material';
+import { Button, CircularProgress, Switch, TextareaAutosize } from '@mui/material';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
@@ -8,9 +8,12 @@ import Stack from '@mui/material/Stack';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { IconMessage, IconNotes } from '@tabler/icons-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react';
 import Modal from '../../modal';
-import { requestConsignAddCommentThunk } from '@/features/requestConsign/thunks';
+import {
+    requestConsignAddCommentThunk,
+    requestConsignUpdateCommentVisibilityThunk,
+} from '@/features/requestConsign/thunks';
 import { CommentsProps, LogsProps } from '@/features/requestConsign/types';
 import { localeDate } from '@/utils/locale/date';
 
@@ -84,9 +87,14 @@ export const Comments = ({ content, requestId }: CommentsContent) => {
     const handleAddComment = () => {
         const comment = textRef.current?.value;
         if (comment) {
-            dispatch(requestConsignAddCommentThunk({ requestId, comment }));
+            dispatch(requestConsignAddCommentThunk({ id: requestId, comment }));
             textRef.current.value = '';
         }
+    };
+
+    const handleChangeVisibility = (e: ChangeEvent<HTMLInputElement>, commentId: string) => {
+        const isPublic = e.target.checked;
+        dispatch(requestConsignUpdateCommentVisibilityThunk({ id: requestId, commentId, isPublic }));
     };
 
     useEffect(() => {
@@ -104,9 +112,15 @@ export const Comments = ({ content, requestId }: CommentsContent) => {
                                 {localeDate(item.when || '')}
                             </Typography>
                         </Box>
-                        <Typography fontWeight="bold" ml={2} mr={2}>
-                            {item.comment}
-                        </Typography>
+                        <Box display={'flex'} justifyContent={'space-between'}>
+                            <Typography fontWeight="bold" ml={2} mr={2}>
+                                {item.comment}
+                            </Typography>
+                            <Box>
+                                <Switch onChange={(e) => handleChangeVisibility(e, item.id)} checked={item.isPublic} />
+                                <span>Public</span>
+                            </Box>
+                        </Box>
                     </Box>
                 ))}
                 {!content.length && <Typography id="modal-modal-description">No Comments</Typography>}

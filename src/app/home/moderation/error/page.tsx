@@ -10,9 +10,10 @@ import RequestConsignDetails from '@/app/home/components/apps/requestConsign/Req
 import RequestConsignList from '@/app/home/components/apps/requestConsign/RequestConsignList';
 import RequestConsignSearch from '@/app/home/components/apps/requestConsign/RequestConsignSearch';
 import AppCard from '@/app/home/components/shared/AppCard';
-import { Theme, useMediaQuery } from '@mui/material';
+import { Button, Modal, Theme, Typography, useMediaQuery } from '@mui/material';
+
 import { useDispatch } from '@/store/hooks';
-import { consignThunk } from '@/features/requestConsign/thunks';
+import { consignThunk, requestConsignUpdateStatusThunk } from '@/features/requestConsign/thunks';
 import { RequestConsign, requestConsignActionsCreators } from '@/features/requestConsign';
 import { BASE_URL_STORE } from '@/constants/api';
 import { toastrActionsCreators } from '@/features/toastr/slice';
@@ -36,6 +37,7 @@ const ErrorModerationPage = () => {
     const [isRightSidebarOpen, setRightSidebarOpen] = useState(false);
     const [search, setSearch] = useState('');
     const [selected, setSelected] = useState<RequestConsign | undefined>(undefined);
+    const [confirmRejectModal, setConfirmRejectModal] = useState(false);
 
     const { chunk: rawRequestConsigns, loading } = useLiveStream<RequestConsign>({
         event: {
@@ -80,6 +82,17 @@ const ErrorModerationPage = () => {
         });
     }, [requestConsigns, search]);
 
+    const handleReject = () => {
+        if (selected) {
+            dispatch(requestConsignActionsCreators.setRequestConsign(selected));
+            dispatch(requestConsignUpdateStatusThunk(selected._id, 'rejected'));
+        } else {
+            dispatch(toastrActionsCreators.displayToastr({ message: 'No Asset selected', type: 'error' }));
+        }
+
+        setConfirmRejectModal(false);
+    };
+
     return (
         <PageContainer title="Request Consign" description="this is requests">
             <Breadcrumb title="Request Consign Application" subtitle="List error requests" />
@@ -120,7 +133,7 @@ const ErrorModerationPage = () => {
                             emails={selected.creator.emails}
                             title={selected.asset.title}
                             handleApprove={handleApprove}
-                            handleReject={() => {}}
+                            handleReject={() => setConfirmRejectModal(true)}
                             handleOpenStore={() =>
                                 window.open(`${BASE_URL_STORE}/preview/${selected.asset._id}`, '_blank')
                             }
@@ -128,8 +141,42 @@ const ErrorModerationPage = () => {
                     ) : null}
                 </Drawer>
             </AppCard>
+
+            <Modal
+                open={confirmRejectModal}
+                onClose={() => setConfirmRejectModal(false)}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Box sx={style}>
+                    <Typography id="modal-modal-title" variant="h6" component="h2">
+                        Confirm Reject
+                    </Typography>
+                    <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                        Are you sure you want to reject this request?
+                    </Typography>
+                    <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+                        <Button onClick={() => setConfirmRejectModal(false)}>Cancel</Button>
+                        <Button onClick={handleReject} variant="contained" color="error">
+                            Reject
+                        </Button>
+                    </Box>
+                </Box>
+            </Modal>
         </PageContainer>
     );
 };
 
 export default ErrorModerationPage;
+
+const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 600,
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+};

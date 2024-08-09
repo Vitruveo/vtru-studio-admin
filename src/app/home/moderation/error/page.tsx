@@ -54,7 +54,10 @@ const ErrorModerationPage = () => {
     const handleSelect = (id: string) => {
         const selectedRequestConsign = requestConsigns.find((item) => item._id === id);
 
-        if (selectedRequestConsign) setSelected(selectedRequestConsign);
+        if (selectedRequestConsign) {
+            setSelected(selectedRequestConsign);
+            dispatch(requestConsignActionsCreators.setRequestConsign(selectedRequestConsign));
+        }
     };
 
     const handleApprove = () => {

@@ -186,7 +186,7 @@ export default function RequestConsignDetails({
                         variant="contained"
                         color="error"
                         onClick={handleReject}
-                        disabled={statusRequestConsign !== 'pending'}
+                        disabled={!(statusRequestConsign === 'pending' || statusRequestConsign === 'error')}
                     >
                         Reject
                     </Button>

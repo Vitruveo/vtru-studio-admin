@@ -7,11 +7,13 @@ import {
     getAssetById,
     updateAssetStatusById,
     updateManyAssetsStatusByIds,
+    updateAssetsNudity,
 } from './requests';
 import type {
     ChangeFilterParams,
     GetCreatorNameByAssetIdParams,
     UpdateAssetStatusByIdParams,
+    UpdateAssetsNudityParams,
     UpdateManyAssetsStatusByIdsParams,
 } from './types';
 import { APIResponse } from '../common/types';
@@ -107,3 +109,19 @@ export const getAssetsByCreatorIdThunk =
 
         if (response.data) dispatch(assetActionsCreators.setAssets(response.data));
     };
+
+export const updateAssetsNudityThunk = (data: UpdateAssetsNudityParams): ReduxThunkAction => {
+    return async function (dispatch) {
+        try {
+            await updateAssetsNudity(data);
+            dispatch(
+                toastrActionsCreators.displayToastr({
+                    type: 'success',
+                    message: 'Assets nudity updated successfully.',
+                })
+            );
+        } catch (e) {
+            // Handle error
+        }
+    };
+};

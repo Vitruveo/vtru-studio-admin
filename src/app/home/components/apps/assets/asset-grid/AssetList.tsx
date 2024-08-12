@@ -15,9 +15,10 @@ import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import emptyCart from 'public/images/products/empty-shopping-cart.svg';
 import { useDispatch, useSelector } from '@/store/hooks';
-import { updateManyAssetsStatusByIdsThunk } from '@/features/assets/thunks';
+import { updateAssetsNudityThunk, updateManyAssetsStatusByIdsThunk } from '@/features/assets/thunks';
 import { assetActionsCreators } from '@/features/assets';
 import { creatorActionsCreators } from '@/features/creator';
+import { NudityDialog } from './NudityDialog';
 
 interface Props {
     onClick: (event: React.SyntheticEvent | Event) => void;
@@ -99,6 +100,15 @@ const AssetList = ({ onClick, onChangeSearch, assets, loading }: Props) => {
         selectedAssetsIds.clear();
     };
 
+    const onNudityConfirm = (option: string) => {
+        dispatch(
+            updateAssetsNudityThunk({
+                ids: selectedAssetsIds.state,
+                nudity: option === 'yes',
+            })
+        );
+    };
+
     return (
         <Box>
             <Stack direction="row" justifyContent="space-between" pb={3}>
@@ -164,6 +174,15 @@ const AssetList = ({ onClick, onChangeSearch, assets, loading }: Props) => {
                             )}
                         </ConfirmationDialog>
                     )}
+                    <NudityDialog
+                        onConfirm={onNudityConfirm}
+                        assets={selectedAssetsIds.state.map(
+                            (id) =>
+                                assets.find((asset) => asset._id === id)?.assetMetadata?.context?.formData?.title ?? ''
+                        )}
+                    >
+                        {(open) => <Button onClick={open}>Nudity</Button>}
+                    </NudityDialog>
                 </Stack>
                 <AssetSearch onChange={(event) => onChangeSearch(event.target.value)} />
             </Stack>

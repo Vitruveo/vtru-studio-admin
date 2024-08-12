@@ -5,6 +5,11 @@ export interface UpdateAssetStatusByIdParams {
     status: 'active' | 'blocked';
 }
 
+export interface UpdateAssetsNudityParams {
+    ids: string[];
+    nudity: boolean;
+}
+
 export interface UpdateManyAssetsStatusByIdsParams {
     ids: string[];
     status: 'active' | 'blocked';

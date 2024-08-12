@@ -55,7 +55,10 @@ const PendingModerationPage = () => {
     const handleSelect = (id: string) => {
         const selectedRequestConsigns = requestConsigns.find((item) => item._id === id);
 
-        if (selectedRequestConsigns) setSelected(selectedRequestConsigns);
+        if (selectedRequestConsigns) {
+            setSelected(selectedRequestConsigns);
+            dispatch(requestConsignActionsCreators.setRequestConsign(selectedRequestConsigns));
+        }
     };
 
     const handleApprove = () => {

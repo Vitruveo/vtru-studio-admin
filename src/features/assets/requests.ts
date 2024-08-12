@@ -1,5 +1,5 @@
 import { apiService } from '@/services/api';
-import type { GetCreatorNameByAssetIdParams, UpdateAssetStatusByIdParams } from './types';
+import type { GetCreatorNameByAssetIdParams, UpdateAssetStatusByIdParams, UpdateAssetsNudityParams } from './types';
 import { AssetType } from '@/app/home/types/apps/asset';
 
 export function updateAssetStatusById({ id, status }: UpdateAssetStatusByIdParams) {
@@ -20,4 +20,8 @@ export const getAssetById = (id: string) => {
 
 export const getAssetsByCreatorId = (creatorId: string) => {
     return apiService.get<AssetType[]>(`/assets?creatorId=${creatorId}`);
+};
+
+export const updateAssetsNudity = ({ ids, nudity }: UpdateAssetsNudityParams) => {
+    return apiService.put(`/assets/nudity`, { ids, nudity });
 };

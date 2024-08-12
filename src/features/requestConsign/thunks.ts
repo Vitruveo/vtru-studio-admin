@@ -16,7 +16,7 @@ export function requestConsignUpdateStatusThunk(
 ): ReduxThunkAction<Promise<APIResponse | void>> {
     return async function (dispatch, getState) {
         try {
-            // await updateStatusRequestConsign({ id, status });
+            await updateStatusRequestConsign({ id, status });
 
             dispatch(
                 toastrActionsCreators.displayToastr({
@@ -104,7 +104,7 @@ export function consignThunk({ requestId }: { requestId: string }): ReduxThunkAc
 
         return consign(requestConsign.asset._id)
             .then((response) => {
-                dispatch(requestConsignUpdateStatusThunk(requestId, 'running'));
+                // dispatch(requestConsignUpdateStatusThunk(requestId, 'running'));
                 dispatch(requestConsignActionsCreators.resetConsign({ id: requestId }));
 
                 // dispatch(

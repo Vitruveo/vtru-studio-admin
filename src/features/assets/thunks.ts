@@ -39,7 +39,7 @@ export function updateManyAssetsStatusByIdsThunk(payload: UpdateManyAssetsStatus
     return async function (dispatch) {
         try {
             await updateManyAssetsStatusByIds(payload);
-            dispatch(assetActionsCreators.setManyStatus(payload));
+            // dispatch(assetActionsCreators.setManyStatus(payload));
             dispatch(
                 toastrActionsCreators.displayToastr({
                     type: 'success',

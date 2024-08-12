@@ -24,6 +24,8 @@ interface Props {
         codeHash: string | null;
         checkedAt: Date | null;
     }[];
+    logs?: LogsProps[];
+    status: string;
     handleApprove: () => void;
     handleReject: () => void;
     handleOpenStore: () => void;
@@ -55,6 +57,7 @@ export const Logs = ({ content }: LogsContent) => {
     return (
         <>
             {content
+                .sort((a, b) => (a.when > b.when ? 1 : -1))
                 .map((item, index) => (
                     <Typography
                         key={item.when || index}
@@ -133,6 +136,8 @@ export default function RequestConsignDetails({
     title,
     emails,
     assetId,
+    status,
+    logs = [],
     handleApprove,
     handleReject,
     handleOpenStore,
@@ -142,9 +147,7 @@ export default function RequestConsignDetails({
     const handleClose = () => setOpen(false);
 
     const url = useMemo(() => `${BASE_URL_STORE}/preview/${assetId}/${Date.now()}`, [assetId]);
-    const logs: LogsProps[] = useSelector((state) => state.requestConsign.byId[requestId]?.logs || []);
     const comments: CommentsProps[] = useSelector((state) => state.requestConsign.byId[requestId]?.comments || []);
-    const statusRequestConsign = useSelector((state) => state.requestConsign.byId[requestId]?.status || '');
 
     const selectModal = ({ owner }: SelectModalProps) => {
         setOpen(true);
@@ -161,7 +164,7 @@ export default function RequestConsignDetails({
                 <Stack gap={0} direction="row" justifyContent="space-between">
                     <Box display="flex" gap={1} alignItems={'center'}>
                         <Button
-                            disabled={statusRequestConsign === 'running' || statusRequestConsign === 'approved'}
+                            disabled={status === 'running' || status === 'approved'}
                             variant="contained"
                             onClick={handleApprove}
                         >
@@ -180,13 +183,13 @@ export default function RequestConsignDetails({
                                 <IconMessage size="18" stroke={1.3} />
                             </IconButton>
                         </Tooltip>
-                        {statusRequestConsign === 'running' && <CircularProgress size={20} />}
+                        {status === 'running' && <CircularProgress size={20} />}
                     </Box>
                     <Button
                         variant="contained"
                         color="error"
                         onClick={handleReject}
-                        disabled={!(statusRequestConsign === 'pending' || statusRequestConsign === 'error')}
+                        disabled={!(status === 'pending' || status === 'error')}
                     >
                         Reject
                     </Button>

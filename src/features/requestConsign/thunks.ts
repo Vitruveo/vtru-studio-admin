@@ -110,16 +110,16 @@ export function consignThunk({ requestId }: { requestId: string }): ReduxThunkAc
 
         return consign(requestConsign.asset._id)
             .then((response) => {
-                dispatch(requestConsignUpdateStatusThunk(requestId, 'running'));
+                // dispatch(requestConsignUpdateStatusThunk(requestId, 'running'));
                 dispatch(requestConsignActionsCreators.resetConsign({ id: requestId }));
 
-                dispatch(
-                    requestConsignActionsCreators.setTransaction({
-                        id: requestId,
-                        transaction: response.data.transaction,
-                    })
-                );
-                dispatch(eventTransactionThunk({ requestId }));
+                // dispatch(
+                //     requestConsignActionsCreators.setTransaction({
+                //         id: requestId,
+                //         transaction: response.data.transaction,
+                //     })
+                // );
+                // dispatch(eventTransactionThunk({ requestId }));
             })
             .catch((error) => {
                 if (error instanceof AxiosError && error.response?.status === 400) {

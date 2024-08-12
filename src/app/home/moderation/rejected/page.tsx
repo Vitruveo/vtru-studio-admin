@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
@@ -37,7 +37,11 @@ const RejectedModerationPage = () => {
     const [search, setSearch] = useState('');
     const [selected, setSelected] = useState<RequestConsign | undefined>(undefined);
 
-    const { chunk: rawRequestConsings, loading } = useLiveStream<RequestConsign>({
+    const {
+        chunk: rawRequestConsings,
+        chumkById,
+        loading,
+    } = useLiveStream<RequestConsign>({
         event: {
             list: LIST_REQUEST_CONSIGNS,
             update: UPDATED_REQUEST_CONSIGN,
@@ -46,6 +50,10 @@ const RejectedModerationPage = () => {
         },
         listemEvents: EVENTS_REQUEST_CONSIGNS,
     });
+
+    useEffect(() => {
+        if (selected && chumkById[selected?._id]) setSelected(chumkById[selected._id]);
+    }, [chumkById, selected]);
 
     const requestConsigns = useMemo(
         () => rawRequestConsings.filter((item) => item.status === 'rejected'),
@@ -118,6 +126,8 @@ const RejectedModerationPage = () => {
                             emails={selected.creator.emails}
                             title={selected.asset.title}
                             handleApprove={handleApprove}
+                            logs={selected.logs}
+                            status={selected.status}
                             handleReject={() => {}}
                             handleOpenStore={() =>
                                 window.open(`${BASE_URL_STORE}/preview/${selected.asset._id}`, '_blank')

@@ -84,6 +84,7 @@ export const useLiveStream = <T,>({ event, listemEvents }: Props) => {
 
     return {
         chunk: Object.values(chunk),
+        chumkById: chunk,
         loading,
     };
 };

@@ -113,10 +113,10 @@ export const Comments = ({ content, requestId }: CommentsContent) => {
                             </Typography>
                         </Box>
                         <Box display={'flex'} justifyContent={'space-between'}>
-                            <Typography fontWeight="bold" ml={2} mr={2}>
+                            <Typography fontWeight="bold" ml={2}>
                                 {item.comment}
                             </Typography>
-                            <Box>
+                            <Box display={'flex-start'} flexShrink={0}>
                                 <Switch onChange={(e) => handleChangeVisibility(e, item.id)} checked={item.isPublic} />
                                 <span>Public</span>
                             </Box>

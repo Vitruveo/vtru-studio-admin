@@ -6,9 +6,15 @@ import { ReduxThunkAction } from '@/store';
 import { requestConsignActionsCreators } from './slice';
 import { BASE_URL_API } from '@/constants/api';
 import { toastrActionsCreators } from '../toastr/slice';
-import { consign, eventsByTransaction, updateRequestConsignComments, updateStatusRequestConsign } from './requests';
+import {
+    consign,
+    eventsByTransaction,
+    updateRequestConsignComments,
+    updateRequestConsignCommentVisibility,
+    updateStatusRequestConsign,
+} from './requests';
 import { APIResponse } from '../common/types';
-import { CommentsProps } from './types';
+import { CommentsProps, RequestConsignAddComment, RequestConsignUpdateCommentVisibility } from './types';
 
 export function requestConsignUpdateStatusThunk(
     id: string,
@@ -207,18 +213,38 @@ export function eventTransactionThunk({ requestId }: { requestId: string }): Red
 }
 
 export function requestConsignAddCommentThunk({
-    requestId,
+    id,
     comment,
-}: {
-    requestId: string;
-    comment: string;
-}): ReduxThunkAction<Promise<void>> {
+}: RequestConsignAddComment): ReduxThunkAction<Promise<void>> {
     return async function (dispatch, getState) {
-        const commentList = getState().requestConsign.byId[requestId].comments || [];
-        updateRequestConsignComments({ id: requestId, comment })
+        const commentList = getState().requestConsign.byId[id].comments || [];
+        updateRequestConsignComments({ id, comment })
             .then((res) => {
                 const updatedComments = [...commentList, res.data] as CommentsProps[];
-                dispatch(requestConsignActionsCreators.setComments({ id: requestId, comments: updatedComments }));
+                dispatch(requestConsignActionsCreators.setComments({ id, comments: updatedComments }));
+            })
+            .catch(() => {
+                // do nothing
+            });
+    };
+}
+
+export function requestConsignUpdateCommentVisibilityThunk({
+    id,
+    commentId,
+    isPublic,
+}: RequestConsignUpdateCommentVisibility): ReduxThunkAction<Promise<void>> {
+    return async function (dispatch, getState) {
+        const commentList = getState().requestConsign.byId[id].comments || [];
+        const comment = commentList.find((item) => item.id === commentId);
+        if (!comment) return;
+
+        updateRequestConsignCommentVisibility({ id, commentId, isPublic })
+            .then(() => {
+                const updatedComments = commentList.map((item) =>
+                    item.id === commentId ? { ...item, isPublic } : item
+                ) as CommentsProps[];
+                dispatch(requestConsignActionsCreators.setComments({ id, comments: updatedComments }));
             })
             .catch(() => {
                 // do nothing

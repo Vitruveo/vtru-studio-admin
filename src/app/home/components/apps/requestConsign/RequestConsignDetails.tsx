@@ -57,7 +57,6 @@ export const Logs = ({ content }: LogsContent) => {
     return (
         <>
             {content
-                .sort((a, b) => (a.when > b.when ? 1 : -1))
                 .map((item, index) => (
                     <Typography
                         key={item.when || index}

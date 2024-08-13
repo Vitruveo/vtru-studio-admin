@@ -82,7 +82,7 @@ export const Logs = ({ content }: LogsContent) => {
     );
 };
 
-export const Comments = ({ content, requestId }: CommentsContent) => {
+export const Comments = ({ content = [], requestId }: CommentsContent) => {
     const dispatch = useDispatch();
     const textRef = useRef<HTMLTextAreaElement>(null);
     const commentsEndRef = useRef<HTMLDivElement>(null);

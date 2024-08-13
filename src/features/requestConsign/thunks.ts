@@ -217,11 +217,11 @@ export function requestConsignAddCommentThunk({
     comment,
 }: RequestConsignAddComment): ReduxThunkAction<Promise<void>> {
     return async function (dispatch, getState) {
-        const commentList = getState().requestConsign.byId[id].comments || [];
+        // const commentList = getState().requestConsign.byId[id].comments || [];
         updateRequestConsignComments({ id, comment })
             .then((res) => {
-                const updatedComments = [...commentList, res.data] as CommentsProps[];
-                dispatch(requestConsignActionsCreators.setComments({ id, comments: updatedComments }));
+                // const updatedComments = [...commentList, res.data] as CommentsProps[];
+                // dispatch(requestConsignActionsCreators.setComments({ id, comments: updatedComments }));
             })
             .catch(() => {
                 // do nothing
@@ -235,16 +235,16 @@ export function requestConsignUpdateCommentVisibilityThunk({
     isPublic,
 }: RequestConsignUpdateCommentVisibility): ReduxThunkAction<Promise<void>> {
     return async function (dispatch, getState) {
-        const commentList = getState().requestConsign.byId[id].comments || [];
-        const comment = commentList.find((item) => item.id === commentId);
-        if (!comment) return;
+        // const commentList = getState().requestConsign.byId[id].comments || [];
+        // const comment = commentList.find((item) => item.id === commentId);
+        // if (!comment) return;
 
         updateRequestConsignCommentVisibility({ id, commentId, isPublic })
             .then(() => {
-                const updatedComments = commentList.map((item) =>
-                    item.id === commentId ? { ...item, isPublic } : item
-                ) as CommentsProps[];
-                dispatch(requestConsignActionsCreators.setComments({ id, comments: updatedComments }));
+                // const updatedComments = commentList.map((item) =>
+                //     item.id === commentId ? { ...item, isPublic } : item
+                // ) as CommentsProps[];
+                // dispatch(requestConsignActionsCreators.setComments({ id, comments: updatedComments }));
             })
             .catch(() => {
                 // do nothing

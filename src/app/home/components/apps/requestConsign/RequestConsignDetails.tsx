@@ -28,6 +28,7 @@ interface Props {
         checkedAt: Date | null;
     }[];
     logs?: LogsProps[];
+    comments?: CommentsProps[];
     status: string;
     handleApprove: () => void;
     handleReject: () => void;
@@ -151,6 +152,7 @@ export default function RequestConsignDetails({
     assetId,
     status,
     logs = [],
+    comments = [],
     handleApprove,
     handleReject,
     handleOpenStore,
@@ -160,7 +162,6 @@ export default function RequestConsignDetails({
     const handleClose = () => setOpen(false);
 
     const url = useMemo(() => `${BASE_URL_STORE}/preview/${assetId}/${Date.now()}`, [assetId]);
-    const comments: CommentsProps[] = useSelector((state) => state.requestConsign.byId[requestId]?.comments || []);
 
     const selectModal = ({ owner }: SelectModalProps) => {
         setOpen(true);

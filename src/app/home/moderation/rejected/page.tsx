@@ -125,9 +125,10 @@ const RejectedModerationPage = () => {
                             username={selected.creator.username}
                             emails={selected.creator.emails}
                             title={selected.asset.title}
-                            handleApprove={handleApprove}
-                            logs={selected.logs}
+                            logs={selected?.logs}
+                            comments={selected?.comments}
                             status={selected.status}
+                            handleApprove={handleApprove}
                             handleReject={() => {}}
                             handleOpenStore={() =>
                                 window.open(`${BASE_URL_STORE}/preview/${selected.asset._id}`, '_blank')

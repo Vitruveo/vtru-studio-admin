@@ -111,8 +111,9 @@ const RunningModerationPage = () => {
                             username={selected.creator.username}
                             emails={selected.creator.emails}
                             title={selected.asset.title}
-                            logs={selected.logs}
                             status={selected.status}
+                            logs={selected?.logs}
+                            comments={selected?.comments}
                             handleApprove={() => {}}
                             handleReject={() => {}}
                             handleOpenStore={() =>

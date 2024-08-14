@@ -1,6 +1,6 @@
 import { BASE_URL_STORE } from '@/constants/api';
-import { useDispatch, useSelector } from '@/store/hooks';
-import { Button, CircularProgress, TextareaAutosize } from '@mui/material';
+import { useDispatch } from '@/store/hooks';
+import { Button, CircularProgress, Switch, TextareaAutosize, Badge } from '@mui/material';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
@@ -8,9 +8,12 @@ import Stack from '@mui/material/Stack';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { IconMessage, IconNotes } from '@tabler/icons-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react';
 import Modal from '../../modal';
-import { requestConsignAddCommentThunk } from '@/features/requestConsign/thunks';
+import {
+    requestConsignAddCommentThunk,
+    requestConsignUpdateCommentVisibilityThunk,
+} from '@/features/requestConsign/thunks';
 import { CommentsProps, LogsProps } from '@/features/requestConsign/types';
 import { localeDate } from '@/utils/locale/date';
 
@@ -24,6 +27,9 @@ interface Props {
         codeHash: string | null;
         checkedAt: Date | null;
     }[];
+    logs?: LogsProps[];
+    comments?: CommentsProps[];
+    status: string;
     handleApprove: () => void;
     handleReject: () => void;
     handleOpenStore: () => void;
@@ -76,7 +82,7 @@ export const Logs = ({ content }: LogsContent) => {
     );
 };
 
-export const Comments = ({ content, requestId }: CommentsContent) => {
+export const Comments = ({ content = [], requestId }: CommentsContent) => {
     const dispatch = useDispatch();
     const textRef = useRef<HTMLTextAreaElement>(null);
     const commentsEndRef = useRef<HTMLDivElement>(null);
@@ -84,9 +90,14 @@ export const Comments = ({ content, requestId }: CommentsContent) => {
     const handleAddComment = () => {
         const comment = textRef.current?.value;
         if (comment) {
-            dispatch(requestConsignAddCommentThunk({ requestId, comment }));
+            dispatch(requestConsignAddCommentThunk({ id: requestId, comment }));
             textRef.current.value = '';
         }
+    };
+
+    const handleChangeVisibility = (e: ChangeEvent<HTMLInputElement>, commentId: string) => {
+        const isPublic = e.target.checked;
+        dispatch(requestConsignUpdateCommentVisibilityThunk({ id: requestId, commentId, isPublic }));
     };
 
     useEffect(() => {
@@ -104,9 +115,15 @@ export const Comments = ({ content, requestId }: CommentsContent) => {
                                 {localeDate(item.when || '')}
                             </Typography>
                         </Box>
-                        <Typography fontWeight="bold" ml={2} mr={2}>
-                            {item.comment}
-                        </Typography>
+                        <Box display={'flex'} justifyContent={'space-between'}>
+                            <Typography fontWeight="bold" ml={2}>
+                                {item.comment}
+                            </Typography>
+                            <Box display={'flex-start'} flexShrink={0}>
+                                <Switch onChange={(e) => handleChangeVisibility(e, item.id)} checked={item.isPublic} />
+                                <span>Public</span>
+                            </Box>
+                        </Box>
                     </Box>
                 ))}
                 {!content.length && <Typography id="modal-modal-description">No Comments</Typography>}
@@ -133,6 +150,9 @@ export default function RequestConsignDetails({
     title,
     emails,
     assetId,
+    status,
+    logs = [],
+    comments = [],
     handleApprove,
     handleReject,
     handleOpenStore,
@@ -142,9 +162,6 @@ export default function RequestConsignDetails({
     const handleClose = () => setOpen(false);
 
     const url = useMemo(() => `${BASE_URL_STORE}/preview/${assetId}/${Date.now()}`, [assetId]);
-    const logs: LogsProps[] = useSelector((state) => state.requestConsign.byId[requestId]?.logs || []);
-    const comments: CommentsProps[] = useSelector((state) => state.requestConsign.byId[requestId]?.comments || []);
-    const statusRequestConsign = useSelector((state) => state.requestConsign.byId[requestId]?.status || '');
 
     const selectModal = ({ owner }: SelectModalProps) => {
         setOpen(true);
@@ -161,7 +178,7 @@ export default function RequestConsignDetails({
                 <Stack gap={0} direction="row" justifyContent="space-between">
                     <Box display="flex" gap={1} alignItems={'center'}>
                         <Button
-                            disabled={statusRequestConsign === 'running' || statusRequestConsign === 'approved'}
+                            disabled={status === 'running' || status === 'approved'}
                             variant="contained"
                             onClick={handleApprove}
                         >
@@ -177,16 +194,18 @@ export default function RequestConsignDetails({
                         </Tooltip>
                         <Tooltip title="Comments">
                             <IconButton onClick={() => selectModal({ owner: 'Comments' })}>
-                                <IconMessage size="18" stroke={1.3} />
+                                <Badge badgeContent={comments.length} color="primary">
+                                    <IconMessage size="18" stroke={1.3} />
+                                </Badge>
                             </IconButton>
                         </Tooltip>
-                        {statusRequestConsign === 'running' && <CircularProgress size={20} />}
+                        {status === 'running' && <CircularProgress size={20} />}
                     </Box>
                     <Button
                         variant="contained"
                         color="error"
                         onClick={handleReject}
-                        disabled={!(statusRequestConsign === 'pending' || statusRequestConsign === 'error')}
+                        disabled={!(status === 'pending' || status === 'error')}
                     >
                         Reject
                     </Button>

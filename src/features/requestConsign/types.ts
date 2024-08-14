@@ -27,15 +27,28 @@ export interface RequestConsign {
 }
 
 export interface CommentsProps {
+    id: string;
     username?: string;
     comment: string;
     when?: string;
+    isPublic?: boolean;
 }
 
 export interface LogsProps {
     status: string;
     message: string;
     when: string;
+}
+
+export interface RequestConsignAddComment {
+    id: string;
+    comment: string;
+}
+
+export interface RequestConsignUpdateCommentVisibility {
+    id: string;
+    commentId: string;
+    isPublic: boolean;
 }
 
 export type GetListApiRes = APIResponse<RequestConsign[]>;

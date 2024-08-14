@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
@@ -38,7 +38,11 @@ const PendingModerationPage = () => {
     const [selected, setSelected] = useState<RequestConsign | undefined>(undefined);
     const [confirmRejectModal, setConfirmRejectModal] = useState(false);
 
-    const { chunk: rawRequestConsigns, loading } = useLiveStream<RequestConsign>({
+    const {
+        chunk: rawRequestConsigns,
+        chumkById,
+        loading,
+    } = useLiveStream<RequestConsign>({
         event: {
             list: LIST_REQUEST_CONSIGNS,
             update: UPDATED_REQUEST_CONSIGN,
@@ -47,6 +51,11 @@ const PendingModerationPage = () => {
         },
         listemEvents: EVENTS_REQUEST_CONSIGNS,
     });
+
+    useEffect(() => {
+        if (selected && chumkById[selected?._id]) setSelected(chumkById[selected._id]);
+    }, [chumkById, selected]);
+
     const requestConsigns = useMemo(
         () => rawRequestConsigns.filter((item) => item.status === 'pending'),
         [rawRequestConsigns]
@@ -132,6 +141,9 @@ const PendingModerationPage = () => {
                             username={selected.creator.username}
                             emails={selected.creator.emails}
                             title={selected.asset.title}
+                            status={selected.status}
+                            logs={selected?.logs}
+                            comments={selected?.comments}
                             handleApprove={handleApprove}
                             handleReject={() => setConfirmRejectModal(true)}
                             handleOpenStore={() =>

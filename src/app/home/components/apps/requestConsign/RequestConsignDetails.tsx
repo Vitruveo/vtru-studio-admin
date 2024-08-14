@@ -1,6 +1,6 @@
 import { BASE_URL_STORE } from '@/constants/api';
-import { useDispatch, useSelector } from '@/store/hooks';
-import { Button, CircularProgress, Switch, TextareaAutosize } from '@mui/material';
+import { useDispatch } from '@/store/hooks';
+import { Button, CircularProgress, Switch, TextareaAutosize, Badge } from '@mui/material';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
@@ -194,7 +194,9 @@ export default function RequestConsignDetails({
                         </Tooltip>
                         <Tooltip title="Comments">
                             <IconButton onClick={() => selectModal({ owner: 'Comments' })}>
-                                <IconMessage size="18" stroke={1.3} />
+                                <Badge badgeContent={comments.length} color="primary">
+                                    <IconMessage size="18" stroke={1.3} />
+                                </Badge>
                             </IconButton>
                         </Tooltip>
                         {status === 'running' && <CircularProgress size={20} />}

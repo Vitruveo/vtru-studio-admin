@@ -32,6 +32,7 @@ interface Props {
     status: string;
     handleApprove: () => void;
     handleReject: () => void;
+    handleCancel: () => void;
     handleOpenStore: () => void;
 }
 
@@ -155,6 +156,7 @@ export default function RequestConsignDetails({
     comments = [],
     handleApprove,
     handleReject,
+    handleCancel,
     handleOpenStore,
 }: Props) {
     const [open, setOpen] = useState<boolean>(false);
@@ -201,14 +203,24 @@ export default function RequestConsignDetails({
                         </Tooltip>
                         {status === 'running' && <CircularProgress size={20} />}
                     </Box>
-                    <Button
-                        variant="contained"
-                        color="error"
-                        onClick={handleReject}
-                        disabled={!(status === 'pending' || status === 'error')}
-                    >
-                        Reject
-                    </Button>
+                    <Box display="flex" gap={2}>
+                        <Button
+                            variant="contained"
+                            color="secondary"
+                            onClick={handleCancel}
+                            disabled={!(status === 'pending' || status === 'rejected' || status === 'error')}
+                        >
+                            Cancel Consign
+                        </Button>
+                        <Button
+                            variant="contained"
+                            color="error"
+                            onClick={handleReject}
+                            disabled={!(status === 'pending' || status === 'error')}
+                        >
+                            Reject Consign
+                        </Button>
+                    </Box>
                 </Stack>
             </Box>
 

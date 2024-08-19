@@ -10,7 +10,7 @@ export async function updateStatusRequestConsign({
     logs,
 }: {
     id: string;
-    status: 'approved' | 'rejected' | 'running' | 'error';
+    status: 'approved' | 'rejected' | 'running' | 'error' | 'draft';
     logs?: any[];
 }): Promise<APIResponse> {
     const response = await apiService.patch(`/requestConsign/${id}`, {

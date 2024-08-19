@@ -37,6 +37,7 @@ const PendingModerationPage = () => {
     const [search, setSearch] = useState('');
     const [selected, setSelected] = useState<RequestConsign | undefined>(undefined);
     const [confirmRejectModal, setConfirmRejectModal] = useState(false);
+    const [confirmCancelModal, setConfirmCancelModal] = useState(false);
 
     const {
         chunk: rawRequestConsigns,
@@ -88,6 +89,17 @@ const PendingModerationPage = () => {
         }
 
         setConfirmRejectModal(false);
+    };
+
+    const handleCancel = () => {
+        if (selected) {
+            dispatch(requestConsignActionsCreators.setRequestConsign(selected));
+            dispatch(requestConsignUpdateStatusThunk(selected._id, 'draft'));
+        } else {
+            dispatch(toastrActionsCreators.displayToastr({ message: 'No Asset selected', type: 'error' }));
+        }
+
+        setConfirmCancelModal(false);
     };
 
     const filteredAndSearchedConsigns = useMemo(() => {
@@ -146,6 +158,7 @@ const PendingModerationPage = () => {
                             comments={selected?.comments}
                             handleApprove={handleApprove}
                             handleReject={() => setConfirmRejectModal(true)}
+                            handleCancel={() => setConfirmCancelModal(true)}
                             handleOpenStore={() =>
                                 window.open(`${BASE_URL_STORE}/preview/${selected.asset._id}`, '_blank')
                             }
@@ -167,10 +180,32 @@ const PendingModerationPage = () => {
                     <Typography id="modal-modal-description" sx={{ mt: 2 }}>
                         Are you sure you want to reject this request?
                     </Typography>
-                    <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+                    <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
                         <Button onClick={() => setConfirmRejectModal(false)}>Cancel</Button>
                         <Button onClick={handleReject} variant="contained" color="error">
-                            Reject
+                            Confirm
+                        </Button>
+                    </Box>
+                </Box>
+            </Modal>
+
+            <Modal
+                open={confirmCancelModal}
+                onClose={() => setConfirmCancelModal(false)}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Box sx={style}>
+                    <Typography id="modal-modal-title" variant="h6" component="h2">
+                        Confirm Cancel Consign
+                    </Typography>
+                    <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                        Are you sure you want to cancel consign this request?
+                    </Typography>
+                    <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+                        <Button onClick={() => setConfirmCancelModal(false)}>Cancel</Button>
+                        <Button onClick={handleCancel} variant="contained" color="error">
+                            Confirm
                         </Button>
                     </Box>
                 </Box>

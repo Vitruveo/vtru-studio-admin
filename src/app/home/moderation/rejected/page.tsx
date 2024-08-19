@@ -10,9 +10,9 @@ import RequestConsignDetails from '@/app/home/components/apps/requestConsign/Req
 import RequestConsignList from '@/app/home/components/apps/requestConsign/RequestConsignList';
 import RequestConsignSearch from '@/app/home/components/apps/requestConsign/RequestConsignSearch';
 import AppCard from '@/app/home/components/shared/AppCard';
-import { Theme, useMediaQuery } from '@mui/material';
+import { Button, Modal, Theme, Typography, useMediaQuery } from '@mui/material';
 import { useDispatch } from '@/store/hooks';
-import { consignThunk } from '@/features/requestConsign/thunks';
+import { consignThunk, requestConsignUpdateStatusThunk } from '@/features/requestConsign/thunks';
 import { RequestConsign, requestConsignActionsCreators } from '@/features/requestConsign';
 import { BASE_URL_STORE } from '@/constants/api';
 import { toastrActionsCreators } from '@/features/toastr/slice';
@@ -36,6 +36,7 @@ const RejectedModerationPage = () => {
     const [isRightSidebarOpen, setRightSidebarOpen] = useState(false);
     const [search, setSearch] = useState('');
     const [selected, setSelected] = useState<RequestConsign | undefined>(undefined);
+    const [confirmCancelModal, setConfirmCancelModal] = useState(false);
 
     const {
         chunk: rawRequestConsings,
@@ -73,6 +74,17 @@ const RejectedModerationPage = () => {
         } else {
             dispatch(toastrActionsCreators.displayToastr({ message: 'No Asset selected', type: 'error' }));
         }
+    };
+
+    const handleCancel = () => {
+        if (selected) {
+            dispatch(requestConsignActionsCreators.setRequestConsign(selected));
+            dispatch(requestConsignUpdateStatusThunk(selected._id, 'draft'));
+        } else {
+            dispatch(toastrActionsCreators.displayToastr({ message: 'No Asset selected', type: 'error' }));
+        }
+
+        setConfirmCancelModal(false);
     };
 
     const filteredAndSearchedConsigns = useMemo(() => {
@@ -130,6 +142,7 @@ const RejectedModerationPage = () => {
                             status={selected.status}
                             handleApprove={handleApprove}
                             handleReject={() => {}}
+                            handleCancel={() => setConfirmCancelModal(true)}
                             handleOpenStore={() =>
                                 window.open(`${BASE_URL_STORE}/preview/${selected.asset._id}`, '_blank')
                             }
@@ -137,8 +150,42 @@ const RejectedModerationPage = () => {
                     ) : null}
                 </Drawer>
             </AppCard>
+
+            <Modal
+                open={confirmCancelModal}
+                onClose={() => setConfirmCancelModal(false)}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Box sx={style}>
+                    <Typography id="modal-modal-title" variant="h6" component="h2">
+                        Confirm Cancel Consign
+                    </Typography>
+                    <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                        Are you sure you want to cancel consign this request?
+                    </Typography>
+                    <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+                        <Button onClick={() => setConfirmCancelModal(false)}>Cancel</Button>
+                        <Button onClick={handleCancel} variant="contained" color="error">
+                            Confirm
+                        </Button>
+                    </Box>
+                </Box>
+            </Modal>
         </PageContainer>
     );
 };
 
 export default RejectedModerationPage;
+
+const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 600,
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+};

@@ -18,7 +18,7 @@ import { CommentsProps, RequestConsignAddComment, RequestConsignUpdateCommentVis
 
 export function requestConsignUpdateStatusThunk(
     id: string,
-    status: 'approved' | 'rejected' | 'running'
+    status: 'approved' | 'rejected' | 'running' | 'draft'
 ): ReduxThunkAction<Promise<APIResponse | void>> {
     return async function (dispatch, getState) {
         try {

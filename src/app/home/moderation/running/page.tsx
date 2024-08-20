@@ -116,6 +116,7 @@ const RunningModerationPage = () => {
                             comments={selected?.comments}
                             handleApprove={() => {}}
                             handleReject={() => {}}
+                            handleCancel={() => {}}
                             handleOpenStore={() =>
                                 window.open(`${BASE_URL_STORE}/preview/${selected.asset._id}`, '_blank')
                             }

@@ -9,8 +9,7 @@ import Navigation from './layout/horizontal/navbar/Navigation';
 import HorizontalHeader from './layout/horizontal/header/Header';
 import { useDispatch, useSelector } from '@/store/hooks';
 import { useRouter } from 'next/navigation';
-import { persistor } from '@/store';
-import { getEventsThunk } from '@/features/events/thunks';
+import { setCookieThunk } from '@/features/auth/thunks';
 
 const MainWrapper = styled('div')(() => ({
     display: 'flex',
@@ -39,13 +38,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
     useEffect(() => {
         if (!hasToken) router.push('/login');
-    }, []);
 
-    // useEffect(() => {
-    //     if (persistor.getState().bootstrapped) {
-    //         dispatch(getEventsThunk());
-    //     }
-    // }, [persistor]);
+        if (hasToken) dispatch(setCookieThunk());
+    }, []);
 
     const customizer = {
         activeDir: 'ltr',

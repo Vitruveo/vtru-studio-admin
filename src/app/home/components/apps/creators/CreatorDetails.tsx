@@ -9,7 +9,7 @@ import Typography from '@mui/material/Typography';
 import emailIcon from 'public/images/breadcrumb/emailSv.png';
 import { websocketSelector } from '@/features/ws';
 import { useDispatch, useSelector } from '@/store/hooks';
-import { updateVaultStatethunk } from '@/features/creator/thunks';
+import { updateVaultStatethunk, updateVaultStateTrustedThunk } from '@/features/creator/thunks';
 import { BASE_URL_STORE } from '@/constants/api';
 import { AssetType } from '@/app/home/types/apps/asset';
 import { localePrice } from '@/utils/locale/date';
@@ -25,7 +25,7 @@ interface Props {
 export default function CreatorDetails({ creatorId, hiddenPreview = false }: Props) {
     const dispatch = useDispatch();
     const { creatorsOnline = [] } = useSelector(websocketSelector(['creatorsOnline']));
-    const { status } = useSelector((state) => state.creator);
+    const { status, loadingTrusted } = useSelector((state) => state.creator);
     const creator = useSelector((state) => state.creator.byId[creatorId]);
     const assets = useSelector((state) =>
         state.asset.allIds
@@ -134,9 +134,20 @@ export default function CreatorDetails({ creatorId, hiddenPreview = false }: Pro
                             disabled={!creator?.vault?.vaultAddress || status === 'loading'}
                         />
                         <Typography variant="subtitle1" fontWeight={600} mb={0.5}>
-                            {creator?.vault?.isBlocked ? 'Blocked' : 'Active'}
+                            Active
                         </Typography>
                         {status === 'loading' && <CircularProgress size={20} />}
+                    </Box>
+                    <Box display="flex" alignItems="center" gap={1}>
+                        <Switch
+                            checked={creator?.vault?.isTrusted}
+                            onChange={() => dispatch(updateVaultStateTrustedThunk({ id: creatorId }))}
+                            disabled={!creator?.vault?.vaultAddress || loadingTrusted}
+                        />
+                        <Typography variant="subtitle1" fontWeight={600} mb={0.5}>
+                            Trusted
+                        </Typography>
+                        {loadingTrusted && <CircularProgress size={20} />}
                     </Box>
                 </Box>
                 <Divider />

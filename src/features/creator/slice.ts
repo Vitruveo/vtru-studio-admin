@@ -6,6 +6,7 @@ const initialState: InitialState = {
     allIds: [],
     error: '',
     status: '',
+    loadingTrusted: false,
 };
 
 export const creatorSlice = createSlice({
@@ -29,12 +30,18 @@ export const creatorSlice = createSlice({
         setVaultIsBlockedById: (state, action: PayloadAction<{ id: string; isBlocked: boolean }>) => {
             state.byId[action.payload.id].vault.isBlocked = action.payload.isBlocked;
         },
+        setVaultIsTrustedById: (state, action: PayloadAction<{ id: string; isTrusted: boolean }>) => {
+            state.byId[action.payload.id].vault.isTrusted = action.payload.isTrusted;
+        },
         removeCreator: (state, action: PayloadAction<{ id: string }>) => {
             delete state.byId[action.payload.id];
             state.allIds = Object.keys(state.byId);
         },
         setStatus: (state, action: PayloadAction<InitialState['status']>) => {
             state.status = action.payload;
+        },
+        setLoadingTrusted: (state, action: PayloadAction<boolean>) => {
+            state.loadingTrusted = action.payload;
         },
         resetCreator: (state) => {
             state.byId = {};

@@ -3,7 +3,7 @@ import { ReduxThunkAction } from '@/store';
 import { BASE_URL_API } from '@/constants/api';
 import { creatorActionsCreators } from './slice';
 import { toastrActionsCreators } from '../toastr/slice';
-import { getCreatorById, updateVaultState } from './requests';
+import { getCreatorById, updateVaultState, updateVaultStateTrusted } from './requests';
 
 export function getCreatorsThunk(): ReduxThunkAction {
     return async function (dispatch, getState) {
@@ -81,5 +81,25 @@ export function getCreatorByIdThunk(id: string): ReduxThunkAction {
         const response = await getCreatorById(id);
 
         if (response.data) dispatch(creatorActionsCreators.setCreator(response.data));
+    };
+}
+
+export function updateVaultStateTrustedThunk({ id }: { id: string }): ReduxThunkAction {
+    return async function (dispatch, getState) {
+        dispatch(creatorActionsCreators.setLoadingTrusted(true));
+
+        const creator = getState().creator.byId[id];
+
+        updateVaultStateTrusted({ vaultAddress: creator.vault.vaultAddress, state: !creator.vault.isTrusted })
+            .then(() => {
+                dispatch(toastrActionsCreators.displayToastr({ type: 'success', message: 'Vault state updated' }));
+                dispatch(creatorActionsCreators.setVaultIsTrustedById({ id, isTrusted: creator.vault.isTrusted }));
+            })
+            .catch(() => {
+                dispatch(toastrActionsCreators.displayToastr({ type: 'error', message: 'Error updating vault state' }));
+            })
+            .finally(() => {
+                dispatch(creatorActionsCreators.setLoadingTrusted(false));
+            });
     };
 }

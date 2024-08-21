@@ -19,9 +19,15 @@ export interface InitialState {
     allIds: string[];
     status: '' | 'loading' | 'succeeded' | 'failed';
     error: string;
+    loadingTrusted: boolean;
 }
 
 export interface UpdateVaultStateOptions {
+    vaultAddress: string;
+    state: boolean;
+}
+
+export interface updateVaultStateTrustedOptions {
     vaultAddress: string;
     state: boolean;
 }

@@ -14,11 +14,11 @@ import {
     updateStatusRequestConsign,
 } from './requests';
 import { APIResponse } from '../common/types';
-import { CommentsProps, RequestConsignAddComment, RequestConsignUpdateCommentVisibility } from './types';
+import { RequestConsignAddComment, RequestConsignUpdateCommentVisibility } from './types';
 
 export function requestConsignUpdateStatusThunk(
     id: string,
-    status: 'approved' | 'rejected' | 'running' | 'draft'
+    status: 'approved' | 'rejected' | 'running' | 'draft' | 'canceled'
 ): ReduxThunkAction<Promise<APIResponse | void>> {
     return async function (dispatch, getState) {
         try {

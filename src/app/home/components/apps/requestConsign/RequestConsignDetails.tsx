@@ -180,7 +180,7 @@ export default function RequestConsignDetails({
                 <Stack gap={0} direction="row" justifyContent="space-between">
                     <Box display="flex" gap={1} alignItems={'center'}>
                         <Button
-                            disabled={status === 'running' || status === 'approved'}
+                            disabled={['running', 'approved', 'canceled'].includes(status)}
                             variant="contained"
                             onClick={handleApprove}
                         >

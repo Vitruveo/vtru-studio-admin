@@ -20,12 +20,12 @@ import {
     IconPackage,
     IconChartDonut3,
     IconAperture,
-    IconList,
     IconClock,
     IconCheck,
     IconHandOff,
     IconLoader2,
     IconX,
+    IconBan,
 } from '@tabler/icons-react';
 
 const Menuitems: MenuitemsType[] = [
@@ -67,6 +67,12 @@ const Menuitems: MenuitemsType[] = [
                 title: 'Rejected',
                 icon: IconHandOff,
                 href: '/home/moderation/rejected',
+            },
+            {
+                id: uniqueId(),
+                title: 'Canceled',
+                icon: IconBan,
+                href: '/home/moderation/canceled',
             },
             {
                 id: uniqueId(),

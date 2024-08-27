@@ -1,6 +1,16 @@
+import axios from 'axios';
 import { apiService } from '@/services/api';
-import type { GetCreatorNameByAssetIdParams, UpdateAssetStatusByIdParams, UpdateAssetsNudityParams } from './types';
+import type {
+    GetAssetsByCreatorIdResponse,
+    GetAssetsPaginatedParams,
+    GetCreatorNameByAssetIdParams,
+    UpdateAssetStatusByIdParams,
+    UpdateAssetsNudityParams,
+} from './types';
 import { AssetType } from '@/app/home/types/apps/asset';
+import store from '@/store';
+import { BASE_URL_API } from '@/constants/api';
+import { APIResponse } from '../common/types';
 
 export function updateAssetStatusById({ id, status }: UpdateAssetStatusByIdParams) {
     return apiService.put(`/assets/${id}/status`, { status });
@@ -24,4 +34,13 @@ export const getAssetsByCreatorId = (creatorId: string) => {
 
 export const updateAssetsNudity = ({ ids, nudity }: UpdateAssetsNudityParams) => {
     return apiService.put(`/assets/nudity`, { ids, nudity });
+};
+
+export const getAssetsPaginated = (params: GetAssetsPaginatedParams) => {
+    return axios.get<APIResponse<GetAssetsByCreatorIdResponse>>(`${BASE_URL_API}/assets/admin`, {
+        headers: {
+            Authorization: `Bearer ${store.getState().auth.token}`,
+        },
+        params,
+    });
 };

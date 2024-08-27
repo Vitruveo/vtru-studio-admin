@@ -8,9 +8,12 @@ import {
     updateAssetStatusById,
     updateManyAssetsStatusByIds,
     updateAssetsNudity,
+    getAssetsPaginated,
 } from './requests';
 import type {
     ChangeFilterParams,
+    GetAssetsByCreatorIdResponse,
+    GetAssetsPaginatedParams,
     GetCreatorNameByAssetIdParams,
     UpdateAssetStatusByIdParams,
     UpdateAssetsNudityParams,
@@ -32,6 +35,16 @@ export function updateAssetStatusByIdThunk(
         );
 
         return updateAssetStatusById(payload);
+    };
+}
+
+export function getAssetsPaginatedThunk(
+    params: GetAssetsPaginatedParams
+): ReduxThunkAction<Promise<GetAssetsByCreatorIdResponse>> {
+    return async function (dispatch) {
+        const response = await getAssetsPaginated(params);
+
+        return response.data.data!;
     };
 }
 

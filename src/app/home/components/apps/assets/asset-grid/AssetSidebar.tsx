@@ -9,9 +9,10 @@ const drawerWidth = 250;
 interface Props {
     isMobileSidebarOpen: boolean;
     onSidebarClose: (event: React.SyntheticEvent | Event) => void;
+    handleChangeFilter: (filter: 'all' | 'active' | 'blocked' | 'consigned') => void;
 }
 
-const AssetSidebar = ({ isMobileSidebarOpen, onSidebarClose }: Props) => {
+const AssetSidebar = ({ isMobileSidebarOpen, onSidebarClose, handleChangeFilter }: Props) => {
     const lgUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('lg'));
 
     return (
@@ -29,7 +30,7 @@ const AssetSidebar = ({ isMobileSidebarOpen, onSidebarClose }: Props) => {
             {/* ------------------------------------------- */}
             {/* Filter Sidebar */}
             {/* ------------------------------------------- */}
-            <AssetFilter />
+            <AssetFilter handleChangeFilter={handleChangeFilter} />
         </Drawer>
     );
 };

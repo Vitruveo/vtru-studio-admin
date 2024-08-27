@@ -10,6 +10,21 @@ export interface UpdateAssetsNudityParams {
     nudity: boolean;
 }
 
+export interface GetAssetsPaginatedParams {
+    page: number;
+    name?: string;
+    limit?: number;
+    query?: Record<string, unknown>;
+    sort?: Record<string, unknown>;
+}
+
+export interface GetAssetsByCreatorIdResponse {
+    data: AssetType[];
+    limit: number;
+    page: number;
+    total: number;
+    totalPage: number;
+}
 export interface UpdateManyAssetsStatusByIdsParams {
     ids: string[];
     status: 'active' | 'blocked';

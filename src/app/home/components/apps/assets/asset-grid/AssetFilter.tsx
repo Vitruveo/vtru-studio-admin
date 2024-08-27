@@ -1,5 +1,4 @@
-import React from 'react';
-import { useDispatch, useSelector } from '@/store/hooks';
+import React, { useState } from 'react';
 import Divider from '@mui/material/Divider';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
@@ -9,11 +8,13 @@ import Typography from '@mui/material/Typography';
 import { IconCircles, IconLock, IconChecklist, IconCloudCheck } from '@tabler/icons-react';
 import { AssetFiterType } from '../../../../types/apps/eCommerce';
 import { customizer } from '@/app/common/customizer';
-import { changeFilterThunk } from '@/features/assets/thunks';
 
-const AssetFilter = () => {
-    const dispatch = useDispatch();
-    const active = useSelector((state) => state.asset.filter);
+interface Props {
+    handleChangeFilter: (filter: 'all' | 'active' | 'blocked' | 'consigned') => void;
+}
+
+const AssetFilter = ({ handleChangeFilter }: Props) => {
+    const [active, setActive] = useState('all');
 
     const br = `${customizer.borderRadius}px`;
 
@@ -25,25 +26,37 @@ const AssetFilter = () => {
             name: 'All',
             sort: 'all',
             icon: IconCircles,
-            onClick: () => dispatch(changeFilterThunk('all')),
+            onClick: () => {
+                handleChangeFilter('all');
+                setActive('all');
+            },
         },
         {
             name: 'Active',
             sort: 'active',
             icon: IconChecklist,
-            onClick: () => dispatch(changeFilterThunk('active')),
+            onClick: () => {
+                handleChangeFilter('active');
+                setActive('active');
+            },
         },
         {
             name: 'Blocked',
             sort: 'blocked',
             icon: IconLock,
-            onClick: () => dispatch(changeFilterThunk('blocked')),
+            onClick: () => {
+                handleChangeFilter('blocked');
+                setActive('blocked');
+            },
         },
         {
             name: 'Consigned',
             sort: 'consigned',
             icon: IconCloudCheck,
-            onClick: () => dispatch(changeFilterThunk('consigned')),
+            onClick: () => {
+                handleChangeFilter('consigned');
+                setActive('consigned');
+            },
         },
     ];
 

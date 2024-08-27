@@ -89,7 +89,9 @@ const AssetsOnePage = ({ params }: Props) => {
                             <AssetPreview media={buildAssetSource(asset?.formats?.preview?.path)} />
                             <Stack direction="row" justifyContent="space-between" mt={1} p={1} alignItems="flex-end">
                                 <Typography variant="caption" fontWeight={600}>
-                                    {localePrice(asset.licenses.nft.single.editionPrice)}
+                                    {asset?.licenses?.nft?.single?.editionPrice
+                                        ? localePrice(asset.licenses.nft.single.editionPrice)
+                                        : '?'}
                                 </Typography>
                                 {!!asset.mintExplorer && (
                                     <Box

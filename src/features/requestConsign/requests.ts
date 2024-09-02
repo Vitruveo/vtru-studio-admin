@@ -2,7 +2,7 @@ import axios from 'axios';
 import { apiService } from '@/services/api';
 import { APIResponse } from '../common/types';
 import { BASE_URL_BATCH } from '@/constants/api';
-import { RequestConsignAddComment, RequestConsignUpdateCommentVisibility } from './types';
+import { GetRequestConsigns, RequestConsignAddComment, RequestConsignUpdateCommentVisibility } from './types';
 
 export async function updateStatusRequestConsign({
     id,
@@ -39,4 +39,8 @@ export async function updateRequestConsignCommentVisibility({
     commentId,
 }: RequestConsignUpdateCommentVisibility) {
     return apiService.patch(`/requestConsign/comments/${id}/visibility`, { commentId, isPublic });
+}
+
+export async function getRequestConsigns({ status, page = 1, limit = 10 }: GetRequestConsigns) {
+    return apiService.get(`/requestConsign?status=${status}&page=${page}&limit=${limit}`);
 }

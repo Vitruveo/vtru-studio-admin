@@ -11,19 +11,15 @@ import RequestConsignList from '@/app/home/components/apps/requestConsign/Reques
 import RequestConsignSearch from '@/app/home/components/apps/requestConsign/RequestConsignSearch';
 import AppCard from '@/app/home/components/shared/AppCard';
 import { Button, Modal, Theme, Typography, useMediaQuery } from '@mui/material';
-import { useDispatch } from '@/store/hooks';
-import { consignThunk, requestConsignUpdateStatusThunk } from '@/features/requestConsign/thunks';
+import { useDispatch, useSelector } from '@/store/hooks';
+import {
+    consignThunk,
+    requestConsignGetThunk,
+    requestConsignUpdateStatusThunk,
+} from '@/features/requestConsign/thunks';
 import { RequestConsign, requestConsignActionsCreators } from '@/features/requestConsign';
 import { BASE_URL_STORE } from '@/constants/api';
 import { toastrActionsCreators } from '@/features/toastr/slice';
-import { useLiveStream } from '../../components/liveStream';
-import {
-    CREATED_REQUEST_CONSIGN,
-    DELETED_REQUEST_CONSIGN,
-    EVENTS_REQUEST_CONSIGNS,
-    LIST_REQUEST_CONSIGNS,
-    UPDATED_REQUEST_CONSIGN,
-} from '../../components/liveStream/events';
 
 const secdrawerWidth = 320;
 
@@ -38,32 +34,14 @@ const PendingModerationPage = () => {
     const [selected, setSelected] = useState<RequestConsign | undefined>(undefined);
     const [confirmRejectModal, setConfirmRejectModal] = useState(false);
     const [confirmCancelModal, setConfirmCancelModal] = useState(false);
-
-    const {
-        chunk: rawRequestConsigns,
-        chumkById,
-        loading,
-    } = useLiveStream<RequestConsign>({
-        event: {
-            list: LIST_REQUEST_CONSIGNS,
-            update: UPDATED_REQUEST_CONSIGN,
-            delete: DELETED_REQUEST_CONSIGN,
-            create: CREATED_REQUEST_CONSIGN,
-        },
-        listemEvents: EVENTS_REQUEST_CONSIGNS,
-    });
+    const { byId, allIds } = useSelector((state) => state.requestConsign);
 
     useEffect(() => {
-        if (selected && chumkById[selected?._id]) setSelected(chumkById[selected._id]);
-    }, [chumkById, selected]);
-
-    const requestConsigns = useMemo(
-        () => rawRequestConsigns.filter((item) => item.status === 'pending'),
-        [rawRequestConsigns]
-    );
+        dispatch(requestConsignGetThunk({ status: 'pending', page: 1, limit: 10 }));
+    }, []);
 
     const handleSelect = (id: string) => {
-        const selectedRequestConsigns = requestConsigns.find((item) => item._id === id);
+        const selectedRequestConsigns = byId[id];
 
         if (selectedRequestConsigns) {
             setSelected(selectedRequestConsigns);
@@ -103,15 +81,21 @@ const PendingModerationPage = () => {
     };
 
     const filteredAndSearchedConsigns = useMemo(() => {
-        return requestConsigns.filter((item) => {
-            const matchesSearch = search
-                ? [item.creator.username, item.asset.title, ...item.creator.emails.map((email) => email.email)]
-                      .filter(Boolean)
-                      .some((field) => field.toLowerCase().includes(search.toLowerCase()))
-                : true;
-            return matchesSearch;
-        });
-    }, [requestConsigns, search]);
+        return allIds
+            .filter((id) => {
+                const matchesSearch = search
+                    ? [
+                          byId[id].creator.username,
+                          byId[id].asset.title,
+                          ...byId[id].creator.emails.map((email) => email.email),
+                      ]
+                          .filter(Boolean)
+                          .some((field) => field.toLowerCase().includes(search.toLowerCase()))
+                    : true;
+                return matchesSearch;
+            })
+            .map((id) => byId[id]);
+    }, [allIds, byId, search]);
 
     return (
         <PageContainer title="Request Consign" description="this is requests">
@@ -130,7 +114,6 @@ const PendingModerationPage = () => {
                         requestConsignId={selected ? selected._id : ''}
                         data={filteredAndSearchedConsigns}
                         onClick={({ _id }) => handleSelect(_id)}
-                        loading={loading}
                     />
                 </Box>
 

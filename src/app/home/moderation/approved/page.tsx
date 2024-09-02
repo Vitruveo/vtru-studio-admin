@@ -13,64 +13,48 @@ import AppCard from '@/app/home/components/shared/AppCard';
 import { Theme, useMediaQuery } from '@mui/material';
 import { RequestConsign } from '@/features/requestConsign';
 import { BASE_URL_STORE } from '@/constants/api';
-import { useLiveStream } from '../../components/liveStream';
-import {
-    CREATED_REQUEST_CONSIGN,
-    DELETED_REQUEST_CONSIGN,
-    EVENTS_REQUEST_CONSIGNS,
-    LIST_REQUEST_CONSIGNS,
-    UPDATED_REQUEST_CONSIGN,
-} from '../../components/liveStream/events';
+import { useDispatch, useSelector } from '@/store/hooks';
+import { requestConsignGetThunk } from '@/features/requestConsign/thunks';
 
 const secdrawerWidth = 320;
 
 const ApprovedModerationPage = () => {
+    const dispatch = useDispatch();
+
     const lgUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('lg'));
     const mdUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
 
     const [isRightSidebarOpen, setRightSidebarOpen] = useState(false);
     const [search, setSearch] = useState('');
     const [selected, setSelected] = useState<RequestConsign | undefined>(undefined);
-
-    const {
-        chunk: rawRequestConsigns,
-        chumkById,
-        loading,
-    } = useLiveStream<RequestConsign>({
-        event: {
-            list: LIST_REQUEST_CONSIGNS,
-            update: UPDATED_REQUEST_CONSIGN,
-            delete: DELETED_REQUEST_CONSIGN,
-            create: CREATED_REQUEST_CONSIGN,
-        },
-        listemEvents: EVENTS_REQUEST_CONSIGNS,
-    });
+    const { allIds, byId } = useSelector((state) => state.requestConsign);
 
     useEffect(() => {
-        if (selected && chumkById[selected?._id]) setSelected(chumkById[selected._id]);
-    }, [chumkById, selected]);
-
-    const requestConsigns = useMemo(
-        () => rawRequestConsigns.filter((item) => item.status === 'approved'),
-        [rawRequestConsigns]
-    );
+        dispatch(requestConsignGetThunk({ status: 'approved', page: 1, limit: 10 }));
+    }, []);
 
     const handleSelect = (id: string) => {
-        const selectedRequestConsign = requestConsigns.find((item) => item._id === id);
+        const selectedRequestConsign = byId[id];
 
         if (selectedRequestConsign) setSelected(selectedRequestConsign);
     };
 
     const filteredAndSearchedConsigns = useMemo(() => {
-        return requestConsigns.filter((item) => {
-            const matchesSearch = search
-                ? [item.creator.username, item.asset.title, ...item.creator.emails.map((email) => email.email)]
-                      .filter(Boolean)
-                      .some((field) => field.toLowerCase().includes(search.toLowerCase()))
-                : true;
-            return matchesSearch;
-        });
-    }, [requestConsigns, search]);
+        return allIds
+            .filter((id) => {
+                const matchesSearch = search
+                    ? [
+                          byId[id].creator.username,
+                          byId[id].asset.title,
+                          ...byId[id].creator.emails.map((email) => email.email),
+                      ]
+                          .filter(Boolean)
+                          .some((field) => field.toLowerCase().includes(search.toLowerCase()))
+                    : true;
+                return matchesSearch;
+            })
+            .map((id) => byId[id]);
+    }, [allIds, byId, search]);
 
     return (
         <PageContainer title="Request Consign" description="this is requests">
@@ -88,7 +72,6 @@ const ApprovedModerationPage = () => {
                         requestConsignId={selected ? selected._id : ''}
                         data={filteredAndSearchedConsigns}
                         onClick={({ _id }) => handleSelect(_id)}
-                        loading={loading}
                     />
                 </Box>
 

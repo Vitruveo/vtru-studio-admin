@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
@@ -13,8 +13,9 @@ import AppCard from '@/app/home/components/shared/AppCard';
 import { Theme, useMediaQuery } from '@mui/material';
 import { RequestConsign } from '@/features/requestConsign';
 import { BASE_URL_STORE } from '@/constants/api';
-import { useDispatch, useSelector } from '@/store/hooks';
+import { useDispatch } from '@/store/hooks';
 import { requestConsignGetThunk } from '@/features/requestConsign/thunks';
+import { debounce } from '@mui/material/utils';
 
 const secdrawerWidth = 320;
 
@@ -25,36 +26,66 @@ const ApprovedModerationPage = () => {
     const mdUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
 
     const [isRightSidebarOpen, setRightSidebarOpen] = useState(false);
-    const [search, setSearch] = useState('');
+    const [search, setSearch] = useState<string | null>(null);
     const [selected, setSelected] = useState<RequestConsign | undefined>(undefined);
-    const { allIds, byId } = useSelector((state) => state.requestConsign);
+    const [paginatedData, setPaginatedData] = useState<{
+        currentPage: number;
+        data: RequestConsign[];
+        total: number;
+        totalPage: number;
+    }>({
+        currentPage: 0,
+        data: [],
+        total: 0,
+        totalPage: 0,
+    });
+
+    const debouncedSearch = useCallback(
+        debounce(async (searchTerm) => {
+            const response = await dispatch(
+                requestConsignGetThunk({ status: 'approved', search: searchTerm, page: 1 })
+            );
+            if (response.data) {
+                const data = response.data;
+                setPaginatedData({
+                    currentPage: data.page,
+                    data: data.data,
+                    total: data.total,
+                    totalPage: data.totalPage,
+                });
+            }
+        }, 500),
+        [dispatch]
+    );
 
     useEffect(() => {
-        dispatch(requestConsignGetThunk({ status: 'approved', page: 1, limit: 10 }));
+        handleNextPage();
     }, []);
 
+    useEffect(() => {
+        if (search !== null) debouncedSearch(search);
+    }, [search, debouncedSearch]);
+
     const handleSelect = (id: string) => {
-        const selectedRequestConsign = byId[id];
+        const selectedRequestConsign = paginatedData.data.find((requestConsign) => requestConsign._id === id);
 
         if (selectedRequestConsign) setSelected(selectedRequestConsign);
     };
 
-    const filteredAndSearchedConsigns = useMemo(() => {
-        return allIds
-            .filter((id) => {
-                const matchesSearch = search
-                    ? [
-                          byId[id].creator.username,
-                          byId[id].asset.title,
-                          ...byId[id].creator.emails.map((email) => email.email),
-                      ]
-                          .filter(Boolean)
-                          .some((field) => field.toLowerCase().includes(search.toLowerCase()))
-                    : true;
-                return matchesSearch;
-            })
-            .map((id) => byId[id]);
-    }, [allIds, byId, search]);
+    const handleNextPage = async () => {
+        const response = await dispatch(
+            requestConsignGetThunk({ status: 'approved', page: paginatedData.currentPage + 1 })
+        );
+        if (response.data) {
+            const data = response.data;
+            setPaginatedData((prev) => ({
+                currentPage: data.page,
+                data: [...prev.data, ...data.data],
+                total: data.total,
+                totalPage: data.totalPage,
+            }));
+        }
+    };
 
     return (
         <PageContainer title="Request Consign" description="this is requests">
@@ -70,8 +101,10 @@ const ApprovedModerationPage = () => {
                     <RequestConsignSearch search={search} setSearch={setSearch} />
                     <RequestConsignList
                         requestConsignId={selected ? selected._id : ''}
-                        data={filteredAndSearchedConsigns}
+                        data={paginatedData.data}
                         onClick={({ _id }) => handleSelect(_id)}
+                        nextPage={handleNextPage}
+                        hasMore={paginatedData.currentPage < paginatedData.totalPage}
                     />
                 </Box>
 

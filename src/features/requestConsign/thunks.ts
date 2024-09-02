@@ -13,7 +13,12 @@ import {
     updateStatusRequestConsign,
 } from './requests';
 import { APIResponse } from '../common/types';
-import { GetRequestConsigns, RequestConsignAddComment, RequestConsignUpdateCommentVisibility } from './types';
+import {
+    GetRequestConsigns,
+    RequestConsignAddComment,
+    RequestConsignPaginatedResponse,
+    RequestConsignUpdateCommentVisibility,
+} from './types';
 
 export function requestConsignUpdateStatusThunk(
     id: string,
@@ -49,22 +54,13 @@ export function requestConsignUpdateStatusThunk(
     };
 }
 
-export function requestConsignGetThunk({ status, page, limit }: GetRequestConsigns): ReduxThunkAction<Promise<void>> {
+export function requestConsignGetThunk({
+    status,
+    page,
+    search,
+}: GetRequestConsigns): ReduxThunkAction<Promise<APIResponse<RequestConsignPaginatedResponse>>> {
     return async function (dispatch, getState) {
-        const state = getState();
-
-        const replaceDomain = window.location.hostname.includes('vitruveo.xyz') ? 'studio-admin.' : 'admin.';
-
-        const domain = window.location.hostname.replace(replaceDomain, '');
-        cookie.set('token', state.auth.token, { path: '/', domain });
-
-        return getRequestConsigns({ status, page, limit })
-            .then((response: APIResponse<any, any>) => {
-                if (response.data) dispatch(requestConsignActionsCreators.setRequestConsigns(response.data.data));
-            })
-            .catch((error) => {
-                // do nothing
-            });
+        return getRequestConsigns({ status, page, search });
     };
 }
 

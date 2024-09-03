@@ -12,7 +12,7 @@ import RequestConsignSearch from '@/app/home/components/apps/requestConsign/Requ
 import AppCard from '@/app/home/components/shared/AppCard';
 import { Button, Modal, Theme, Typography, useMediaQuery } from '@mui/material';
 import { debounce } from '@mui/material/utils';
-import { useDispatch } from '@/store/hooks';
+import { useDispatch, useSelector } from '@/store/hooks';
 import {
     consignThunk,
     requestConsignGetThunk,
@@ -46,6 +46,7 @@ const PendingModerationPage = () => {
         total: 0,
         totalPage: 0,
     });
+    const status = useSelector((state) => state.requestConsign.status);
 
     const debouncedSearch = useCallback(
         debounce(async (searchTerm) => {
@@ -145,6 +146,7 @@ const PendingModerationPage = () => {
                         onClick={({ _id }) => handleSelect(_id)}
                         nextPage={handleNextPage}
                         hasMore={paginatedData.currentPage < paginatedData.totalPage}
+                        loading={status === 'loading'}
                     />
                 </Box>
 

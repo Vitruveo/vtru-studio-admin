@@ -60,7 +60,10 @@ export function requestConsignGetThunk({
     search,
 }: GetRequestConsigns): ReduxThunkAction<Promise<APIResponse<RequestConsignPaginatedResponse>>> {
     return async function (dispatch, getState) {
-        return getRequestConsigns({ status, page, search });
+        dispatch(requestConsignActionsCreators.setStartLoading());
+        return getRequestConsigns({ status, page, search }).finally(() => {
+            dispatch(requestConsignActionsCreators.setFinishLoading());
+        });
     };
 }
 

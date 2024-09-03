@@ -14,7 +14,7 @@ import { debounce, Theme, useMediaQuery } from '@mui/material';
 import { RequestConsign } from '@/features/requestConsign';
 import { BASE_URL_STORE } from '@/constants/api';
 import { requestConsignGetThunk } from '@/features/requestConsign/thunks';
-import { useDispatch } from '@/store/hooks';
+import { useDispatch, useSelector } from '@/store/hooks';
 
 const secdrawerWidth = 320;
 
@@ -37,6 +37,7 @@ const RunningModerationPage = () => {
         total: 0,
         totalPage: 0,
     });
+    const status = useSelector((state) => state.requestConsign.status);
 
     const debouncedSearch = useCallback(
         debounce(async (searchTerm) => {
@@ -101,6 +102,7 @@ const RunningModerationPage = () => {
                         onClick={({ _id }) => handleSelect(_id)}
                         nextPage={handleNextPage}
                         hasMore={paginatedData.currentPage < paginatedData.totalPage}
+                        loading={status === 'loading'}
                     />
                 </Box>
 

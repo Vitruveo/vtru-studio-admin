@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
@@ -11,20 +11,17 @@ import RequestConsignList from '@/app/home/components/apps/requestConsign/Reques
 import RequestConsignSearch from '@/app/home/components/apps/requestConsign/RequestConsignSearch';
 import AppCard from '@/app/home/components/shared/AppCard';
 import { Button, Modal, Theme, Typography, useMediaQuery } from '@mui/material';
+import { debounce } from '@mui/material/utils';
 
 import { useDispatch } from '@/store/hooks';
-import { consignThunk, requestConsignUpdateStatusThunk } from '@/features/requestConsign/thunks';
+import {
+    consignThunk,
+    requestConsignGetThunk,
+    requestConsignUpdateStatusThunk,
+} from '@/features/requestConsign/thunks';
 import { RequestConsign, requestConsignActionsCreators } from '@/features/requestConsign';
 import { BASE_URL_STORE } from '@/constants/api';
 import { toastrActionsCreators } from '@/features/toastr/slice';
-import { useLiveStream } from '../../components/liveStream';
-import {
-    CREATED_REQUEST_CONSIGN,
-    DELETED_REQUEST_CONSIGN,
-    EVENTS_REQUEST_CONSIGNS,
-    LIST_REQUEST_CONSIGNS,
-    UPDATED_REQUEST_CONSIGN,
-} from '../../components/liveStream/events';
 
 const secdrawerWidth = 320;
 
@@ -35,35 +32,48 @@ const ErrorModerationPage = () => {
     const mdUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
 
     const [isRightSidebarOpen, setRightSidebarOpen] = useState(false);
-    const [search, setSearch] = useState('');
+    const [search, setSearch] = useState<string | null>(null);
     const [selected, setSelected] = useState<RequestConsign | undefined>(undefined);
     const [confirmRejectModal, setConfirmRejectModal] = useState(false);
     const [confirmCancelModal, setConfirmCancelModal] = useState(false);
-
-    const {
-        chunk: rawRequestConsigns,
-        chumkById,
-        loading,
-    } = useLiveStream<RequestConsign>({
-        event: {
-            list: LIST_REQUEST_CONSIGNS,
-            update: UPDATED_REQUEST_CONSIGN,
-            delete: DELETED_REQUEST_CONSIGN,
-            create: CREATED_REQUEST_CONSIGN,
-        },
-        listemEvents: EVENTS_REQUEST_CONSIGNS,
+    const [paginatedData, setPaginatedData] = useState<{
+        currentPage: number;
+        data: RequestConsign[];
+        total: number;
+        totalPage: number;
+    }>({
+        currentPage: 0,
+        data: [],
+        total: 0,
+        totalPage: 0,
     });
-    const requestConsigns = useMemo(
-        () => rawRequestConsigns.filter((item) => item.status === 'error'),
-        [rawRequestConsigns]
+
+    const debouncedSearch = useCallback(
+        debounce(async (searchTerm) => {
+            const response = await dispatch(requestConsignGetThunk({ status: 'error', search: searchTerm, page: 1 }));
+            if (response.data) {
+                const data = response.data;
+                setPaginatedData({
+                    data: data.data,
+                    currentPage: data.page,
+                    total: data.total,
+                    totalPage: data.totalPage,
+                });
+            }
+        }, 500),
+        [dispatch]
     );
 
     useEffect(() => {
-        if (selected && chumkById[selected?._id]) setSelected(chumkById[selected._id]);
-    }, [chumkById, selected]);
+        handleNextPage();
+    }, []);
+
+    useEffect(() => {
+        if (search !== null) debouncedSearch(search);
+    }, [search, debouncedSearch]);
 
     const handleSelect = (id: string) => {
-        const selectedRequestConsign = requestConsigns.find((item) => item._id === id);
+        const selectedRequestConsign = paginatedData.data.find((item) => item._id === id);
 
         if (selectedRequestConsign) {
             setSelected(selectedRequestConsign);
@@ -79,17 +89,6 @@ const ErrorModerationPage = () => {
             dispatch(toastrActionsCreators.displayToastr({ message: 'No Asset selected', type: 'error' }));
         }
     };
-
-    const filteredAndSearchedConsigns = useMemo(() => {
-        return requestConsigns.filter((item) => {
-            const matchesSearch = search
-                ? [item.creator.username, item.asset.title, ...item.creator.emails.map((email) => email.email)]
-                      .filter(Boolean)
-                      .some((field) => field.toLowerCase().includes(search.toLowerCase()))
-                : true;
-            return matchesSearch;
-        });
-    }, [requestConsigns, search]);
 
     const handleReject = () => {
         if (selected) {
@@ -112,6 +111,21 @@ const ErrorModerationPage = () => {
 
         setConfirmCancelModal(false);
     };
+
+    const handleNextPage = async () => {
+        const response = await dispatch(
+            requestConsignGetThunk({ status: 'error', page: paginatedData.currentPage + 1 })
+        );
+        if (response.data) {
+            const data = response.data;
+            setPaginatedData((prev) => ({
+                data: [...prev.data, ...data.data],
+                currentPage: data.page,
+                total: data.total,
+                totalPage: data.totalPage,
+            }));
+        }
+    };
     return (
         <PageContainer title="Request Consign" description="this is requests">
             <Breadcrumb title="Request Consign Application" subtitle="List error requests" />
@@ -126,9 +140,10 @@ const ErrorModerationPage = () => {
                     <RequestConsignSearch search={search} setSearch={setSearch} />
                     <RequestConsignList
                         requestConsignId={selected ? selected._id : ''}
-                        data={filteredAndSearchedConsigns}
+                        data={paginatedData.data}
                         onClick={({ _id }) => handleSelect(_id)}
-                        loading={loading}
+                        nextPage={handleNextPage}
+                        hasMore={paginatedData.currentPage < paginatedData.totalPage}
                     />
                 </Box>
 

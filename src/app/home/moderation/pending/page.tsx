@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
@@ -11,7 +11,8 @@ import RequestConsignList from '@/app/home/components/apps/requestConsign/Reques
 import RequestConsignSearch from '@/app/home/components/apps/requestConsign/RequestConsignSearch';
 import AppCard from '@/app/home/components/shared/AppCard';
 import { Button, Modal, Theme, Typography, useMediaQuery } from '@mui/material';
-import { useDispatch, useSelector } from '@/store/hooks';
+import { debounce } from '@mui/material/utils';
+import { useDispatch } from '@/store/hooks';
 import {
     consignThunk,
     requestConsignGetThunk,
@@ -30,18 +31,48 @@ const PendingModerationPage = () => {
     const mdUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
 
     const [isRightSidebarOpen, setRightSidebarOpen] = useState(false);
-    const [search, setSearch] = useState('');
+    const [search, setSearch] = useState<string | null>(null);
     const [selected, setSelected] = useState<RequestConsign | undefined>(undefined);
     const [confirmRejectModal, setConfirmRejectModal] = useState(false);
     const [confirmCancelModal, setConfirmCancelModal] = useState(false);
-    const { byId, allIds } = useSelector((state) => state.requestConsign);
+    const [paginatedData, setPaginatedData] = useState<{
+        currentPage: number;
+        data: RequestConsign[];
+        total: number;
+        totalPage: number;
+    }>({
+        currentPage: 0,
+        data: [],
+        total: 0,
+        totalPage: 0,
+    });
+
+    const debouncedSearch = useCallback(
+        debounce(async (searchTerm) => {
+            const response = await dispatch(requestConsignGetThunk({ status: 'pending', search: searchTerm, page: 1 }));
+            if (response.data) {
+                const data = response.data;
+                setPaginatedData({
+                    data: data.data,
+                    currentPage: data.page,
+                    total: data.total,
+                    totalPage: data.totalPage,
+                });
+            }
+        }, 500),
+        [dispatch]
+    );
 
     useEffect(() => {
-        dispatch(requestConsignGetThunk({ status: 'pending', page: 1, limit: 10 }));
+        handleNextPage();
     }, []);
 
+    useEffect(() => {
+        if (search !== null) debouncedSearch(search);
+    }, [search, debouncedSearch]);
+
     const handleSelect = (id: string) => {
-        const selectedRequestConsigns = byId[id];
+        const selectedRequestConsigns = paginatedData.data.find((requestConsign) => requestConsign._id === id);
 
         if (selectedRequestConsigns) {
             setSelected(selectedRequestConsigns);
@@ -80,22 +111,20 @@ const PendingModerationPage = () => {
         setConfirmCancelModal(false);
     };
 
-    const filteredAndSearchedConsigns = useMemo(() => {
-        return allIds
-            .filter((id) => {
-                const matchesSearch = search
-                    ? [
-                          byId[id].creator.username,
-                          byId[id].asset.title,
-                          ...byId[id].creator.emails.map((email) => email.email),
-                      ]
-                          .filter(Boolean)
-                          .some((field) => field.toLowerCase().includes(search.toLowerCase()))
-                    : true;
-                return matchesSearch;
-            })
-            .map((id) => byId[id]);
-    }, [allIds, byId, search]);
+    const handleNextPage = async () => {
+        const response = await dispatch(
+            requestConsignGetThunk({ status: 'pending', page: paginatedData.currentPage + 1 })
+        );
+        if (response.data) {
+            const data = response.data;
+            setPaginatedData((prev) => ({
+                data: [...prev.data, ...data.data],
+                currentPage: data.page,
+                total: data.total,
+                totalPage: data.totalPage,
+            }));
+        }
+    };
 
     return (
         <PageContainer title="Request Consign" description="this is requests">
@@ -112,8 +141,10 @@ const PendingModerationPage = () => {
 
                     <RequestConsignList
                         requestConsignId={selected ? selected._id : ''}
-                        data={filteredAndSearchedConsigns}
+                        data={paginatedData.data}
                         onClick={({ _id }) => handleSelect(_id)}
+                        nextPage={handleNextPage}
+                        hasMore={paginatedData.currentPage < paginatedData.totalPage}
                     />
                 </Box>
 

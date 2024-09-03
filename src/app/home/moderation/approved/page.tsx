@@ -48,8 +48,8 @@ const ApprovedModerationPage = () => {
             if (response.data) {
                 const data = response.data;
                 setPaginatedData({
-                    currentPage: data.page,
                     data: data.data,
+                    currentPage: data.page,
                     total: data.total,
                     totalPage: data.totalPage,
                 });
@@ -79,8 +79,8 @@ const ApprovedModerationPage = () => {
         if (response.data) {
             const data = response.data;
             setPaginatedData((prev) => ({
-                currentPage: data.page,
                 data: [...prev.data, ...data.data],
+                currentPage: data.page,
                 total: data.total,
                 totalPage: data.totalPage,
             }));

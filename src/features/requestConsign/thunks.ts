@@ -1,20 +1,23 @@
 import { AxiosError } from 'axios';
-import { fetchEventSource } from '@microsoft/fetch-event-source';
-import cookie from 'cookiejs';
 
 import { ReduxThunkAction } from '@/store';
 import { requestConsignActionsCreators } from './slice';
-import { BASE_URL_API } from '@/constants/api';
 import { toastrActionsCreators } from '../toastr/slice';
 import {
     consign,
     eventsByTransaction,
+    getRequestConsigns,
     updateRequestConsignComments,
     updateRequestConsignCommentVisibility,
     updateStatusRequestConsign,
 } from './requests';
 import { APIResponse } from '../common/types';
-import { RequestConsignAddComment, RequestConsignUpdateCommentVisibility } from './types';
+import {
+    GetRequestConsigns,
+    RequestConsignAddComment,
+    RequestConsignPaginatedResponse,
+    RequestConsignUpdateCommentVisibility,
+} from './types';
 
 export function requestConsignUpdateStatusThunk(
     id: string,
@@ -50,49 +53,15 @@ export function requestConsignUpdateStatusThunk(
     };
 }
 
-export function requestConsignGetThunk(): ReduxThunkAction<Promise<void>> {
+export function requestConsignGetThunk({
+    status,
+    page,
+    search,
+}: GetRequestConsigns): ReduxThunkAction<Promise<APIResponse<RequestConsignPaginatedResponse>>> {
     return async function (dispatch, getState) {
-        const state = getState();
-        const token = state.auth.token;
-
-        const replaceDomain = window.location.hostname.includes('vitruveo.xyz') ? 'studio-admin.' : 'admin.';
-
-        const domain = window.location.hostname.replace(replaceDomain, '');
-        cookie.set('token', state.auth.token, { path: '/', domain });
-
-        const ctrl = new AbortController();
-
-        const url = `${BASE_URL_API}/requestConsign`;
-        const headers = {
-            Accept: 'text/event-stream',
-            Authorization: `Bearer ${token}`,
-        };
-
-        const response = await fetch(url, { method: 'HEAD', headers });
-
-        if (response.status === 401) {
-            dispatch(
-                toastrActionsCreators.displayToastr({
-                    type: 'error',
-                    message: 'You are not authorized to view this page.',
-                })
-            );
-
-            dispatch(requestConsignActionsCreators.resetRequestConsign());
-
-            return;
-        }
-
-        return fetchEventSource(url, {
-            method: 'GET',
-            headers,
-            onmessage(message) {
-                dispatch(requestConsignActionsCreators.setRequestConsign(JSON.parse(message.data)));
-            },
-            onerror() {
-                throw new Error('Error fetching event source');
-            },
-            signal: ctrl.signal,
+        dispatch(requestConsignActionsCreators.setStartLoading());
+        return getRequestConsigns({ status, page, search }).finally(() => {
+            dispatch(requestConsignActionsCreators.setFinishLoading());
         });
     };
 }
@@ -110,16 +79,7 @@ export function consignThunk({ requestId }: { requestId: string }): ReduxThunkAc
 
         return consign(requestConsign.asset._id)
             .then((response) => {
-                // dispatch(requestConsignUpdateStatusThunk(requestId, 'running'));
                 dispatch(requestConsignActionsCreators.resetConsign({ id: requestId }));
-
-                // dispatch(
-                //     requestConsignActionsCreators.setTransaction({
-                //         id: requestId,
-                //         transaction: response.data.transaction,
-                //     })
-                // );
-                // dispatch(eventTransactionThunk({ requestId }));
             })
             .catch((error) => {
                 if (error instanceof AxiosError && error.response?.status === 400) {
@@ -217,11 +177,9 @@ export function requestConsignAddCommentThunk({
     comment,
 }: RequestConsignAddComment): ReduxThunkAction<Promise<void>> {
     return async function (dispatch, getState) {
-        // const commentList = getState().requestConsign.byId[id].comments || [];
         updateRequestConsignComments({ id, comment })
             .then((res) => {
-                // const updatedComments = [...commentList, res.data] as CommentsProps[];
-                // dispatch(requestConsignActionsCreators.setComments({ id, comments: updatedComments }));
+                // do nothing
             })
             .catch(() => {
                 // do nothing
@@ -235,16 +193,9 @@ export function requestConsignUpdateCommentVisibilityThunk({
     isPublic,
 }: RequestConsignUpdateCommentVisibility): ReduxThunkAction<Promise<void>> {
     return async function (dispatch, getState) {
-        // const commentList = getState().requestConsign.byId[id].comments || [];
-        // const comment = commentList.find((item) => item.id === commentId);
-        // if (!comment) return;
-
         updateRequestConsignCommentVisibility({ id, commentId, isPublic })
             .then(() => {
-                // const updatedComments = commentList.map((item) =>
-                //     item.id === commentId ? { ...item, isPublic } : item
-                // ) as CommentsProps[];
-                // dispatch(requestConsignActionsCreators.setComments({ id, comments: updatedComments }));
+                // do nothing
             })
             .catch(() => {
                 // do nothing

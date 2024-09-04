@@ -6,7 +6,7 @@ import TextField from '@mui/material/TextField';
 import { IconSearch } from '@tabler/icons-react';
 
 type Props = {
-    search: string;
+    search: string | null;
     setSearch(value: string): void;
 };
 

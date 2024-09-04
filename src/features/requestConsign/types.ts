@@ -59,3 +59,18 @@ export interface InitialState {
     status: '' | 'loading' | 'succeeded' | 'failed';
     error: string;
 }
+
+export interface GetRequestConsigns {
+    page?: number;
+    limit?: number;
+    search?: string;
+    status: string;
+}
+
+export interface RequestConsignPaginatedResponse {
+    data: RequestConsign[];
+    page: number;
+    totalPage: number;
+    total: number;
+    limit: number;
+}

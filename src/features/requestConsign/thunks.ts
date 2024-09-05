@@ -1,5 +1,4 @@
 import { AxiosError } from 'axios';
-import cookie from 'cookiejs';
 
 import { ReduxThunkAction } from '@/store';
 import { requestConsignActionsCreators } from './slice';
@@ -22,7 +21,7 @@ import {
 
 export function requestConsignUpdateStatusThunk(
     id: string,
-    status: 'approved' | 'rejected' | 'running' | 'draft'
+    status: 'approved' | 'rejected' | 'running' | 'draft' | 'canceled'
 ): ReduxThunkAction<Promise<APIResponse | void>> {
     return async function (dispatch, getState) {
         try {

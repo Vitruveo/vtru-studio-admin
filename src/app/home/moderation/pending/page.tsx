@@ -104,7 +104,7 @@ const PendingModerationPage = () => {
     const handleCancel = () => {
         if (selected) {
             dispatch(requestConsignActionsCreators.setRequestConsign(selected));
-            dispatch(requestConsignUpdateStatusThunk(selected._id, 'draft'));
+            dispatch(requestConsignUpdateStatusThunk(selected._id, 'canceled'));
         } else {
             dispatch(toastrActionsCreators.displayToastr({ message: 'No Asset selected', type: 'error' }));
         }

@@ -4,6 +4,7 @@ import { APIResponse } from '../common/types';
 import { BASE_URL_BATCH } from '@/constants/api';
 import {
     GetRequestConsigns,
+    RequestConsign,
     RequestConsignAddComment,
     RequestConsignPaginatedResponse,
     RequestConsignUpdateCommentVisibility,
@@ -50,4 +51,8 @@ export async function getRequestConsigns({ status, page, search = '', limit = 25
     return apiService.get<RequestConsignPaginatedResponse>(
         `/requestConsign?status=${status}&page=${page}&limit=${limit}&search=${search}`
     );
+}
+
+export async function getRequestConsignsById(id: string) {
+    return apiService.get<RequestConsign>(`/requestConsign/${id}`);
 }

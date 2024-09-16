@@ -99,6 +99,19 @@ const RejectedModerationPage = () => {
         setConfirmCancelModal(false);
     };
 
+    const handleRefresh = async () => {
+        const response = await dispatch(requestConsignGetThunk({ status: 'rejected', page: 1 }));
+        if (response.data) {
+            const data = response.data;
+            setPaginatedData({
+                data: data.data,
+                currentPage: data.page,
+                total: data.total,
+                totalPage: data.totalPage,
+            });
+        }
+    };
+
     const handleNextPage = async () => {
         const response = await dispatch(
             requestConsignGetThunk({ status: 'rejected', page: paginatedData.currentPage + 1 })
@@ -125,7 +138,7 @@ const RejectedModerationPage = () => {
                         flexShrink: 0,
                     }}
                 >
-                    <RequestConsignSearch search={search} setSearch={setSearch} />
+                    <RequestConsignSearch search={search} setSearch={setSearch} handleRefresh={handleRefresh} />
                     <RequestConsignList
                         requestConsignId={selected ? selected._id : ''}
                         data={paginatedData.data}

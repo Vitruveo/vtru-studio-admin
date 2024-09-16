@@ -25,7 +25,7 @@ const CanceledModerationPage = () => {
     const mdUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
 
     const [isRightSidebarOpen, setRightSidebarOpen] = useState(false);
-    const [search, setSearch] = useState('');
+    const [search, setSearch] = useState<string | null>(null);
     const [selected, setSelected] = useState<RequestConsign | undefined>(undefined);
     const [paginatedData, setPaginatedData] = useState<{
         currentPage: number;
@@ -72,9 +72,22 @@ const CanceledModerationPage = () => {
         if (selectedRequestConsign) setSelected(selectedRequestConsign);
     };
 
+    const handleRefresh = async () => {
+        const response = await dispatch(requestConsignGetThunk({ status: 'canceled', page: 1 }));
+        if (response.data) {
+            const data = response.data;
+            setPaginatedData({
+                data: data.data,
+                currentPage: data.page,
+                total: data.total,
+                totalPage: data.totalPage,
+            });
+        }
+    };
+
     const handleNextPage = async () => {
         const response = await dispatch(
-            requestConsignGetThunk({ status: 'approved', page: paginatedData.currentPage + 1 })
+            requestConsignGetThunk({ status: 'canceled', page: paginatedData.currentPage + 1 })
         );
         if (response.data) {
             const data = response.data;
@@ -98,7 +111,7 @@ const CanceledModerationPage = () => {
                         flexShrink: 0,
                     }}
                 >
-                    <RequestConsignSearch search={search} setSearch={setSearch} />
+                    <RequestConsignSearch search={search} setSearch={setSearch} handleRefresh={handleRefresh} />
                     <RequestConsignList
                         requestConsignId={selected ? selected._id : ''}
                         data={paginatedData.data}

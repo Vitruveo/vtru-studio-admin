@@ -11,10 +11,11 @@ import RequestConsignList from '@/app/home/components/apps/requestConsign/Reques
 import RequestConsignSearch from '@/app/home/components/apps/requestConsign/RequestConsignSearch';
 import AppCard from '@/app/home/components/shared/AppCard';
 import { debounce, Theme, useMediaQuery } from '@mui/material';
-import { RequestConsign } from '@/features/requestConsign';
+import { RequestConsign, requestConsignActionsCreators } from '@/features/requestConsign';
 import { BASE_URL_STORE } from '@/constants/api';
-import { requestConsignGetThunk } from '@/features/requestConsign/thunks';
+import { consignThunk, requestConsignGetThunk } from '@/features/requestConsign/thunks';
 import { useDispatch, useSelector } from '@/store/hooks';
+import { toastrActionsCreators } from '@/features/toastr/slice';
 
 const secdrawerWidth = 320;
 
@@ -24,7 +25,7 @@ const RunningModerationPage = () => {
     const mdUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
 
     const [isRightSidebarOpen, setRightSidebarOpen] = useState(false);
-    const [search, setSearch] = useState('');
+    const [search, setSearch] = useState<string | null>(null);
     const [selected, setSelected] = useState<RequestConsign | undefined>(undefined);
     const [paginatedData, setPaginatedData] = useState<{
         currentPage: number;
@@ -69,6 +70,19 @@ const RunningModerationPage = () => {
         if (selectedRequestConsign) setSelected(selectedRequestConsign);
     };
 
+    const handleRefresh = async () => {
+        const response = await dispatch(requestConsignGetThunk({ status: 'running', page: 1 }));
+        if (response.data) {
+            const data = response.data;
+            setPaginatedData({
+                data: data.data,
+                currentPage: data.page,
+                total: data.total,
+                totalPage: data.totalPage,
+            });
+        }
+    };
+
     const handleNextPage = async () => {
         const response = await dispatch(
             requestConsignGetThunk({ status: 'running', page: paginatedData.currentPage + 1 })
@@ -83,6 +97,14 @@ const RunningModerationPage = () => {
             }));
         }
     };
+    const handleApprove = () => {
+        if (selected) {
+            dispatch(requestConsignActionsCreators.setRequestConsign(selected));
+            dispatch(consignThunk({ requestId: selected._id }));
+        } else {
+            dispatch(toastrActionsCreators.displayToastr({ message: 'No Asset selected', type: 'error' }));
+        }
+    };
 
     return (
         <PageContainer title="Request Consign" description="this is requests">
@@ -95,7 +117,7 @@ const RunningModerationPage = () => {
                         flexShrink: 0,
                     }}
                 >
-                    <RequestConsignSearch search={search} setSearch={setSearch} />
+                    <RequestConsignSearch search={search} setSearch={setSearch} handleRefresh={handleRefresh} />
                     <RequestConsignList
                         requestConsignId={selected ? selected._id : ''}
                         data={paginatedData.data}
@@ -128,7 +150,7 @@ const RunningModerationPage = () => {
                             status={selected.status}
                             logs={selected?.logs}
                             comments={selected?.comments}
-                            handleApprove={() => {}}
+                            handleApprove={handleApprove}
                             handleReject={() => {}}
                             handleCancel={() => {}}
                             handleOpenStore={() =>

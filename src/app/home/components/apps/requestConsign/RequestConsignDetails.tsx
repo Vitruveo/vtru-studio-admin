@@ -12,6 +12,7 @@ import { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react';
 import Modal from '../../modal';
 import {
     requestConsignAddCommentThunk,
+    requestConsignByIdThunk,
     requestConsignUpdateCommentVisibilityThunk,
 } from '@/features/requestConsign/thunks';
 import { CommentsProps, LogsProps } from '@/features/requestConsign/types';
@@ -46,10 +47,23 @@ export interface CommentsContent {
 }
 
 export interface LogsContent {
-    content: LogsProps[];
+    requestId: string;
 }
 
-export const Logs = ({ content }: LogsContent) => {
+export const Logs = ({ requestId }: LogsContent) => {
+    const dispatch = useDispatch();
+    const [logs, setLogs] = useState<LogsProps[]>([]);
+
+    const refresh = async () => {
+        const response = await dispatch(requestConsignByIdThunk(requestId));
+
+        setLogs(response.data?.logs || []);
+    };
+
+    useEffect(() => {
+        refresh();
+    }, []);
+
     const handleColorStatus = (status: string) => {
         if (status === 'failed') return { color: 'red' };
         if (status === 'pending') return { color: 'orange' };
@@ -60,8 +74,21 @@ export const Logs = ({ content }: LogsContent) => {
     };
 
     return (
-        <>
-            {content
+        <Box position="relative">
+            <Button
+                variant="contained"
+                onClick={refresh}
+                style={{
+                    position: 'fixed',
+                    right: 20,
+                    top: 30,
+                }}
+            >
+                Refresh
+            </Button>
+
+            {logs
+                .sort((a, b) => (a.when > b.when ? -1 : 1))
                 .map((item, index) => (
                     <Typography
                         key={item.when || index}
@@ -75,11 +102,10 @@ export const Logs = ({ content }: LogsContent) => {
                         <b>when:</b>
                         {item.when || ''} <br />
                     </Typography>
-                ))
-                .reverse()}
+                ))}
 
-            {!content.length && <Typography id="modal-modal-description">No logs</Typography>}
-        </>
+            {!logs.length && <Typography id="modal-modal-description">No logs</Typography>}
+        </Box>
     );
 };
 
@@ -180,11 +206,11 @@ export default function RequestConsignDetails({
                 <Stack gap={0} direction="row" justifyContent="space-between">
                     <Box display="flex" gap={1} alignItems={'center'}>
                         <Button
-                            disabled={['running', 'approved', 'canceled'].includes(status)}
+                            disabled={['approved', 'canceled'].includes(status)}
                             variant="contained"
                             onClick={handleApprove}
                         >
-                            Approve and Consign
+                            {status === 'running' ? 'Re-Approve and Consign' : 'Approve and Consign'}
                         </Button>
                         <Button variant="contained" onClick={handleOpenStore}>
                             Open in New Window
@@ -254,7 +280,7 @@ export default function RequestConsignDetails({
             </Box>
             {titleModal.includes('Logs') && (
                 <Modal open={open} handleClose={handleClose} title={titleModal}>
-                    <Logs content={logs} />
+                    <Logs requestId={requestId} />
                 </Modal>
             )}
             {titleModal.includes('Comments') && (

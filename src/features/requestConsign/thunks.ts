@@ -7,6 +7,7 @@ import {
     consign,
     eventsByTransaction,
     getRequestConsigns,
+    getRequestConsignsById,
     updateRequestConsignComments,
     updateRequestConsignCommentVisibility,
     updateStatusRequestConsign,
@@ -14,6 +15,7 @@ import {
 import { APIResponse } from '../common/types';
 import {
     GetRequestConsigns,
+    RequestConsign,
     RequestConsignAddComment,
     RequestConsignPaginatedResponse,
     RequestConsignUpdateCommentVisibility,
@@ -63,6 +65,11 @@ export function requestConsignGetThunk({
         return getRequestConsigns({ status, page, search }).finally(() => {
             dispatch(requestConsignActionsCreators.setFinishLoading());
         });
+    };
+}
+export function requestConsignByIdThunk(id: string): ReduxThunkAction<Promise<APIResponse<RequestConsign>>> {
+    return async function (dispatch, getState) {
+        return getRequestConsignsById(id);
     };
 }
 

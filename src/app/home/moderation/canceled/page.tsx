@@ -19,9 +19,8 @@ import { debounce } from '@mui/material/utils';
 
 const secdrawerWidth = 320;
 
-const ApprovedModerationPage = () => {
+const CanceledModerationPage = () => {
     const dispatch = useDispatch();
-
     const lgUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('lg'));
     const mdUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
 
@@ -44,7 +43,7 @@ const ApprovedModerationPage = () => {
     const debouncedSearch = useCallback(
         debounce(async (searchTerm) => {
             const response = await dispatch(
-                requestConsignGetThunk({ status: 'approved', search: searchTerm, page: 1 })
+                requestConsignGetThunk({ status: 'canceled', search: searchTerm, page: 1 })
             );
             if (response.data) {
                 const data = response.data;
@@ -68,13 +67,13 @@ const ApprovedModerationPage = () => {
     }, [search, debouncedSearch]);
 
     const handleSelect = (id: string) => {
-        const selectedRequestConsign = paginatedData.data.find((requestConsign) => requestConsign._id === id);
+        const selectedRequestConsign = paginatedData.data.find((item) => item._id === id);
 
         if (selectedRequestConsign) setSelected(selectedRequestConsign);
     };
 
     const handleRefresh = async () => {
-        const response = await dispatch(requestConsignGetThunk({ status: 'approved', page: 1 }));
+        const response = await dispatch(requestConsignGetThunk({ status: 'canceled', page: 1 }));
         if (response.data) {
             const data = response.data;
             setPaginatedData({
@@ -88,7 +87,7 @@ const ApprovedModerationPage = () => {
 
     const handleNextPage = async () => {
         const response = await dispatch(
-            requestConsignGetThunk({ status: 'approved', page: paginatedData.currentPage + 1 })
+            requestConsignGetThunk({ status: 'canceled', page: paginatedData.currentPage + 1 })
         );
         if (response.data) {
             const data = response.data;
@@ -103,7 +102,7 @@ const ApprovedModerationPage = () => {
 
     return (
         <PageContainer title="Request Consign" description="this is requests">
-            <Breadcrumb title="Request Consign Application" subtitle="List approved requests" />
+            <Breadcrumb title="Request Consign Application" subtitle="List canceled requests" />
             <AppCard>
                 <Box
                     sx={{
@@ -117,9 +116,9 @@ const ApprovedModerationPage = () => {
                         requestConsignId={selected ? selected._id : ''}
                         data={paginatedData.data}
                         onClick={({ _id }) => handleSelect(_id)}
+                        loading={status === 'loading'}
                         nextPage={handleNextPage}
                         hasMore={paginatedData.currentPage < paginatedData.totalPage}
-                        loading={status === 'loading'}
                     />
                 </Box>
 
@@ -159,4 +158,4 @@ const ApprovedModerationPage = () => {
     );
 };
 
-export default ApprovedModerationPage;
+export default CanceledModerationPage;

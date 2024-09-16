@@ -2,7 +2,13 @@ import axios from 'axios';
 import { apiService } from '@/services/api';
 import { APIResponse } from '../common/types';
 import { BASE_URL_BATCH } from '@/constants/api';
-import { RequestConsignAddComment, RequestConsignUpdateCommentVisibility } from './types';
+import {
+    GetRequestConsigns,
+    RequestConsign,
+    RequestConsignAddComment,
+    RequestConsignPaginatedResponse,
+    RequestConsignUpdateCommentVisibility,
+} from './types';
 
 export async function updateStatusRequestConsign({
     id,
@@ -10,7 +16,7 @@ export async function updateStatusRequestConsign({
     logs,
 }: {
     id: string;
-    status: 'approved' | 'rejected' | 'running' | 'error' | 'draft';
+    status: 'approved' | 'rejected' | 'running' | 'error' | 'draft' | 'canceled';
     logs?: any[];
 }): Promise<APIResponse> {
     const response = await apiService.patch(`/requestConsign/${id}`, {
@@ -39,4 +45,14 @@ export async function updateRequestConsignCommentVisibility({
     commentId,
 }: RequestConsignUpdateCommentVisibility) {
     return apiService.patch(`/requestConsign/comments/${id}/visibility`, { commentId, isPublic });
+}
+
+export async function getRequestConsigns({ status, page, search = '', limit = 25 }: GetRequestConsigns) {
+    return apiService.get<RequestConsignPaginatedResponse>(
+        `/requestConsign?status=${status}&page=${page}&limit=${limit}&search=${search}`
+    );
+}
+
+export async function getRequestConsignsById(id: string) {
+    return apiService.get<RequestConsign>(`/requestConsign/${id}`);
 }

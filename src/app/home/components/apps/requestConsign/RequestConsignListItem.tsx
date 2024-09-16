@@ -9,7 +9,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { useTheme } from '@mui/material/styles';
-import { IconCheck, IconHandOff, IconClock, IconX, IconUserCheck, IconUserOff } from '@tabler/icons-react';
+import { IconCheck, IconHandOff, IconClock, IconX, IconUserCheck, IconUserOff, IconBan } from '@tabler/icons-react';
 import { RequestConsign } from '@/features/requestConsign';
 import { CircularProgress } from '@mui/material';
 
@@ -25,17 +25,13 @@ export default function RequestConsignListItem({ onClick, creator, asset, active
     const handleStatusIcon = () => {
         if (status === 'error') return <IconX size="18" stroke={1.3} color="red" />;
 
-        if (status === 'running') {
-            return <CircularProgress size={18} thickness={5} color="inherit" />;
-        }
+        if (status === 'running') return <CircularProgress size={18} thickness={5} color="inherit" />;
 
-        if (status === 'approved') {
-            return <IconCheck size="18" stroke={1.3} color="green" />;
-        }
+        if (status === 'approved') return <IconCheck size="18" stroke={1.3} color="green" />;
 
-        if (status === 'rejected') {
-            return <IconHandOff size="18" stroke={1.3} />;
-        }
+        if (status === 'rejected') return <IconHandOff size="18" stroke={1.3} />;
+
+        if (status === 'canceled') return <IconBan size="18" stroke={1.3} />;
 
         return <IconClock size="18" stroke={1.3} />;
     };

@@ -4,15 +4,18 @@ import Box from '@mui/material/Box';
 import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
 import { IconSearch } from '@tabler/icons-react';
+import { IconButton, Tooltip } from '@mui/material';
+import { RefreshRounded } from '@mui/icons-material';
 
 type Props = {
-    search: string;
+    search: string | null;
     setSearch(value: string): void;
+    handleRefresh(): void;
 };
 
-export default function RequestConsignSearch({ search, setSearch }: Props) {
+export default function RequestConsignSearch({ search, setSearch, handleRefresh }: Props) {
     return (
-        <Box display="flex" sx={{ p: 2 }}>
+        <Box display="flex" gap={2} sx={{ p: 2 }}>
             <TextField
                 id="outlined-basic"
                 InputProps={{
@@ -29,6 +32,12 @@ export default function RequestConsignSearch({ search, setSearch }: Props) {
                 variant="outlined"
                 onChange={(e) => setSearch(e.target.value)}
             />
+
+            <Tooltip title="Refresh">
+                <IconButton onClick={handleRefresh}>
+                    <RefreshRounded />
+                </IconButton>
+            </Tooltip>
         </Box>
     );
 }

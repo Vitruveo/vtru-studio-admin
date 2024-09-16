@@ -85,6 +85,8 @@ const PendingModerationPage = () => {
         if (selected) {
             dispatch(requestConsignActionsCreators.setRequestConsign(selected));
             dispatch(consignThunk({ requestId: selected._id }));
+
+            handleRefresh();
         } else {
             dispatch(toastrActionsCreators.displayToastr({ message: 'No Asset selected', type: 'error' }));
         }
@@ -94,6 +96,8 @@ const PendingModerationPage = () => {
         if (selected) {
             dispatch(requestConsignActionsCreators.setRequestConsign(selected));
             dispatch(requestConsignUpdateStatusThunk(selected._id, 'rejected'));
+
+            handleRefresh();
         } else {
             dispatch(toastrActionsCreators.displayToastr({ message: 'No Asset selected', type: 'error' }));
         }
@@ -105,6 +109,8 @@ const PendingModerationPage = () => {
         if (selected) {
             dispatch(requestConsignActionsCreators.setRequestConsign(selected));
             dispatch(requestConsignUpdateStatusThunk(selected._id, 'canceled'));
+
+            handleRefresh();
         } else {
             dispatch(toastrActionsCreators.displayToastr({ message: 'No Asset selected', type: 'error' }));
         }

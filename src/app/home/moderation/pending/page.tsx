@@ -119,6 +119,8 @@ const PendingModerationPage = () => {
     };
 
     const handleRefresh = async () => {
+        setSelected(undefined);
+
         const response = await dispatch(requestConsignGetThunk({ status: 'pending', page: 1 }));
         if (response.data) {
             const data = response.data;

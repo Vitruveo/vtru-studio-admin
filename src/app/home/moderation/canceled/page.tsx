@@ -73,6 +73,8 @@ const CanceledModerationPage = () => {
     };
 
     const handleRefresh = async () => {
+        setSelected(undefined);
+
         const response = await dispatch(requestConsignGetThunk({ status: 'canceled', page: 1 }));
         if (response.data) {
             const data = response.data;

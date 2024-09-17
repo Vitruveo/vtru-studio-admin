@@ -42,7 +42,6 @@ interface SelectModalProps {
 }
 
 export interface CommentsContent {
-    content: CommentsProps[];
     requestId: string;
 }
 
@@ -109,32 +108,58 @@ export const Logs = ({ requestId }: LogsContent) => {
     );
 };
 
-export const Comments = ({ content = [], requestId }: CommentsContent) => {
+export const Comments = ({ requestId }: CommentsContent) => {
     const dispatch = useDispatch();
     const textRef = useRef<HTMLTextAreaElement>(null);
     const commentsEndRef = useRef<HTMLDivElement>(null);
 
-    const handleAddComment = () => {
+    const handleAddComment = async () => {
         const comment = textRef.current?.value;
         if (comment) {
-            dispatch(requestConsignAddCommentThunk({ id: requestId, comment }));
+            await dispatch(requestConsignAddCommentThunk({ id: requestId, comment }));
+            setTimeout(() => {
+                refresh();
+            }, 1_000);
             textRef.current.value = '';
         }
     };
 
-    const handleChangeVisibility = (e: ChangeEvent<HTMLInputElement>, commentId: string) => {
+    const handleChangeVisibility = async (e: ChangeEvent<HTMLInputElement>, commentId: string) => {
         const isPublic = e.target.checked;
-        dispatch(requestConsignUpdateCommentVisibilityThunk({ id: requestId, commentId, isPublic }));
+        await dispatch(requestConsignUpdateCommentVisibilityThunk({ id: requestId, commentId, isPublic }));
+        setTimeout(() => {
+            refresh();
+        }, 1_000);
+    };
+
+    const [comments, setComments] = useState<CommentsProps[]>([]);
+
+    const refresh = async () => {
+        const response = await dispatch(requestConsignByIdThunk(requestId));
+
+        setComments(response.data?.comments || []);
     };
 
     useEffect(() => {
-        commentsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [content]);
+        refresh();
+    }, []);
 
     return (
-        <Box display="flex" flexDirection="column" justifyContent="space-between" height="100%">
+        <Box position="relative" display="flex" flexDirection="column" justifyContent="space-between" height="100%">
+            <Button
+                variant="contained"
+                onClick={refresh}
+                style={{
+                    position: 'fixed',
+                    right: 20,
+                    top: 20,
+                }}
+            >
+                Refresh
+            </Button>
+
             <Box flexGrow={1} overflow="auto" mb={2}>
-                {content.map((item, index) => (
+                {comments.map((item, index) => (
                     <Box key={index} mt={2} border={'1px solid gray'} p={1} borderRadius={1}>
                         <Box display={'flex'} justifyContent={'space-between'}>
                             <Typography color="#763EBD">{item.username || ''}</Typography>
@@ -153,7 +178,7 @@ export const Comments = ({ content = [], requestId }: CommentsContent) => {
                         </Box>
                     </Box>
                 ))}
-                {!content.length && <Typography id="modal-modal-description">No Comments</Typography>}
+                {!comments.length && <Typography id="modal-modal-description">No Comments</Typography>}
                 <div ref={commentsEndRef} />
             </Box>
             <Box display="flex" justifyContent="space-between" height={'15%'} alignItems={'end'}>
@@ -285,7 +310,7 @@ export default function RequestConsignDetails({
             )}
             {titleModal.includes('Comments') && (
                 <Modal open={open} handleClose={handleClose} title={titleModal}>
-                    <Comments content={comments} requestId={requestId} />
+                    <Comments requestId={requestId} />
                 </Modal>
             )}
         </>

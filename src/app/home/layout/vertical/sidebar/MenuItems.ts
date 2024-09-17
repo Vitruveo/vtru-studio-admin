@@ -76,6 +76,12 @@ const Menuitems: MenuitemsType[] = [
             },
             {
                 id: uniqueId(),
+                title: 'Queue',
+                icon: IconLoader2,
+                href: '/home/moderation/queue',
+            },
+            {
+                id: uniqueId(),
                 title: 'Running',
                 icon: IconLoader2,
                 href: '/home/moderation/running',

@@ -120,6 +120,8 @@ const ErrorModerationPage = () => {
     };
 
     const handleRefresh = async () => {
+        setSelected(undefined);
+
         const response = await dispatch(requestConsignGetThunk({ status: 'error', page: 1 }));
         if (response.data) {
             const data = response.data;

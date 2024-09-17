@@ -43,9 +43,7 @@ const ApprovedModerationPage = () => {
 
     const debouncedSearch = useCallback(
         debounce(async (searchTerm) => {
-            const response = await dispatch(
-                requestConsignGetThunk({ status: 'approved', search: searchTerm, page: 1 })
-            );
+            const response = await dispatch(requestConsignGetThunk({ status: 'queue', search: searchTerm, page: 1 }));
             if (response.data) {
                 const data = response.data;
                 setPaginatedData({
@@ -76,7 +74,7 @@ const ApprovedModerationPage = () => {
     const handleRefresh = async () => {
         setSelected(undefined);
 
-        const response = await dispatch(requestConsignGetThunk({ status: 'approved', page: 1 }));
+        const response = await dispatch(requestConsignGetThunk({ status: 'queue', page: 1 }));
         if (response.data) {
             const data = response.data;
             setPaginatedData({
@@ -90,7 +88,7 @@ const ApprovedModerationPage = () => {
 
     const handleNextPage = async () => {
         const response = await dispatch(
-            requestConsignGetThunk({ status: 'approved', page: paginatedData.currentPage + 1 })
+            requestConsignGetThunk({ status: 'queue', page: paginatedData.currentPage + 1 })
         );
         if (response.data) {
             const data = response.data;

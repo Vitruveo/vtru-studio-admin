@@ -71,6 +71,8 @@ const RunningModerationPage = () => {
     };
 
     const handleRefresh = async () => {
+        setSelected(undefined);
+
         const response = await dispatch(requestConsignGetThunk({ status: 'running', page: 1 }));
         if (response.data) {
             const data = response.data;

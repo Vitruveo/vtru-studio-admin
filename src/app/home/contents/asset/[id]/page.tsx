@@ -15,6 +15,8 @@ import Modal from '@/app/home/components/modal';
 import CreatorDetails from '@/app/home/components/apps/creators/CreatorDetails';
 import { getCreatorByIdThunk } from '@/features/creator/thunks';
 import { localePrice } from '@/utils/locale/date';
+import { AssetType } from '@/app/home/types/apps/asset';
+import { getAssetById } from '@/features/assets/requests';
 
 const BCrumb = [
     { title: 'Home' },
@@ -30,7 +32,7 @@ interface Props {
 const AssetsOnePage = ({ params }: Props) => {
     const dispatch = useDispatch();
 
-    const asset = useSelector((state) => state.asset.byId[params.id]);
+    const [asset, setAsset] = useState<AssetType | null>(null);
     const creator = useSelector((state) =>
         asset?.framework?.createdBy ? state.creator.byId[asset.framework.createdBy] : null
     );
@@ -38,6 +40,17 @@ const AssetsOnePage = ({ params }: Props) => {
     const creatorsFormData = asset?.assetMetadata?.creators?.formData || [];
 
     const [open, setOpen] = useState<boolean>(false);
+
+    useEffect(() => {
+        const fetchAsset = async () => {
+            if (params.id) {
+                const assetData = await getAssetById(params.id);
+                if (assetData.data) setAsset(assetData.data);
+            }
+        };
+
+        fetchAsset();
+    }, [params.id]);
 
     useEffect(() => {
         if (asset?.framework?.createdBy) dispatch(getCreatorByIdThunk(asset.framework.createdBy));
@@ -52,7 +65,7 @@ const AssetsOnePage = ({ params }: Props) => {
     const handleClickPreview = () => {
         const isActive = asset?.consignArtwork?.status === 'active';
         const path = isActive ? creator?.username : 'preview';
-        const URL = `${BASE_URL_STORE}/${path}/${asset._id}`;
+        const URL = `${BASE_URL_STORE}/${path}/${asset?._id}`;
         window.open(URL, '_blank');
     };
 

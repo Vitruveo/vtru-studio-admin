@@ -7,7 +7,7 @@ import type {
     UpdateAssetStatusByIdParams,
     UpdateAssetsNudityParams,
 } from './types';
-import { AssetType } from '@/app/home/types/apps/asset';
+import { AssetPaginated, AssetType } from '@/app/home/types/apps/asset';
 import store from '@/store';
 import { BASE_URL_API } from '@/constants/api';
 import { APIResponse } from '../common/types';
@@ -28,8 +28,8 @@ export const getAssetById = (id: string) => {
     return apiService.get<AssetType>(`/assets/${id}`);
 };
 
-export const getAssetsByCreatorId = (creatorId: string) => {
-    return apiService.get<AssetType[]>(`/assets?creatorId=${creatorId}`);
+export const getAssetsByCreatorId = (creatorId: string, page?: number) => {
+    return apiService.get<AssetPaginated>(`/assets?creatorId=${creatorId}&page=${page ?? 1}`);
 };
 
 export const updateAssetsNudity = ({ ids, nudity }: UpdateAssetsNudityParams) => {

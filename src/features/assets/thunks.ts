@@ -107,6 +107,12 @@ export function setCurrentPageThunk(payload: number): ReduxThunkAction {
     };
 }
 
+export function setPageThunk(payload: number): ReduxThunkAction {
+    return function (dispatch) {
+        dispatch(assetActionsCreators.setPage(payload));
+    };
+}
+
 export function getAssetByIdThunk(id: string): ReduxThunkAction {
     return async function (dispatch, getState) {
         const response = await getAssetById(id);
@@ -116,11 +122,15 @@ export function getAssetByIdThunk(id: string): ReduxThunkAction {
 }
 
 export const getAssetsByCreatorIdThunk =
-    (creatorId: string): ReduxThunkAction =>
+    (creatorId: string, page?: number): ReduxThunkAction =>
     async (dispatch) => {
-        const response = await getAssetsByCreatorId(creatorId);
+        const response = await getAssetsByCreatorId(creatorId, page);
 
-        if (response.data) dispatch(assetActionsCreators.setAssets(response.data));
+        if (response.data) {
+            dispatch(assetActionsCreators.setAssets(response.data.data));
+            dispatch(assetActionsCreators.setTotal(response.data.total));
+            dispatch(assetActionsCreators.setTotalPage(response.data.totalPage));
+        }
     };
 
 export const updateAssetsNudityThunk = (data: UpdateAssetsNudityParams): ReduxThunkAction => {

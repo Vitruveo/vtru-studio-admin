@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
-import { Button, CircularProgress, Grid, Switch } from '@mui/material';
+import { useEffect, useRef } from 'react';
+import { Button, CircularProgress, Grid, Pagination, Switch } from '@mui/material';
 import Avatar from '@mui/material/Avatar';
 import Image from 'next/image';
 import Box from '@mui/material/Box';
@@ -13,7 +13,7 @@ import { updateVaultStatethunk } from '@/features/creator/thunks';
 import { BASE_URL_STORE } from '@/constants/api';
 import { AssetType } from '@/app/home/types/apps/asset';
 import { localePrice } from '@/utils/locale/date';
-import { getAssetsByCreatorIdThunk } from '@/features/assets/thunks';
+import { getAssetsByCreatorIdThunk, setPageThunk } from '@/features/assets/thunks';
 
 interface Props {
     creatorId: string;
@@ -32,10 +32,17 @@ export default function CreatorDetails({ creatorId, hiddenPreview = false }: Pro
             .map((id) => state.asset.byId[id])
             .filter((asset) => asset?.framework?.createdBy === creatorId)
     );
+    const { page, totalPage } = useSelector((state) => state.asset);
+    const topRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         dispatch(getAssetsByCreatorIdThunk(creatorId));
+        dispatch(setPageThunk(1));
     }, [creatorId]);
+
+    useEffect(() => {
+        if (topRef.current) topRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+    }, [page]);
 
     const handleClickPreview = (item: AssetType) => {
         if (item) {
@@ -149,9 +156,10 @@ export default function CreatorDetails({ creatorId, hiddenPreview = false }: Pro
                     <Box
                         sx={{
                             width: '100%',
-                            height: 170,
+                            maxHeight: '29vh',
                             overflowY: 'auto',
                         }}
+                        ref={topRef}
                     >
                         <Box>
                             {assets.map((item, index) => (
@@ -173,6 +181,20 @@ export default function CreatorDetails({ creatorId, hiddenPreview = false }: Pro
                             ))}
                         </Box>
                     </Box>
+                    <Pagination
+                        count={totalPage}
+                        page={page}
+                        color="primary"
+                        onChange={(_event, value) => {
+                            dispatch(getAssetsByCreatorIdThunk(creatorId, value));
+                            dispatch(setPageThunk(value));
+                        }}
+                        sx={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            marginTop: 2,
+                        }}
+                    />
                 </Box>
             )}
         </Box>

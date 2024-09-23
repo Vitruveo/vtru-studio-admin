@@ -9,6 +9,10 @@ const initialState: InitialState = {
     creator: '',
     filter: 'all',
     currentPage: 1,
+    page: 1,
+    limit: 24,
+    total: 0,
+    totalPage: 1,
 };
 
 export const assetSlice = createSlice({
@@ -54,6 +58,15 @@ export const assetSlice = createSlice({
         },
         setCurrentPage: (state, action: PayloadAction<number>) => {
             state.currentPage = action.payload;
+        },
+        setTotal: (state, action: PayloadAction<number>) => {
+            state.total = action.payload;
+        },
+        setTotalPage: (state, action: PayloadAction<number>) => {
+            state.totalPage = action.payload;
+        },
+        setPage: (state, action: PayloadAction<number>) => {
+            state.page = action.payload;
         },
     },
 });

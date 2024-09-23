@@ -1,5 +1,15 @@
 import { CreatorType } from '@/features/creator';
 
+export interface AssetPaginated {
+    data: AssetType[];
+    limit: number;
+    page: number;
+    total: number;
+    totalPage: number;
+    collection: string;
+    collections: { collection: string }[];
+}
+
 export interface AssetType {
     _id: string;
     formats: Formats;

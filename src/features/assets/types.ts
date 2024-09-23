@@ -49,6 +49,10 @@ export interface InitialState {
     creator: string;
     filter: ChangeFilterParams;
     currentPage: number;
+    page: number;
+    limit: number;
+    total: number;
+    totalPage: number;
 }
 
 export type ChangeFilterParams = 'all' | 'blocked' | 'consigned' | 'active';

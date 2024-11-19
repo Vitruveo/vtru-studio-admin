@@ -147,7 +147,7 @@ const ApprovedModerationPage = () => {
                             status={selected.status}
                             logs={selected?.logs}
                             comments={selected?.comments}
-                            approvedBy={selected.approvedBy}
+                            approvedBy={selected?.approvedBy}
                             handleApprove={() => {}}
                             handleReject={() => {}}
                             handleCancel={() => {}}

@@ -30,6 +30,7 @@ interface Props {
     }[];
     logs?: LogsProps[];
     comments?: CommentsProps[];
+    approvedBy?: string;
     status: string;
     handleApprove: () => void;
     handleReject: () => void;
@@ -200,6 +201,7 @@ export default function RequestConsignDetails({
     requestId,
     username,
     title,
+    approvedBy,
     emails,
     assetId,
     status,
@@ -278,6 +280,7 @@ export default function RequestConsignDetails({
             <Box display="flex" gap={1} p={2}>
                 <Typography>Title: {title}</Typography>
                 <Typography>Username: {username}</Typography>
+                {approvedBy && <Typography>Approved by: {approvedBy}</Typography>}
 
                 {emails.map((item) => (
                     <Typography key={item.email}>Email: {item.email}</Typography>

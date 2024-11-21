@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { apiService } from '@/services/api';
+import { apiBatchService } from '@/services/apiBatch';
 import { APIResponse } from '../common/types';
 import { BASE_URL_BATCH } from '@/constants/api';
 import {
@@ -28,7 +29,7 @@ export async function updateStatusRequestConsign({
 }
 
 export async function consign(id: string) {
-    return axios.post(`${BASE_URL_BATCH}/consign/${id}`);
+    return apiBatchService.post(`/consign/${id}`, {});
 }
 
 export async function eventsByTransaction(transaction: string) {

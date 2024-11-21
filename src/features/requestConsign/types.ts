@@ -24,6 +24,7 @@ export interface RequestConsign {
     transaction?: string;
     logs?: LogsProps[];
     comments?: CommentsProps[];
+    approvedBy?: string;
 }
 
 export interface CommentsProps {

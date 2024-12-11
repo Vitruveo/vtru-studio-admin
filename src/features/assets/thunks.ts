@@ -9,12 +9,17 @@ import {
     updateManyAssetsStatusByIds,
     updateAssetsNudity,
     getAssetsPaginated,
+    getAssetsArtCards,
+    updateAssetArtCards,
 } from './requests';
 import type {
     ChangeFilterParams,
+    GetAssetsArtCardsParams,
+    GetAssetsArtCardsResponse,
     GetAssetsByCreatorIdResponse,
     GetAssetsPaginatedParams,
     GetCreatorNameByAssetIdParams,
+    UpdateAssetArtCardsParams,
     UpdateAssetStatusByIdParams,
     UpdateAssetsNudityParams,
     UpdateManyAssetsStatusByIdsParams,
@@ -45,6 +50,21 @@ export function getAssetsPaginatedThunk(
         const response = await getAssetsPaginated(params);
 
         return response.data.data!;
+    };
+}
+export function getAssetArtCardsThunk(
+    params: GetAssetsArtCardsParams
+): ReduxThunkAction<Promise<GetAssetsArtCardsResponse>> {
+    return async function () {
+        const response = await getAssetsArtCards(params);
+
+        return response.data.data!;
+    };
+}
+
+export function updateAssetArtCardsThunk(params: UpdateAssetArtCardsParams): ReduxThunkAction {
+    return async function () {
+        await updateAssetArtCards(params);
     };
 }
 

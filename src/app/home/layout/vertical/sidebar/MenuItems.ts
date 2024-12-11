@@ -94,6 +94,32 @@ const Menuitems: MenuitemsType[] = [
             },
         ],
     },
+    {
+        id: uniqueId(),
+        title: 'Art Cards',
+        icon: IconAperture,
+        // permission: 'moderator',
+        children: [
+            {
+                id: uniqueId(),
+                title: 'Pending',
+                icon: IconClock,
+                href: '/home/moderationArtCards/pending',
+            },
+            {
+                id: uniqueId(),
+                title: 'Approved',
+                icon: IconCheck,
+                href: '/home/moderationArtCards/approved',
+            },
+            {
+                id: uniqueId(),
+                title: 'Rejected',
+                icon: IconHandOff,
+                href: '/home/moderationArtCards/rejected',
+            },
+        ],
+    },
     // {
     //     id: uniqueId(),
     //     title: 'Allow List',

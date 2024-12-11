@@ -80,6 +80,7 @@ export interface Licenses {
     stream: Stream;
     print: Print;
     remix: Remix;
+    artCards: ArtCards;
 }
 
 export interface Nft {
@@ -110,6 +111,12 @@ export interface Unlimited {
 export interface Stream {
     version: string;
     added: boolean;
+}
+
+export interface ArtCards {
+    version: string;
+    added: boolean;
+    status: string;
 }
 
 export interface Print {

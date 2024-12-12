@@ -3,7 +3,8 @@ import { ReduxThunkAction } from '@/store';
 import { BASE_URL_API } from '@/constants/api';
 import { creatorActionsCreators } from './slice';
 import { toastrActionsCreators } from '../toastr/slice';
-import { getCreatorById, updateVaultState } from './requests';
+import { getCreatorById, updateLicense, updateVaultState } from './requests';
+import { UpdateLicenseOptions } from './types';
 
 export function getCreatorsThunk(): ReduxThunkAction {
     return async function (dispatch, getState) {
@@ -81,5 +82,14 @@ export function getCreatorByIdThunk(id: string): ReduxThunkAction {
         const response = await getCreatorById(id);
 
         if (response.data) dispatch(creatorActionsCreators.setCreator(response.data));
+    };
+}
+
+export function updateLicenseThunk(id: string, data: UpdateLicenseOptions): ReduxThunkAction {
+    return async function (dispatch, getState) {
+        await updateLicense(id, data);
+
+        dispatch(creatorActionsCreators.setCreatorLicenseArtCards({ id, value: data.value }));
+        dispatch(toastrActionsCreators.displayToastr({ type: 'success', message: 'Licenses updated' }));
     };
 }

@@ -157,6 +157,13 @@ const Menuitems: MenuitemsType[] = [
         permission: 'asset',
     },
     {
+        id: uniqueId(),
+        title: 'Templates',
+        icon: IconChartDonut3,
+        href: '/home/templates',
+        // permission: 'asset',
+    },
+    {
         navlabel: true,
         subheader: 'Settings',
     },

@@ -6,7 +6,7 @@ import { io } from 'socket.io-client';
 import { nanoid } from '@reduxjs/toolkit';
 import { Form, Formik, useFormikContext } from 'formik';
 import { useDispatch, useSelector } from '@/store/hooks';
-import { BASE_URL_ARTCARDS } from '@/constants/api';
+import { BASE_URL_API } from '@/constants/api';
 import { TOKEN_ADMINS, WS_SERVER_URL } from '@/constants/ws';
 import { ARTCARDS_TEMPLATES_STORAGE_URL } from '@/constants/tempĺates';
 import { toastrActionsCreators } from '@/features/toastr/slice';
@@ -227,7 +227,7 @@ export default function TemplatesPages() {
 
                     const extension = mimetype.split('/')[1];
 
-                    fetch(`${BASE_URL_ARTCARDS}/admin/template/json/upload`, {
+                    fetch(`${BASE_URL_API}/templates/json/upload`, {
                         method: 'post',
                         body: JSON.stringify({
                             values: {
@@ -316,7 +316,7 @@ export default function TemplatesPages() {
                     ['Content-Type']: mimetype,
                 };
 
-                fetch(`${BASE_URL_ARTCARDS}/admin/template/image/upload`, {
+                fetch(`${BASE_URL_API}/templates/image/upload`, {
                     method: 'post',
                     body: JSON.stringify({
                         mimetype,

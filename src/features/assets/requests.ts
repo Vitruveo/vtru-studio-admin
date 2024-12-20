@@ -1,6 +1,9 @@
 import axios from 'axios';
 import { apiService } from '@/services/api';
 import type {
+    GetAssetsArtCardsResponse,
+    UpdateAssetArtCardsParams,
+    GetAssetsArtCardsParams,
     GetAssetsByCreatorIdResponse,
     GetAssetsPaginatedParams,
     GetCreatorNameByAssetIdParams,
@@ -43,4 +46,25 @@ export const getAssetsPaginated = (params: GetAssetsPaginatedParams) => {
         },
         params,
     });
+};
+
+export const getAssetsArtCards = (params: GetAssetsArtCardsParams) => {
+    return axios.get<APIResponse<GetAssetsArtCardsResponse>>(`${BASE_URL_API}/assets/artCards`, {
+        headers: {
+            Authorization: `Bearer ${store.getState().auth.token}`,
+        },
+        params,
+    });
+};
+
+export const updateAssetArtCards = (params: UpdateAssetArtCardsParams) => {
+    return axios.patch(
+        `${BASE_URL_API}/assets/artCards/${params.id}`,
+        { status: params.status },
+        {
+            headers: {
+                Authorization: `Bearer ${store.getState().auth.token}`,
+            },
+        }
+    );
 };

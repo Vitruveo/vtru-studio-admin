@@ -12,6 +12,9 @@ export interface CreatorType {
         isBlocked: boolean;
         isTrusted: boolean;
     };
+    licenses?: {
+        artCards: number;
+    };
 }
 
 export interface InitialState {
@@ -24,4 +27,9 @@ export interface InitialState {
 export interface UpdateVaultStateOptions {
     vaultAddress: string;
     state: boolean;
+}
+
+export interface UpdateLicenseOptions {
+    license: string;
+    value: number;
 }

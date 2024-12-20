@@ -18,6 +18,26 @@ export interface GetAssetsPaginatedParams {
     sort?: Record<string, unknown>;
 }
 
+export interface UpdateAssetArtCardsParams {
+    id: string;
+    status: string;
+}
+
+export interface GetAssetsArtCardsParams {
+    page: number;
+    limit: number;
+    status: string;
+    search?: string;
+}
+export interface GetAssetsArtCardsResponse {
+    data: AssetType[];
+
+    page: number;
+    totalPage: number;
+    total: number;
+    limit: number;
+}
+
 export interface GetAssetsByCreatorIdResponse {
     data: AssetType[];
     limit: number;

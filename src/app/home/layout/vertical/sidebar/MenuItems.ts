@@ -94,6 +94,32 @@ const Menuitems: MenuitemsType[] = [
             },
         ],
     },
+    {
+        id: uniqueId(),
+        title: 'Art Cards',
+        icon: IconAperture,
+        // permission: 'moderator',
+        children: [
+            {
+                id: uniqueId(),
+                title: 'Pending',
+                icon: IconClock,
+                href: '/home/moderationArtCards/pending',
+            },
+            {
+                id: uniqueId(),
+                title: 'Approved',
+                icon: IconCheck,
+                href: '/home/moderationArtCards/approved',
+            },
+            {
+                id: uniqueId(),
+                title: 'Rejected',
+                icon: IconHandOff,
+                href: '/home/moderationArtCards/rejected',
+            },
+        ],
+    },
     // {
     //     id: uniqueId(),
     //     title: 'Allow List',
@@ -129,6 +155,13 @@ const Menuitems: MenuitemsType[] = [
         icon: IconChartDonut3,
         href: '/home/contents/assets',
         permission: 'asset',
+    },
+    {
+        id: uniqueId(),
+        title: 'Templates',
+        icon: IconChartDonut3,
+        href: '/home/templates',
+        // permission: 'asset',
     },
     {
         navlabel: true,

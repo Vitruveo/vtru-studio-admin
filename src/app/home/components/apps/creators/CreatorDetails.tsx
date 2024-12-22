@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react';
-import { Button, CircularProgress, Grid, Pagination, Switch } from '@mui/material';
+import { useEffect, useRef, useState } from 'react';
+import { Button, CircularProgress, Grid, Pagination, Switch, TextField } from '@mui/material';
 import Avatar from '@mui/material/Avatar';
 import Image from 'next/image';
 import Box from '@mui/material/Box';
@@ -9,7 +9,7 @@ import Typography from '@mui/material/Typography';
 import emailIcon from 'public/images/breadcrumb/emailSv.png';
 import { websocketSelector } from '@/features/ws';
 import { useDispatch, useSelector } from '@/store/hooks';
-import { updateVaultStatethunk } from '@/features/creator/thunks';
+import { updateLicenseThunk, updateVaultStatethunk } from '@/features/creator/thunks';
 import { BASE_URL_STORE } from '@/constants/api';
 import { AssetType } from '@/app/home/types/apps/asset';
 import { localePrice } from '@/utils/locale/date';
@@ -34,6 +34,16 @@ export default function CreatorDetails({ creatorId, hiddenPreview = false }: Pro
     );
     const { page, totalPage } = useSelector((state) => state.asset);
     const topRef = useRef<HTMLDivElement>(null);
+
+    const [licenses, setLicenses] = useState({
+        artCards: creator?.licenses?.artCards ?? 3,
+    });
+
+    useEffect(() => {
+        setLicenses({
+            artCards: creator?.licenses?.artCards ?? 3,
+        });
+    }, [creator]);
 
     useEffect(() => {
         dispatch(getAssetsByCreatorIdThunk(creatorId));
@@ -145,6 +155,35 @@ export default function CreatorDetails({ creatorId, hiddenPreview = false }: Pro
                         </Typography>
                         {status === 'loading' && <CircularProgress size={20} />}
                     </Box>
+                </Box>
+                <Divider />
+            </Box>
+
+            <Box>
+                <Typography variant="h5" p={1} pb={1}>
+                    Licenses Art Cards
+                </Typography>
+                <Box p={1} pt={2} display="flex" gap={2}>
+                    <TextField
+                        label="Total Licenses"
+                        size="small"
+                        type="number"
+                        value={licenses.artCards}
+                        onChange={(e) => setLicenses({ ...licenses, artCards: Number(e.target.value) })}
+                    />
+                    <Button
+                        variant="contained"
+                        onClick={() => {
+                            dispatch(
+                                updateLicenseThunk(creator._id, {
+                                    license: 'artCards',
+                                    value: licenses.artCards,
+                                })
+                            );
+                        }}
+                    >
+                        Save
+                    </Button>
                 </Box>
                 <Divider />
             </Box>

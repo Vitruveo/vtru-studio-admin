@@ -26,6 +26,15 @@ export const creatorSlice = createSlice({
             };
             state.allIds = Object.keys(state.byId);
         },
+        setCreatorLicenseArtCards: (state, action: PayloadAction<{ id: string; value: number }>) => {
+            if (!state.byId[action.payload.id].licenses) {
+                state.byId[action.payload.id].licenses = {
+                    artCards: 0,
+                };
+            }
+
+            state.byId[action.payload.id].licenses!.artCards = action.payload.value;
+        },
         setVaultIsBlockedById: (state, action: PayloadAction<{ id: string; isBlocked: boolean }>) => {
             state.byId[action.payload.id].vault.isBlocked = action.payload.isBlocked;
         },

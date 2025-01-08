@@ -33,3 +33,19 @@ export interface UpdateLicenseOptions {
     license: string;
     value: number;
 }
+
+export interface GetCreatorsPaginatedParams {
+    page: number;
+    limit: number;
+    username?: string;
+    email?: string;
+}
+
+export interface GetCreatorsPaginatedResponse {
+    data: CreatorType[];
+
+    page: number;
+    totalPage: number;
+    total: number;
+    limit: number;
+}

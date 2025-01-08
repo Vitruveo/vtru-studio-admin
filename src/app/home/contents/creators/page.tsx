@@ -151,6 +151,8 @@ export default function Creators() {
                             setCreatorId(creator._id);
                         }}
                         loading={loadingCreators}
+                        nextPage={handleNextPage}
+                        hasMore={paginatedData.currentPage < paginatedData.totalPage}
                     />
                 </Box>
 

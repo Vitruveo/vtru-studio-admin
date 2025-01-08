@@ -37,8 +37,9 @@ export interface UpdateLicenseOptions {
 export interface GetCreatorsPaginatedParams {
     page: number;
     limit: number;
-    username?: string;
-    email?: string;
+    search?: string;
+    isBlocked?: boolean;
+    ids?: string[];
 }
 
 export interface GetCreatorsPaginatedResponse {

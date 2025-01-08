@@ -7,7 +7,7 @@ import { getCreatorById, getCreatorsPaginated, updateLicense, updateVaultState }
 import { GetCreatorsPaginatedParams, GetCreatorsPaginatedResponse, UpdateLicenseOptions } from './types';
 
 export function getCreatorsThunk(): ReduxThunkAction {
-    return async function(dispatch, getState) {
+    return async function (dispatch, getState) {
         const state = getState();
         const token = state.auth.token;
 
@@ -51,7 +51,7 @@ export function getCreatorsThunk(): ReduxThunkAction {
 export function getCreatorsPaginatedThunk(
     params: GetCreatorsPaginatedParams
 ): ReduxThunkAction<Promise<GetCreatorsPaginatedResponse>> {
-    return async function() {
+    return async function () {
         const response = await getCreatorsPaginated(params);
 
         return response.data.data!;
@@ -59,7 +59,7 @@ export function getCreatorsPaginatedThunk(
 }
 
 export function deleteCreatorThunk(id: string): ReduxThunkAction {
-    return async function(dispatch, getState) {
+    return async function (dispatch, _getState) {
         return new Promise((resolve) => {
             dispatch(creatorActionsCreators.removeCreator({ id }));
             resolve();
@@ -68,7 +68,7 @@ export function deleteCreatorThunk(id: string): ReduxThunkAction {
 }
 
 export function updateVaultStatethunk({ id }: { id: string }): ReduxThunkAction {
-    return async function(dispatch, getState) {
+    return async function (dispatch, getState) {
         dispatch(creatorActionsCreators.setStatus('loading'));
 
         const creator = getState().creator.byId[id];
@@ -88,7 +88,7 @@ export function updateVaultStatethunk({ id }: { id: string }): ReduxThunkAction 
 }
 
 export function getCreatorByIdThunk(id: string): ReduxThunkAction {
-    return async function(dispatch, getState) {
+    return async function (dispatch, _getState) {
         const response = await getCreatorById(id);
 
         if (response.data) dispatch(creatorActionsCreators.setCreator(response.data));
@@ -96,7 +96,7 @@ export function getCreatorByIdThunk(id: string): ReduxThunkAction {
 }
 
 export function updateLicenseThunk(id: string, data: UpdateLicenseOptions): ReduxThunkAction {
-    return async function(dispatch, getState) {
+    return async function (dispatch, _getState) {
         await updateLicense(id, data);
 
         dispatch(creatorActionsCreators.setCreatorLicenseArtCards({ id, value: data.value }));

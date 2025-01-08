@@ -20,7 +20,20 @@ export interface RoleSliceState {
     error: string;
 }
 
-export type RoleApiResFindMany = APIResponse<Role[]>;
+export interface GetRolesPaginatedParams {
+    page: number;
+    limit: number;
+    search?: string;
+}
+
+export interface GetRolesPaginatedResponse {
+    data: Role[];
+    page: number;
+    totalPage: number;
+    total: number;
+    limit: number;
+}
+
 export type RoleApiResFindOne = APIResponse<Role>;
 
 export interface RoleReqDelete {

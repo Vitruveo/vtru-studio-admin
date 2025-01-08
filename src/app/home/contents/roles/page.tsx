@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -15,12 +15,11 @@ import RoleSearch from '@/app/home/components/apps/roles/RoleSearch';
 import RoleFilter from '@/app/home/components/apps/roles/RoleFilter';
 import AppCard from '@/app/home/components/shared/AppCard';
 import { useDispatch } from '@/store/hooks';
-import { roleDeleteThunk } from '@/features/role/thunks';
+import { roleDeleteThunk, roleGetPaginatedThunk } from '@/features/role/thunks';
 import RoleAdd from '../../components/apps/roles/RoleAdd';
 import { RoleDialogDelete } from '../../components/apps/roles/RoleDialogDelete';
-import { useLiveStream } from '../../components/liveStream';
 import { RoleType } from '@/mock/roles';
-import { CREATED_ROLE, DELETED_ROLE, EVENTS_ROLES, LIST_ROLES, UPDATED_ROLE } from '../../components/liveStream/events';
+import { debounce } from '@mui/material/utils';
 
 const drawerWidth = 240;
 const secdrawerWidth = 320;
@@ -37,41 +36,47 @@ export default function Roles() {
     const [roleDelete, setRoleDelete] = useState({ name: '', id: '' });
     const [isLeftSidebarOpen, setLeftSidebarOpen] = useState(false);
     const [isRightSidebarOpen, setRightSidebarOpen] = useState(false);
-
-    const { chunk: roles, loading: loadingRoles } = useLiveStream<RoleType>({
-        event: {
-            list: LIST_ROLES,
-            update: UPDATED_ROLE,
-            delete: DELETED_ROLE,
-            create: CREATED_ROLE,
-        },
-        listemEvents: EVENTS_ROLES,
+    const [paginatedData, setPaginatedData] = useState<{
+        currentPage: number;
+        data: RoleType[];
+        total: number;
+        totalPage: number;
+    }>({
+        currentPage: 0,
+        data: [],
+        total: 0,
+        totalPage: 0,
     });
 
+    const debouncedSearch = useCallback(
+        debounce(async (searchTerm) => {
+            const response = await dispatch(roleGetPaginatedThunk({ search: searchTerm, page: 1, limit: 10 }));
+            setPaginatedData({
+                data: response.data,
+                currentPage: response.page,
+                total: response.total,
+                totalPage: response.totalPage,
+            });
+        }, 500),
+        [dispatch]
+    );
+
     useEffect(() => {
-        if (!roleId && roles.length >= 1) {
-            setRoleId(roles[0]._id);
+        handleNextPage();
+    }, []);
+
+    useEffect(() => {
+        if (!roleId && paginatedData.data.length >= 1) {
+            setRoleId(paginatedData.data[0]._id);
         }
-    }, [roles]);
+    }, [paginatedData.data]);
 
-    const rolesFiltered = useMemo(() => {
-        return search.length > 0 ? roles.filter((role) => role.name.toLowerCase().includes(search.toLowerCase())) : [];
-    }, [search, roles]);
-
-    const rolesCategoryFiltered = useMemo(() => {
-        return category.length > 0
-            ? roles.filter((role) => {
-                  return role.permissions.some((permission) => {
-                      const [categoryName] = permission.split(':');
-
-                      return category.toLowerCase() === categoryName.toLowerCase();
-                  });
-              })
-            : [];
-    }, [category, roles]);
+    useEffect(() => {
+        if (search !== null) debouncedSearch(search);
+    }, [search, debouncedSearch]);
 
     const categories = useMemo(() => {
-        return roles
+        return paginatedData.data
             .reduce((acc: string[], role) => {
                 role.permissions.forEach((permission) => {
                     const [categoryName] = permission.split(':');
@@ -84,7 +89,7 @@ export default function Roles() {
                 return acc;
             }, [])
             .sort();
-    }, [roles]);
+    }, [paginatedData.data]);
 
     const onDeleteClick = ({ id, name }: { id: string; name: string }) => {
         setIsOpenDialogDelete(true);
@@ -99,6 +104,19 @@ export default function Roles() {
         if (id === roleId) setRoleId('');
         setIsOpenDialogDelete(false);
     };
+
+    const handleNextPage = async () => {
+        const response = await dispatch(roleGetPaginatedThunk({ page: paginatedData.currentPage + 1, limit: 10 }));
+        if (response.data.length) {
+            setPaginatedData((prev) => ({
+                data: [...prev.data, ...response.data],
+                currentPage: response.page,
+                total: response.total,
+                totalPage: response.totalPage,
+            }));
+        }
+    };
+
     return (
         <PageContainer title="Role" description="this is Role">
             <Breadcrumb title="Roles Application" subtitle="List Your Roles" />
@@ -135,13 +153,11 @@ export default function Roles() {
                     <RoleSearch onClick={() => setLeftSidebarOpen(true)} search={search} setSearch={setSearch} />
                     <RoleList
                         roleId={roleId}
-                        data={
-                            (search.length > 0 && rolesFiltered) ||
-                            (category.length > 0 && rolesCategoryFiltered) ||
-                            roles
-                        }
+                        data={paginatedData.data}
                         onDeleteClick={onDeleteClick}
                         onRoleClick={({ id }) => setRoleId(id)}
+                        nextPage={handleNextPage}
+                        hasMore={paginatedData.currentPage < paginatedData.totalPage}
                     />
                 </Box>
 

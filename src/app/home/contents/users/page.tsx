@@ -1,10 +1,11 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Drawer from '@mui/material/Drawer';
 import { Theme } from '@mui/material/styles';
+import { debounce } from '@mui/material/utils';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
 import PageContainer from '@/app/home/components/container/PageContainer';
@@ -20,22 +21,10 @@ import { userDeleteThunk } from '@/features/user/slice';
 import UserAdd from '../../components/apps/users/UserAdd';
 
 import { UserDialogDelete } from '../../components/apps/users/UserDialogDelete';
-import { userAddThunk, userUpdateThunk } from '@/features/user/thunks';
-import {
-    CREATED_ROLE,
-    CREATED_USER,
-    DELETED_ROLE,
-    DELETED_USER,
-    EVENTS_ROLES,
-    EVENTS_USERS,
-    LIST_ROLES,
-    LIST_USERS,
-    UPDATED_ROLE,
-    UPDATED_USER,
-} from '../../components/liveStream/events';
-import { useLiveStream } from '../../components/liveStream';
-import { UserType } from '@/mock/users';
-import { RoleType } from '@/mock/roles';
+import { userAddThunk, userGetPaginatedThunk, userUpdateThunk } from '@/features/user/thunks';
+import { User } from '@/features/user/types';
+import { Role } from '@/features/role/types';
+import { roleGetPaginatedThunk } from '@/features/role/thunks';
 
 const drawerWidth = 240;
 const secdrawerWidth = 320;
@@ -50,40 +39,55 @@ export default function Users() {
 
     const usersById = useSelector((state) => state.user.byId);
 
-    const { chunk: users, loading: loadingCreators } = useLiveStream<UserType>({
-        event: {
-            list: LIST_USERS,
-            update: UPDATED_USER,
-            delete: DELETED_USER,
-            create: CREATED_USER,
-        },
-        listemEvents: EVENTS_USERS,
-    });
-
-    const { chunk: roles, loading: loadingRoles } = useLiveStream<RoleType>({
-        event: {
-            list: LIST_ROLES,
-            update: UPDATED_ROLE,
-            delete: DELETED_ROLE,
-            create: CREATED_ROLE,
-        },
-        listemEvents: EVENTS_ROLES,
-    });
-
     const [search, setSearch] = useState('');
     const [userId, setUserId] = useState('');
     const [isOpenDialogDelete, setIsOpenDialogDelete] = useState(false);
     const [userDelete, setUserDelete] = useState({ email: '', id: '' });
+    const [loadingCreators, setLoadingCreators] = useState(false);
+    const [loadingRoles, setLoadingRoles] = useState(false);
+    const [paginatedData, setPaginatedData] = useState<{
+        currentPage: number;
+        data: User[];
+        total: number;
+        totalPage: number;
+    }>({
+        currentPage: 0,
+        data: [],
+        total: 0,
+        totalPage: 0,
+    });
+    const [paginatedRoles, setPaginatedRoles] = useState<{
+        currentPage: number;
+        data: Role[];
+        total: number;
+        totalPage: number;
+    }>({
+        currentPage: 0,
+        data: [],
+        total: 0,
+        totalPage: 0,
+    });
 
-    const usersFiltered = useMemo(() => {
-        return search.length > 0
-            ? users.filter(
-                  (user) =>
-                      user.name.toLowerCase().includes(search.toLowerCase()) ||
-                      user.login.email.toLowerCase().includes(search.toLowerCase())
-              )
-            : [];
-    }, [search, users]);
+    const debouncedSearch = useCallback(
+        debounce(async (searchTerm) => {
+            const response = await dispatch(userGetPaginatedThunk({ search: searchTerm, page: 1, limit: 10 }));
+            setPaginatedData({
+                data: response.data,
+                currentPage: response.page,
+                total: response.total,
+                totalPage: response.totalPage,
+            });
+        }, 500),
+        [dispatch]
+    );
+
+    useEffect(() => {
+        handleNextPage();
+    }, []);
+
+    useEffect(() => {
+        if (search !== null) debouncedSearch(search);
+    }, [search, debouncedSearch]);
 
     const onDeleteClick = ({ id, email }: { id: string; email: string }) => {
         setIsOpenDialogDelete(true);
@@ -107,6 +111,33 @@ export default function Users() {
     const handleUpdateUser = useCallback(({ id, name }: { id: string; name: string }) => {
         dispatch(userUpdateThunk({ ...usersById[id], _id: id, name }));
     }, []);
+
+    const handleNextPage = async () => {
+        setLoadingCreators(true);
+        const response = await dispatch(userGetPaginatedThunk({ page: paginatedData.currentPage + 1, limit: 10 }));
+        if (response.data.length) {
+            setPaginatedData((prev) => ({
+                data: [...prev.data, ...response.data],
+                currentPage: response.page,
+                total: response.total,
+                totalPage: response.totalPage,
+            }));
+        }
+        setLoadingCreators(false);
+        setLoadingRoles(true);
+        const responseRoles = await dispatch(
+            roleGetPaginatedThunk({ page: paginatedRoles.currentPage + 1, limit: 10 })
+        );
+        if (responseRoles.data.length) {
+            setPaginatedRoles((prev) => ({
+                data: [...prev.data, ...responseRoles.data],
+                currentPage: responseRoles.page,
+                total: responseRoles.total,
+                totalPage: responseRoles.totalPage,
+            }));
+        }
+        setLoadingRoles(false);
+    };
 
     return (
         <PageContainer title="User" description="this is Users">
@@ -140,7 +171,7 @@ export default function Users() {
                     <UserSearch onClick={() => setLeftSidebarOpen(true)} search={search} setSearch={setSearch} />
                     <UserList
                         userId={userId}
-                        data={(search.length > 0 && usersFiltered) || users}
+                        data={paginatedData.data}
                         onDeleteClick={onDeleteClick}
                         onUserClick={({ id }) => setUserId(id)}
                         loading={loadingCreators || loadingRoles}
@@ -175,7 +206,7 @@ export default function Users() {
                         </Box>
                     )}
                     <UserDetails
-                        roles={roles}
+                        roles={paginatedRoles.data}
                         userId={userId}
                         onDeleteClick={onDeleteClick}
                         handleUpdateUser={handleUpdateUser}

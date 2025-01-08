@@ -3,14 +3,13 @@ import cookie from 'cookiejs';
 
 import { ReduxThunkAction } from '@/store';
 import { BASE_URL_API } from '@/constants/api';
-import { RequestConsign, requestConsignActionsCreators } from '../requestConsign';
+import { requestConsignActionsCreators } from '../requestConsign';
 import { assetActionsCreators } from '../assets';
 import { userActionsCreators } from '../user/slice';
 import { creatorActionsCreators } from '../creator';
 import { waitingListActionsCreators } from '../waitingList';
 import { roleActionsCreators } from '../role/slice';
 import { allowListActionsCreators } from '../allowList/slice';
-import { updateStatusRequestConsign } from '../requestConsign/requests';
 
 const rolesAll = ['roles'];
 const rolesOne = ['createdRole', 'updatedRole', 'deletedRole'];

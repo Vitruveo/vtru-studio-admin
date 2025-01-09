@@ -59,7 +59,13 @@ export default function Features() {
     };
 
     const handleUpdateFeature = async (params: FeatureItem) => {
-        if (!features.some((item) => item.name.trim() === params.name.trim() && params._id !== item._id)) {
+        if (
+            !features.some(
+                (item) =>
+                    item.name.trim().toLowerCase().replace(/\s/g, '') ===
+                        params.name.trim().toLowerCase().replace(/\s/g, '') && params._id !== item._id
+            )
+        ) {
             setActiveFeature(undefined);
             await updateFeature(params);
             setFeatures((prev) => prev.map((v) => (v._id === params._id ? params : v)));

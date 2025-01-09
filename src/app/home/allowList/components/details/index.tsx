@@ -9,11 +9,11 @@ import Typography from '@mui/material/Typography';
 import emailIcon from 'public/images/breadcrumb/emailSv.png';
 
 import { useDispatch } from '@/store/hooks';
-import { Button } from '@mui/material';
+
 import BlankCard from '@/app/home/components/shared/BlankCard';
 import Scrollbar from '@/app/home/components/custom-scroll/Scrollbar';
 import CustomFormLabel from '@/app/home/components/forms/theme-elements/CustomFormLabel';
-import CustomTextField from '@/app/home/components/forms/theme-elements/CustomTextField';
+
 import { AllowItem } from '@/features/allowList/types';
 import { CreatorType } from '@/features/creator';
 
@@ -74,31 +74,6 @@ export default function Details({ creators, activeEmail, setActiveEmail, handleU
                                                 <Box>
                                                     <CustomFormLabel htmlFor="name">Vault Address</CustomFormLabel>
                                                     <Box>{creator?.vault.vaultAddress || 'N/A'}</Box>
-                                                </Box>
-
-                                                <Box
-                                                    width="100%"
-                                                    marginTop={5}
-                                                    gap={1}
-                                                    display="flex"
-                                                    justifyContent="flex-end"
-                                                >
-                                                    <Button
-                                                        color="error"
-                                                        variant="outlined"
-                                                        size="small"
-                                                        onClick={() => setActiveEmail(undefined)}
-                                                    >
-                                                        Cancel
-                                                    </Button>
-                                                    <Button
-                                                        color="primary"
-                                                        variant="contained"
-                                                        size="small"
-                                                        type="submit"
-                                                    >
-                                                        Save
-                                                    </Button>
                                                 </Box>
                                             </Box>
                                         </form>

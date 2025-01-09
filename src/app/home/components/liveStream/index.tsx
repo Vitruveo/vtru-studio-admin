@@ -21,8 +21,6 @@ export const useLiveStream = <T,>({ event, listemEvents, getData }: Props) => {
     const [chunk, setChunk] = useState<Record<string, T>>({});
     const [loading, setLoading] = useState(true);
 
-    const ctrl = new AbortController();
-
     const headers = {
         Accept: 'text/event-stream',
         Authorization: `Bearer ${token}`,
@@ -31,8 +29,7 @@ export const useLiveStream = <T,>({ event, listemEvents, getData }: Props) => {
     };
 
     useEffect(() => {
-        console.log('passei aqui novamente!', getData);
-
+        const ctrl = new AbortController();
         const url = `${BASE_URL_API}/events?timestamp=${new Date().getTime()}&events=${listemEvents.join(',')}`;
 
         fetchEventSource(url, {
@@ -56,7 +53,6 @@ export const useLiveStream = <T,>({ event, listemEvents, getData }: Props) => {
                 }
 
                 if (message.event === event.update || message.event === event.create) {
-                    console.log({ message });
                     setUpdated((prev) => !prev);
                     setChunk((prev) => ({
                         ...prev,

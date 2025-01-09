@@ -1,7 +1,16 @@
 import { fetchEventSource } from '@microsoft/fetch-event-source';
 import { AxiosError } from 'axios';
-import { userAddReq, userUpdateReq, userDeleteReq } from './requests';
-import { UserAddApiRes, UserAddReq, UserApiResDelete, UserApiResUpdate, UserDeleteReq, UserUpdateReq } from './types';
+import { userAddReq, userUpdateReq, userDeleteReq, getUsersPaginated } from './requests';
+import {
+    GetUsersPaginatedParams,
+    GetUsersPaginatedResponse,
+    UserAddApiRes,
+    UserAddReq,
+    UserApiResDelete,
+    UserApiResUpdate,
+    UserDeleteReq,
+    UserUpdateReq,
+} from './types';
 import { ReduxThunkAction } from '@/store';
 import { toastrActionsCreators } from '../toastr/slice';
 import { BASE_URL_API } from '@/constants/api';
@@ -81,44 +90,11 @@ export function userDeleteThunk(payload: UserDeleteReq): ReduxThunkAction<Promis
     };
 }
 
-export function userGetThunk(): ReduxThunkAction<Promise<void>> {
-    return async function (dispatch, getState) {
-        const state = getState();
-        const token = state.auth.token;
-
-        const ctrl = new AbortController();
-
-        const url = `${BASE_URL_API}/users`;
-        const headers = {
-            Accept: 'text/event-stream',
-            Authorization: `Bearer ${token}`,
-        };
-
-        const response = await fetch(url, { method: 'HEAD', headers });
-
-        if (response.status === 401) {
-            dispatch(
-                toastrActionsCreators.displayToastr({
-                    type: 'error',
-                    message: 'You are not authorized to view this page.',
-                })
-            );
-
-            dispatch(userActionsCreators.resetUser());
-
-            return;
-        }
-
-        fetchEventSource(url, {
-            method: 'GET',
-            headers,
-            onmessage(message) {
-                dispatch(userActionsCreators.setUser(JSON.parse(message.data)));
-            },
-            onerror() {
-                throw new Error('Error fetching event source');
-            },
-            signal: ctrl.signal,
-        });
+export function userGetPaginatedThunk(
+    params: GetUsersPaginatedParams
+): ReduxThunkAction<Promise<GetUsersPaginatedResponse>> {
+    return async function () {
+        const response = await getUsersPaginated(params);
+        return response.data.data!;
     };
 }

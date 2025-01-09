@@ -17,6 +17,7 @@ export interface AllowItem {
 export interface AllowListSliceState {
     byId: { [key: string]: AllowItem };
     allIds: string[];
+    getData: boolean;
     status: '' | 'loading' | 'succeeded' | 'failed';
     error: string;
 }

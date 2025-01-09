@@ -2,6 +2,7 @@
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Drawer, useMediaQuery, Theme, Box, Button } from '@mui/material';
+import * as Yup from 'yup';
 import PageContainer from '../components/container/PageContainer';
 import Breadcrumb from '../layout/shared/breadcrumb/Breadcrumb';
 import AppCard from '../components/shared/AppCard';
@@ -9,75 +10,59 @@ import AddList from './components/addList';
 import List from './components/list';
 import Search from './components/search';
 import Details from './components/details';
-import { addMultipleAllowList, deletAllowList, findAllowList, updateAllowList } from '@/features/allowList/requests';
-import { AllowItem } from '@/features/allowList/types';
+
 import { useToastr } from '@/app/hooks/use-toastr';
 import { useSelector } from '@/store/hooks';
-import { useLiveStream } from '../components/liveStream';
-import {
-    CREATED_CREATOR,
-    DELETED_CREATOR,
-    EVENTS_CREATORS,
-    LIST_CREATORS,
-    UPDATED_CREATOR,
-} from '../components/liveStream/events';
-import { CreatorType } from '@/features/creator';
+import { addFeature, deleteFeature, findFeatures, updateFeature } from '@/features/features/requests';
+import { FeatureItem } from '@/features/features/types';
 
 const drawerWidth = 240;
 const secdrawerWidth = 320;
 
-export default function AllowList() {
+export default function Features() {
     const toastr = useToastr();
 
     const lgUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('lg'));
     const mdUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
-    const [emails, setEmails] = useState<AllowItem[]>([]);
+    const [features, setFeatures] = useState<FeatureItem[]>([]);
     const [isRightSidebarOpen, setRightSidebarOpen] = useState(false);
     const [isLeftSidebarOpen, setLeftSidebarOpen] = useState(false);
-    const [activeEmail, setActiveEmail] = useState<AllowItem>();
+    const [activeFeature, setActiveFeature] = useState<FeatureItem>();
     const [search, setSearch] = useState('');
 
     const getData = useSelector((state) => state.allowList.getData);
 
-    const { chunk: creators } = useLiveStream<CreatorType>({
-        event: {
-            list: LIST_CREATORS,
-            update: UPDATED_CREATOR,
-            delete: DELETED_CREATOR,
-            create: CREATED_CREATOR,
-        },
-        listemEvents: EVENTS_CREATORS,
-    });
-
-    const handleAddNewEmails = useCallback(async (params: { emails: string[] }) => {
-        if (params.emails.length) {
-            await addMultipleAllowList(params.emails.map((email) => ({ email })));
-        } else {
+    const handleAddNewFeature = useCallback(async (params: { name: string }) => {
+        if (
+            features.some(
+                (v) =>
+                    v.name.trim().toLowerCase().replace(/\s/g, '') !==
+                    params.name.trim().toLowerCase().replace(/\s/g, '')
+            )
+        )
+            await addFeature(params);
+        else {
             toastr.display({
                 type: 'info',
-                message: 'emails/email already belong to the allowlist',
+                message: 'name already exists',
             });
         }
     }, []);
 
-    const onDeleteClick = async (params: AllowItem) => {
-        const newEmails = emails.filter((item) => item.email !== params.email);
-        if (activeEmail?.email === params.email) {
-            setActiveEmail(newEmails[0]);
+    const onDeleteClick = async (params: FeatureItem) => {
+        const newEmails = features.filter((item) => item.name !== params.name);
+        if (activeFeature?.name === params.name) {
+            setActiveFeature(newEmails[0]);
         }
-        await deletAllowList(params._id);
-        setEmails((prev) => prev.filter((v) => v._id !== params._id));
+        await deleteFeature(params._id);
+        setFeatures((prev) => prev.filter((v) => v._id !== params._id));
     };
 
-    const handleUpdateEmail = async (params: AllowItem) => {
-        if (!emails.some((item) => item.email.trim() === params.email.trim())) {
-            setActiveEmail(undefined);
-            await updateAllowList(params);
-        } else {
-            toastr.display({
-                type: 'info',
-                message: 'emails/email already belong to the allowlist',
-            });
+    const handleUpdateFeature = async (params: FeatureItem) => {
+        if (!features.some((item) => item.name.trim() === params.name.trim() && params._id !== item._id)) {
+            setActiveFeature(undefined);
+            await updateFeature(params);
+            setFeatures((prev) => prev.map((v) => (v._id === params._id ? params : v)));
         }
     };
 
@@ -85,22 +70,22 @@ export default function AllowList() {
         setLeftSidebarOpen((prev) => !prev);
     }, []);
 
-    const emailsFiltered = useMemo(() => {
-        return search.length > 0 ? emails.filter((v) => v.email.toLowerCase().includes(search.toLowerCase())) : [];
-    }, [search, emails]);
+    const featuresFiltered = useMemo(() => {
+        return search.length > 0 ? features.filter((v) => v.name.toLowerCase().includes(search.toLowerCase())) : [];
+    }, [search, features]);
 
     useEffect(() => {
         (async () => {
-            const res = await findAllowList();
+            const res = await findFeatures();
             if (res.data?.length) {
-                setEmails(res.data.sort((a, b) => (a.email < b.email ? -1 : a.email > b.email ? 1 : 0)));
+                setFeatures(res.data);
             }
         })();
     }, [getData]);
 
     return (
-        <PageContainer title="Allow List">
-            <Breadcrumb title="Allow List" />
+        <PageContainer title="Features">
+            <Breadcrumb title="Features" />
 
             <AppCard>
                 <Drawer
@@ -117,7 +102,7 @@ export default function AllowList() {
                     }}
                     variant={lgUp ? 'permanent' : 'temporary'}
                 >
-                    <AddList creators={creators} allowList={emails} handleAddNewEmails={handleAddNewEmails} />
+                    <AddList handleAddNewFeature={handleAddNewFeature} />
                 </Drawer>
                 <Box
                     sx={{
@@ -132,10 +117,10 @@ export default function AllowList() {
                 >
                     <Search onClick={toggleLeftSidebar} search={search} setSearch={setSearch} />
                     <List
-                        activeEmail={activeEmail}
-                        emails={search.length > 0 ? emailsFiltered : emails}
+                        activeFeature={activeFeature}
+                        features={search.length > 0 ? featuresFiltered : features}
                         onDeleteClick={onDeleteClick}
-                        onEmailClick={(allowItem) => setActiveEmail(allowItem)}
+                        onFeatureClick={(featureItem) => setActiveFeature(featureItem)}
                     />
                 </Box>
                 <Drawer
@@ -176,10 +161,9 @@ export default function AllowList() {
                         </Box>
                     )}
                     <Details
-                        creators={creators}
-                        setActiveEmail={setActiveEmail}
-                        activeEmail={activeEmail}
-                        handleUpdateEmail={handleUpdateEmail}
+                        setActiveFeature={setActiveFeature}
+                        activeFeature={activeFeature}
+                        handleUpdateFeature={handleUpdateFeature}
                     />
                 </Drawer>
             </AppCard>

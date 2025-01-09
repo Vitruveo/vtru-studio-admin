@@ -10,14 +10,14 @@ import { useTheme } from '@mui/material/styles';
 import { IconTrash } from '@tabler/icons-react';
 
 interface Props {
-    onEmailClick: (event: React.MouseEvent<HTMLElement>) => void;
+    onFeatureClick: (event: React.MouseEvent<HTMLElement>) => void;
     onDeleteClick: React.MouseEventHandler<SVGElement>;
     image: string;
-    email: string;
+    name: string;
     active: any;
 }
 
-export default function RoleListItem({ onEmailClick, onDeleteClick, email, active }: Props) {
+export default function RoleListItem({ onFeatureClick, onDeleteClick, name, active }: Props) {
     const customizer = {
         activeDir: 'ltr',
         activeMode: 'light', // This can be light or dark
@@ -42,12 +42,12 @@ export default function RoleListItem({ onEmailClick, onDeleteClick, email, activ
 
     return (
         <Box display="flex" alignItems="center">
-            <ListItemButton onClick={onEmailClick} sx={{ mb: 1 }} selected={active}>
+            <ListItemButton onClick={onFeatureClick} sx={{ mb: 1 }} selected={active}>
                 <ListItemText>
                     <Stack direction="row" gap="10px" alignItems="center">
                         <Box mr="auto">
                             <Typography variant="subtitle1" noWrap fontWeight={600} sx={{ maxWidth: '240px' }}>
-                                {email}
+                                {name}
                             </Typography>
                         </Box>
                     </Stack>

@@ -1,54 +1,64 @@
 import { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 
-import Image from 'next/image';
 import Box from '@mui/material/Box';
 
 import Typography from '@mui/material/Typography';
 
-import emailIcon from 'public/images/breadcrumb/emailSv.png';
-
 import { useDispatch } from '@/store/hooks';
-import { Button } from '@mui/material';
+import { Button, Switch } from '@mui/material';
 import BlankCard from '@/app/home/components/shared/BlankCard';
 import Scrollbar from '@/app/home/components/custom-scroll/Scrollbar';
 import CustomFormLabel from '@/app/home/components/forms/theme-elements/CustomFormLabel';
 import CustomTextField from '@/app/home/components/forms/theme-elements/CustomTextField';
-import { AllowItem } from '@/features/allowList/types';
-import { CreatorType } from '@/features/creator';
+import { FeatureItem } from '@/features/features/types';
 
 interface Props {
-    creators: CreatorType[];
-    activeEmail?: AllowItem;
-    setActiveEmail(params?: AllowItem): void;
-    handleUpdateEmail(params: { email: string }): void;
+    activeFeature?: FeatureItem;
+    setActiveFeature(params?: FeatureItem): void;
+    handleUpdateFeature(params: { name: string }): void;
 }
 
-export default function Details({ creators, activeEmail, setActiveEmail, handleUpdateEmail }: Props) {
+export default function Details({ activeFeature, setActiveFeature, handleUpdateFeature }: Props) {
     const dispatch = useDispatch();
 
     const [isEditing, setIsEditing] = useState(false);
     const [starred, setStarred] = useState(false);
 
-    const { values, errors, setFieldValue, handleSubmit, handleChange } = useFormik<{ email: string }>({
+    const { values, errors, setFieldValue, handleSubmit, handleChange } = useFormik<{
+        name: string;
+        released: boolean;
+        onlyForAllowList: boolean;
+    }>({
         initialValues: {
-            email: '',
+            name: '',
+            released: false,
+            onlyForAllowList: false,
         },
         onSubmit: async (payload) => {
-            await handleUpdateEmail({ ...activeEmail, ...payload });
+            console.log({ payload });
+            await handleUpdateFeature({ ...activeFeature, ...payload });
             setIsEditing(false);
         },
     });
 
-    const creator = creators.find((creatorItem) => creatorItem.emails.some((v) => v.email === activeEmail?.email));
-
     useEffect(() => {
-        setFieldValue('email', activeEmail?.email);
-    }, [activeEmail]);
+        setFieldValue('name', activeFeature?.name);
+        setFieldValue('released', activeFeature?.released);
+        setFieldValue('onlyForAllowList', activeFeature?.onlyForAllowList);
+    }, [activeFeature]);
+
+    const handleChangeReleased = () => {
+        setFieldValue('released', !values.released);
+    };
+
+    const handleChangeOnlyForAllowList = () => {
+        setFieldValue('onlyForAllowList', !values.onlyForAllowList);
+    };
 
     return (
         <>
-            {activeEmail ? (
+            {activeFeature ? (
                 <>
                     <Box sx={{ overflow: 'auto' }}>
                         <>
@@ -65,15 +75,45 @@ export default function Details({ creators, activeEmail, setActiveEmail, handleU
                                         <form onSubmit={handleSubmit}>
                                             <Box width={350} p={3}>
                                                 <Typography variant="h6" mb={0.5}>
-                                                    Creator
+                                                    Editing feature
                                                 </Typography>
                                                 <Box>
-                                                    <CustomFormLabel htmlFor="name">Username</CustomFormLabel>
-                                                    <Box>{creator?.username || 'N/A'}</Box>
+                                                    <CustomFormLabel htmlFor="name">Name</CustomFormLabel>
+                                                    <CustomTextField
+                                                        type="name"
+                                                        name="name"
+                                                        id="name"
+                                                        variant="outlined"
+                                                        size="small"
+                                                        fullWidth
+                                                        value={values.name}
+                                                        onChange={handleChange}
+                                                    />
+                                                    {errors?.name && <span>{errors.name}</span>}
                                                 </Box>
-                                                <Box>
-                                                    <CustomFormLabel htmlFor="name">Vault Address</CustomFormLabel>
-                                                    <Box>{creator?.vault.vaultAddress || 'N/A'}</Box>
+
+                                                <Box marginTop={1} alignItems="center" gap={1}>
+                                                    <Typography variant="subtitle1" fontWeight={600} mb={0.5}>
+                                                        Released
+                                                    </Typography>
+                                                    <Box>
+                                                        <Switch
+                                                            checked={values.released}
+                                                            onChange={handleChangeReleased}
+                                                        />
+                                                    </Box>
+                                                </Box>
+
+                                                <Box marginTop={1} alignItems="center" gap={1}>
+                                                    <Typography variant="subtitle1" fontWeight={600} mb={0.5}>
+                                                        Only For AllowList
+                                                    </Typography>
+                                                    <Box>
+                                                        <Switch
+                                                            checked={values.onlyForAllowList}
+                                                            onChange={handleChangeOnlyForAllowList}
+                                                        />
+                                                    </Box>
                                                 </Box>
 
                                                 <Box
@@ -87,7 +127,7 @@ export default function Details({ creators, activeEmail, setActiveEmail, handleU
                                                         color="error"
                                                         variant="outlined"
                                                         size="small"
-                                                        onClick={() => setActiveEmail(undefined)}
+                                                        onClick={() => setActiveFeature(undefined)}
                                                     >
                                                         Cancel
                                                     </Button>
@@ -111,9 +151,8 @@ export default function Details({ creators, activeEmail, setActiveEmail, handleU
             ) : (
                 <Box p={3} height="50vh" display={'flex'} justifyContent="center" alignItems={'center'}>
                     <Box>
-                        <Typography variant="h4">Please Select a Email</Typography>
+                        <Typography variant="h4">Please Select a Feature</Typography>
                         <br />
-                        <Image src={emailIcon} alt={'emailIcon'} width="250" />
                     </Box>
                 </Box>
             )}

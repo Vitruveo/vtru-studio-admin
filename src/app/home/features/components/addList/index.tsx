@@ -5,35 +5,32 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
+
 import DialogTitle from '@mui/material/DialogTitle';
+import FormLabel from '@mui/material/FormLabel';
 import Grid from '@mui/material/Grid';
-import AsyncSearchSelect from './searchInput';
+import TextField from '@mui/material/TextField';
 
 import { useDispatch } from '@/store/hooks';
-import { AllowItem } from '@/features/allowList/types';
 import { allowListActionsCreators } from '@/features/allowList/slice';
-import { CreatorType } from '@/features/creator';
 
 interface Props {
-    creators: CreatorType[];
-    allowList: AllowItem[];
-    handleAddNewEmails(params: { emails: string[] }): void;
+    handleAddNewFeature(params: { name: string }): void;
 }
 
-export default function AddList({ allowList, creators, handleAddNewEmails }: Props) {
+export default function AddList({ handleAddNewFeature }: Props) {
     const dispatch = useDispatch();
 
     const [modal, setModal] = React.useState(false);
 
-    const { handleSubmit, resetForm, setFieldValue, values } = useFormik({
+    const { handleSubmit, handleChange, resetForm, setFieldValue, values, errors } = useFormik({
         initialValues: {
-            email: '',
+            name: '',
             emails: [],
         },
         onSubmit: async (payload) => {
-            const newEmails = values.email.length ? [values.email, ...values.emails] : values.emails;
-            handleAddNewEmails({
-                emails: newEmails,
+            handleAddNewFeature({
+                name: payload.name,
             });
             toggle();
             resetForm();
@@ -45,15 +42,11 @@ export default function AddList({ allowList, creators, handleAddNewEmails }: Pro
         setModal(!modal);
     };
 
-    const handleEmailsChange = (emails: string[]) => {
-        setFieldValue('emails', emails);
-    };
-
     return (
         <>
             <Box p={3} pb={1}>
                 <Button color="primary" variant="contained" fullWidth onClick={toggle}>
-                    Add Creators
+                    Add Feature
                 </Button>
             </Box>
             <Dialog
@@ -63,37 +56,30 @@ export default function AddList({ allowList, creators, handleAddNewEmails }: Pro
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
-                <DialogTitle marginInline={2} id="alert-dialog-title" variant="h5">
-                    Add Creators
+                <DialogTitle id="alert-dialog-title" variant="h5">
+                    Add Feature
                 </DialogTitle>
                 <DialogContent>
-                    <Box marginInline={2} maxHeight={500} width={500} mt={1}>
+                    <Box width={500} mt={1}>
                         <form onSubmit={handleSubmit}>
                             <Grid container>
-                                {/* <Grid item xs={12} lg={9}>
-                                    <FormLabel>Email</FormLabel>
+                                <Grid item xs={12} lg={9}>
+                                    <FormLabel>Name</FormLabel>
                                     <Box>
                                         <TextField
-                                            id="email"
-                                            placeholder="Enter email address"
-                                            name="email"
+                                            id="name"
+                                            placeholder="Enter feature name"
+                                            name="name"
                                             size="small"
                                             variant="outlined"
                                             fullWidth
-                                            value={values.email}
-                                            onChange={handleEmailChange}
+                                            value={values.name}
+                                            onChange={handleChange}
                                         />
-                                        {errors?.email && <span>{errors.email}</span>}
+                                        {errors?.name && <span>{errors.name}</span>}
                                     </Box>
-                                </Grid> */}
+                                </Grid>
 
-                                <Box width="100%" display="flex" justifyContent="center">
-                                    <AsyncSearchSelect
-                                        creators={creators}
-                                        allowList={allowList}
-                                        handleEmailsChange={handleEmailsChange}
-                                    />
-                                </Box>
                                 <Box
                                     width="100%"
                                     marginTop={1}

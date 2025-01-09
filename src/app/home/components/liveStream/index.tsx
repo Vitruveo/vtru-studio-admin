@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { fetchEventSource } from '@microsoft/fetch-event-source';
 
 import { useSelector } from '@/store/hooks';
 import { BASE_URL_API } from '@/constants/api';
 
 interface Props {
+    getData?: boolean;
     event: {
         list: string;
         update: string;
@@ -14,8 +15,9 @@ interface Props {
     listemEvents: string[];
 }
 
-export const useLiveStream = <T,>({ event, listemEvents }: Props) => {
+export const useLiveStream = <T,>({ event, listemEvents, getData }: Props) => {
     const token = useSelector((state) => state.auth.token);
+    const [updated, setUpdated] = useState(false);
     const [chunk, setChunk] = useState<Record<string, T>>({});
     const [loading, setLoading] = useState(true);
 
@@ -28,7 +30,9 @@ export const useLiveStream = <T,>({ event, listemEvents }: Props) => {
         Pragma: 'no-cache',
     };
 
-    const fetchData = useCallback(() => {
+    useEffect(() => {
+        console.log('passei aqui novamente!', getData);
+
         const url = `${BASE_URL_API}/events?timestamp=${new Date().getTime()}&events=${listemEvents.join(',')}`;
 
         fetchEventSource(url, {
@@ -37,29 +41,33 @@ export const useLiveStream = <T,>({ event, listemEvents }: Props) => {
             signal: ctrl.signal,
             onmessage(message) {
                 const parsed = JSON.parse(message.data);
+                const id = parsed._id || parsed.id;
 
                 if (message.event === event.list) {
                     setChunk((prevState) => {
-                        if (prevState[parsed._id]) return prevState;
+                        if (prevState[id]) return prevState;
 
                         return {
                             ...prevState,
-                            [parsed._id]: parsed,
+                            [id]: parsed,
                         };
                     });
                     if (loading) setLoading(false);
                 }
 
                 if (message.event === event.update || message.event === event.create) {
+                    console.log({ message });
+                    setUpdated((prev) => !prev);
                     setChunk((prev) => ({
                         ...prev,
-                        [parsed._id]: parsed,
+                        [id]: parsed,
                     }));
                 }
 
                 if (message.event === event.delete) {
+                    setUpdated((prev) => !prev);
                     setChunk((prev) => {
-                        delete prev[parsed._id];
+                        delete prev[id];
                         return prev;
                     });
                 }
@@ -70,21 +78,23 @@ export const useLiveStream = <T,>({ event, listemEvents }: Props) => {
             onclose() {
                 console.log('Event source closed');
             },
-            // abort event
         });
-    }, [ctrl]);
-
-    useEffect(() => {
-        fetchData();
 
         return () => {
-            ctrl.abort();
+            if (ctrl) {
+                ctrl.abort();
+            }
         };
-    }, []);
+    }, [getData]);
+
+    useEffect(() => {
+        console.log({ updated });
+    }, [updated]);
 
     return {
         chunk: Object.values(chunk),
         chumkById: chunk,
         loading,
+        updated,
     };
 };

@@ -2,6 +2,7 @@
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Drawer, useMediaQuery, Theme, Box, Button } from '@mui/material';
+
 import PageContainer from '../components/container/PageContainer';
 import Breadcrumb from '../layout/shared/breadcrumb/Breadcrumb';
 import AppCard from '../components/shared/AppCard';
@@ -12,21 +13,16 @@ import Details from './components/details';
 import { addMultipleAllowList, deletAllowList, findAllowList, updateAllowList } from '@/features/allowList/requests';
 import { AllowItem } from '@/features/allowList/types';
 import { useToastr } from '@/app/hooks/use-toastr';
-import { useSelector } from '@/store/hooks';
-import { useLiveStream } from '../components/liveStream';
-import {
-    CREATED_CREATOR,
-    DELETED_CREATOR,
-    EVENTS_CREATORS,
-    LIST_CREATORS,
-    UPDATED_CREATOR,
-} from '../components/liveStream/events';
+import { useSelector, useDispatch } from '@/store/hooks';
+
 import { CreatorType } from '@/features/creator';
+import { getCreatorsPaginatedThunk } from '@/features/creator/thunks';
 
 const drawerWidth = 240;
 const secdrawerWidth = 320;
 
 export default function AllowList() {
+    const dispatch = useDispatch();
     const toastr = useToastr();
 
     const lgUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('lg'));
@@ -39,14 +35,16 @@ export default function AllowList() {
 
     const getData = useSelector((state) => state.allowList.getData);
 
-    const { chunk: creators } = useLiveStream<CreatorType>({
-        event: {
-            list: LIST_CREATORS,
-            update: UPDATED_CREATOR,
-            delete: DELETED_CREATOR,
-            create: CREATED_CREATOR,
-        },
-        listemEvents: EVENTS_CREATORS,
+    const [paginatedData, setPaginatedData] = useState<{
+        currentPage: number;
+        data: { [key: string]: CreatorType };
+        total: number;
+        totalPage: number;
+    }>({
+        currentPage: 0,
+        data: {},
+        total: 0,
+        totalPage: 0,
     });
 
     const handleAddNewEmails = useCallback(async (params: { emails: string[] }) => {
@@ -98,6 +96,30 @@ export default function AllowList() {
         })();
     }, [getData]);
 
+    useEffect(() => {
+        const fetchPaginatedData = async (page = 1, aggregatedData = {}) => {
+            const response = await dispatch(getCreatorsPaginatedThunk({ page, limit: 100 }));
+
+            const updatedData = {
+                ...aggregatedData,
+                ...response.data.reduce((acc, cur) => ({ ...acc, [cur._id]: cur }), {}),
+            };
+
+            setPaginatedData({
+                data: updatedData,
+                currentPage: response.page,
+                total: response.total,
+                totalPage: response.totalPage,
+            });
+
+            if (response.page < response.totalPage) {
+                fetchPaginatedData(page + 1, updatedData);
+            }
+        };
+
+        fetchPaginatedData();
+    }, [dispatch]);
+
     return (
         <PageContainer title="Allow List">
             <Breadcrumb title="Allow List" />
@@ -117,7 +139,11 @@ export default function AllowList() {
                     }}
                     variant={lgUp ? 'permanent' : 'temporary'}
                 >
-                    <AddList creators={creators} allowList={emails} handleAddNewEmails={handleAddNewEmails} />
+                    <AddList
+                        creators={Object.values(paginatedData.data)}
+                        allowList={emails}
+                        handleAddNewEmails={handleAddNewEmails}
+                    />
                 </Drawer>
                 <Box
                     sx={{
@@ -176,7 +202,7 @@ export default function AllowList() {
                         </Box>
                     )}
                     <Details
-                        creators={creators}
+                        creators={Object.values(paginatedData.data)}
                         setActiveEmail={setActiveEmail}
                         activeEmail={activeEmail}
                         handleUpdateEmail={handleUpdateEmail}

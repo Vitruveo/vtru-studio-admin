@@ -1,10 +1,10 @@
-import { BASE_URL_BATCH } from '@/constants/api';
+import { BASE_URL_API3 } from '@/constants/api';
 import { APIResponse } from '@/features/common/types';
 import { store } from '@/store/index';
 import axios, { AxiosResponse } from 'axios';
 
 const api = axios.create({
-    baseURL: BASE_URL_BATCH,
+    baseURL: BASE_URL_API3,
     // timeout: 10000,
     headers: {
         'Content-Type': 'application/json',
@@ -27,7 +27,7 @@ api.interceptors.request.use(
     }
 );
 
-export const apiBatchService = {
+export const api3Service = {
     get: async <T = unknown, E = any>(url: string): Promise<APIResponse<T, E>> => {
         try {
             const response: AxiosResponse = await api.get(url);

@@ -69,11 +69,14 @@ export default function Details({ activeFeature, setActiveFeature, handleUpdateF
         setFieldValue('onlyFor', onlyFor);
     };
 
-    const handleAddNewEmails = useCallback(async (params: { emails: string[] }) => {
-        if (params.emails.length) {
-            setFieldValue('emails', [...values.emails, ...params.emails]);
-        }
-    }, []);
+    const handleAddNewEmails = useCallback(
+        async (params: { emails: string[] }) => {
+            if (params.emails.length) {
+                setFieldValue('emails', [...values.emails, ...params.emails]);
+            }
+        },
+        [setFieldValue, values.emails]
+    );
 
     const handleOnDeleteEmailClick = (emailFilter: string) => {
         const newEmails = values.emails.filter((email) => email !== emailFilter);

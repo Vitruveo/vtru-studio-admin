@@ -83,10 +83,6 @@ export const useLiveStream = <T,>({ event, listemEvents, getData }: Props) => {
         };
     }, [getData]);
 
-    useEffect(() => {
-        console.log({ updated });
-    }, [updated]);
-
     return {
         chunk: Object.values(chunk),
         chumkById: chunk,

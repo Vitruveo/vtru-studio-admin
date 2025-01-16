@@ -4,7 +4,9 @@ export interface FeatureItem {
     _id: string;
     name: string;
     released: boolean;
-    onlyForAllowList: boolean;
+    isOnlyFor: boolean;
+    onlyFor: 'allowList' | 'specificUsers';
+    emails: string[];
     framework: {
         createdAt: Date;
         updatedAt: Date;

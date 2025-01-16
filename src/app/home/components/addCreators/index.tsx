@@ -10,17 +10,26 @@ import Grid from '@mui/material/Grid';
 import AsyncSearchSelect from './searchInput';
 
 import { useDispatch } from '@/store/hooks';
-import { AllowItem } from '@/features/allowList/types';
 import { allowListActionsCreators } from '@/features/allowList/slice';
 import { CreatorType } from '@/features/creator';
 
 interface Props {
+    buttonSize?: 'small' | 'medium' | 'large';
+    noMarginButton?: boolean;
+    showAddCreators?: boolean;
     creators: CreatorType[];
-    allowList: AllowItem[];
+    addedEmails: string[];
     handleAddNewEmails(params: { emails: string[] }): void;
 }
 
-export default function AddList({ allowList, creators, handleAddNewEmails }: Props) {
+export default function AddList({
+    showAddCreators = true,
+    noMarginButton,
+    buttonSize,
+    addedEmails,
+    creators,
+    handleAddNewEmails,
+}: Props) {
     const dispatch = useDispatch();
 
     const [modal, setModal] = React.useState(false);
@@ -51,10 +60,18 @@ export default function AddList({ allowList, creators, handleAddNewEmails }: Pro
 
     return (
         <>
-            <Box p={3} pb={1}>
-                <Button color="primary" variant="contained" fullWidth onClick={toggle}>
-                    Add Creators
-                </Button>
+            <Box p={noMarginButton ? 0 : 3} pb={1}>
+                {showAddCreators && (
+                    <Button
+                        size={buttonSize || 'medium'}
+                        color="primary"
+                        variant="contained"
+                        fullWidth
+                        onClick={toggle}
+                    >
+                        Add Creators
+                    </Button>
+                )}
             </Box>
             <Dialog
                 open={modal}
@@ -90,7 +107,7 @@ export default function AddList({ allowList, creators, handleAddNewEmails }: Pro
                                 <Box width="100%" display="flex" justifyContent="center">
                                     <AsyncSearchSelect
                                         creators={creators}
-                                        allowList={allowList}
+                                        addedEmails={addedEmails}
                                         handleEmailsChange={handleEmailsChange}
                                     />
                                 </Box>

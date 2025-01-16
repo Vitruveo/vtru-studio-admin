@@ -4,16 +4,7 @@ import TextField from '@mui/material/TextField';
 import CircularProgress from '@mui/material/CircularProgress';
 import Autocomplete from '@mui/material/Autocomplete';
 import Chip from '@mui/material/Chip';
-import { useLiveStream } from '@/app/home/components/liveStream';
 import { CreatorType } from '@/features/creator';
-import {
-    CREATED_CREATOR,
-    DELETED_CREATOR,
-    EVENTS_CREATORS,
-    LIST_CREATORS,
-    UPDATED_CREATOR,
-} from '@/app/home/components/liveStream/events';
-import { AllowItem } from '@/features/allowList/types';
 import { Box } from '@mui/material';
 
 const useDebounce = (value: string, delay: number) => {
@@ -68,11 +59,11 @@ const ListboxComponent = forwardRef<HTMLDivElement, ListBoxComponentProps>(funct
 
 interface AsyncAutocompletePropsType {
     creators: CreatorType[];
-    allowList: AllowItem[];
+    addedEmails: string[];
     handleEmailsChange: (emails: string[]) => void;
 }
 
-export default function AsyncAutocomplete({ allowList, creators, handleEmailsChange }: AsyncAutocompletePropsType) {
+export default function AsyncAutocomplete({ addedEmails, creators, handleEmailsChange }: AsyncAutocompletePropsType) {
     const [selectedValues, setSelectedValues] = useState<string[]>([]);
     const [inputValue, setInputValue] = useState('');
     const [loading, setLoading] = useState(false);
@@ -86,17 +77,17 @@ export default function AsyncAutocomplete({ allowList, creators, handleEmailsCha
         return creators
             .flatMap((creator) =>
                 creator.emails.filter((item) => {
-                    const isAllowed = !allowList?.some((v) => v.email === item.email);
+                    const isAdded = !addedEmails?.some((email) => email === item.email);
                     const matchesInput =
                         debouncedInputValue.length === 0 ||
                         item.email.toLowerCase().includes(debouncedInputValue.toLowerCase());
 
-                    return isAllowed && matchesInput;
+                    return isAdded && matchesInput;
                 })
             )
             .map((item) => item.email)
             .sort();
-    }, [creators, debouncedInputValue, allowList]);
+    }, [creators, debouncedInputValue, addedEmails]);
 
     const handleAddValue = (newValue: string[]) => {
         setSelectedValues(newValue);

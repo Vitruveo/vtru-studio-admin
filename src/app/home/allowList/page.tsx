@@ -6,7 +6,7 @@ import { Drawer, useMediaQuery, Theme, Box, Button } from '@mui/material';
 import PageContainer from '../components/container/PageContainer';
 import Breadcrumb from '../layout/shared/breadcrumb/Breadcrumb';
 import AppCard from '../components/shared/AppCard';
-import AddList from './components/addList';
+import AddList from '../components/addCreators';
 import List from './components/list';
 import Search from './components/search';
 import Details from './components/details';
@@ -141,7 +141,7 @@ export default function AllowList() {
                 >
                     <AddList
                         creators={Object.values(paginatedData.data)}
-                        allowList={emails}
+                        addedEmails={emails.map((v) => v.email)}
                         handleAddNewEmails={handleAddNewEmails}
                     />
                 </Drawer>

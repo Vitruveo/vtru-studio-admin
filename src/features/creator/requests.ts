@@ -6,13 +6,13 @@ import {
     UpdateLicenseOptions,
     UpdateVaultStateOptions,
 } from './types';
-import { BASE_URL_API, BASE_URL_API3 } from '@/constants/api';
+import { BASE_URL_API, BASE_URL_BATCH } from '@/constants/api';
 import { apiService } from '@/services/api';
 import { APIResponse } from '../common/types';
 import store from '@/store';
 
 export async function updateVaultState({ vaultAddress, state }: UpdateVaultStateOptions) {
-    return axios.put(`${BASE_URL_API3}/vault`, { vaultAddress, state });
+    return axios.put(`${BASE_URL_BATCH}/vault`, { vaultAddress, state });
 }
 
 export function getCreatorById(id: string) {

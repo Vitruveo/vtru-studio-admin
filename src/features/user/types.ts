@@ -50,6 +50,20 @@ export interface UserAuthRes {
     email: string;
 }
 
+export interface GetUsersPaginatedParams {
+    page: number;
+    limit: number;
+    search?: string;
+}
+
+export interface GetUsersPaginatedResponse {
+    data: User[];
+    page: number;
+    total: number;
+    totalPage: number;
+    limit: number;
+}
+
 export interface UserAddReq {
     name: string;
     login: { email: string };

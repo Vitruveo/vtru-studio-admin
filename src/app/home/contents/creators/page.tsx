@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useSelector, useDispatch } from '@/store/hooks';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -18,21 +18,15 @@ import { CreatorDialogDelete } from '../../components/apps/creators/CreatorDialo
 
 import { subscribeWebSocketThunk, unsubscribeWebSocketThunk, websocketSelector } from '@/features/ws';
 import { CreatorType, creatorActionsCreators, deleteCreatorThunk } from '@/features/creator';
-import { useLiveStream } from '../../components/liveStream';
-import {
-    CREATED_CREATOR,
-    DELETED_CREATOR,
-    EVENTS_CREATORS,
-    LIST_CREATORS,
-    UPDATED_CREATOR,
-} from '../../components/liveStream/events';
+import { getCreatorsPaginatedThunk } from '@/features/creator/thunks';
+import { debounce } from '@mui/material/utils';
 
 const drawerWidth = 240;
 const secdrawerWidth = 320;
 
 export default function Creators() {
     const dispatch = useDispatch();
-    // const creators = useSelector((state) => state.creator.allIds.map((id) => state.creator.byId[id]));
+
     const { creatorsOnline } = useSelector(websocketSelector(['creatorsOnline']));
     const [isLeftSidebarOpen, setLeftSidebarOpen] = useState(false);
     const [isRightSidebarOpen, setRightSidebarOpen] = useState(false);
@@ -45,16 +39,31 @@ export default function Creators() {
     const [isOpenDialogDelete, setIsOpenDialogDelete] = useState(false);
     const [isBlocked, setIsBlocked] = useState(false);
     const [creatorDelete, setCreatorDelete] = useState({ email: '', id: '' });
-
-    const { chunk: creators, loading: loadingCreators } = useLiveStream<CreatorType>({
-        event: {
-            list: LIST_CREATORS,
-            update: UPDATED_CREATOR,
-            delete: DELETED_CREATOR,
-            create: CREATED_CREATOR,
-        },
-        listemEvents: EVENTS_CREATORS,
+    const [loadingCreators, setLoadingCreators] = useState(false);
+    const [paginatedData, setPaginatedData] = useState<{
+        currentPage: number;
+        data: CreatorType[];
+        total: number;
+        totalPage: number;
+    }>({
+        currentPage: 0,
+        data: [],
+        total: 0,
+        totalPage: 0,
     });
+
+    const debouncedSearch = useCallback(
+        debounce(async (searchTerm) => {
+            const response = await dispatch(getCreatorsPaginatedThunk({ search: searchTerm, page: 1, limit: 10 }));
+            setPaginatedData({
+                data: response.data,
+                currentPage: response.page,
+                total: response.total,
+                totalPage: response.totalPage,
+            });
+        }, 500),
+        [dispatch]
+    );
 
     useEffect(() => {
         dispatch(subscribeWebSocketThunk());
@@ -63,23 +72,50 @@ export default function Creators() {
         };
     }, []);
 
-    const creatorsFiltered = useMemo(() => {
-        return search.length > 0
-            ? creators.filter(
-                  (creator) =>
-                      creator?.username?.toLowerCase().includes(search.toLowerCase()) ||
-                      creator.emails.some((item) => item.email.toLowerCase().includes(search.toLowerCase()))
-              )
-            : [];
-    }, [search, creators]);
+    useEffect(() => {
+        handleNextPage();
+    }, []);
 
-    const creatorsOnlineFiltered = useMemo(() => {
-        return creators.filter((creator) => creatorsOnline.some((item) => creator._id === item._id));
-    }, [creators, creatorsOnline]);
+    useEffect(() => {
+        if (search !== null) debouncedSearch(search);
+    }, [search, debouncedSearch]);
 
-    const creatorsBlockedFiltered = useMemo(() => {
-        return creators.filter((creator) => creator?.vault?.isBlocked);
-    }, [creators]);
+    useEffect(() => {
+        const getBlockedCreators = async () => {
+            const response = await dispatch(getCreatorsPaginatedThunk({ page: 1, limit: 10, isBlocked: isBlocked }));
+            setPaginatedData({
+                data: response.data,
+                currentPage: response.page,
+                total: response.total,
+                totalPage: response.totalPage,
+            });
+        };
+        getBlockedCreators();
+    }, [isBlocked]);
+
+    useEffect(() => {
+        const getCreatorsOnline = async () => {
+            const getIds = () => {
+                if (!isCreatorsOnline) return undefined;
+                if (creatorsOnline.length === 0) return [''];
+                return creatorsOnline.map((creator) => creator._id);
+            };
+            const response = await dispatch(
+                getCreatorsPaginatedThunk({
+                    page: 1,
+                    limit: 10,
+                    ids: getIds(),
+                })
+            );
+            setPaginatedData({
+                data: response.data,
+                currentPage: response.page,
+                total: response.total,
+                totalPage: response.totalPage,
+            });
+        };
+        getCreatorsOnline();
+    }, [isCreatorsOnline]);
 
     const onDeleteClick = ({ id, email }: { id: string; email: string }) => {
         setIsOpenDialogDelete(true);
@@ -90,6 +126,22 @@ export default function Creators() {
         dispatch(deleteCreatorThunk(creatorDelete.id));
         if (creatorDelete.id === creatorId) setCreatorId('');
         setIsOpenDialogDelete(false);
+    };
+
+    const handleNextPage = async () => {
+        setLoadingCreators(true);
+        const response = await dispatch(
+            getCreatorsPaginatedThunk({ page: paginatedData.currentPage + 1, limit: 10, isBlocked: isBlocked })
+        );
+        if (response.data.length) {
+            setPaginatedData((prev) => ({
+                data: [...prev.data, ...response.data],
+                currentPage: response.page,
+                total: response.total,
+                totalPage: response.totalPage,
+            }));
+        }
+        setLoadingCreators(false);
     };
 
     return (
@@ -126,18 +178,15 @@ export default function Creators() {
                     <CreatorSearch onClick={() => setLeftSidebarOpen(true)} search={search} setSearch={setSearch} />
                     <CreatorList
                         creatorId={creatorId}
-                        data={
-                            (search.length > 0 && creatorsFiltered) ||
-                            (isBlocked && creatorsBlockedFiltered) ||
-                            (isCreatorsOnline && creatorsOnlineFiltered) ||
-                            creators
-                        }
+                        data={paginatedData.data}
                         onDeleteClick={onDeleteClick}
                         onCreatorClick={(creator) => {
                             dispatch(creatorActionsCreators.setCreator(creator));
                             setCreatorId(creator._id);
                         }}
                         loading={loadingCreators}
+                        nextPage={handleNextPage}
+                        hasMore={paginatedData.currentPage < paginatedData.totalPage}
                     />
                 </Box>
 

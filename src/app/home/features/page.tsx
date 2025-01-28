@@ -2,80 +2,76 @@
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Drawer, useMediaQuery, Theme, Box, Button } from '@mui/material';
-
+import * as Yup from 'yup';
 import PageContainer from '../components/container/PageContainer';
 import Breadcrumb from '../layout/shared/breadcrumb/Breadcrumb';
 import AppCard from '../components/shared/AppCard';
-import AddList from '../components/addCreators';
+import AddList from './components/addList';
 import List from './components/list';
 import Search from './components/search';
 import Details from './components/details';
-import { addMultipleAllowList, deletAllowList, findAllowList, updateAllowList } from '@/features/allowList/requests';
-import { AllowItem } from '@/features/allowList/types';
-import { useToastr } from '@/app/hooks/use-toastr';
-import { useSelector, useDispatch } from '@/store/hooks';
 
-import { CreatorType } from '@/features/creator';
-import { getCreatorsPaginatedThunk } from '@/features/creator/thunks';
+import { useToastr } from '@/app/hooks/use-toastr';
+import { useSelector } from '@/store/hooks';
+import { addFeature, deleteFeature, findFeatures, updateFeature } from '@/features/features/requests';
+import { FeatureItem } from '@/features/features/types';
 
 const drawerWidth = 240;
 const secdrawerWidth = 320;
 
-export default function AllowList() {
-    const dispatch = useDispatch();
+export default function Features() {
     const toastr = useToastr();
 
     const lgUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('lg'));
     const mdUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
-    const [emails, setEmails] = useState<AllowItem[]>([]);
+    const [features, setFeatures] = useState<FeatureItem[]>([]);
     const [isRightSidebarOpen, setRightSidebarOpen] = useState(false);
     const [isLeftSidebarOpen, setLeftSidebarOpen] = useState(false);
-    const [activeEmail, setActiveEmail] = useState<AllowItem>();
+    const [activeFeature, setActiveFeature] = useState<FeatureItem>();
     const [search, setSearch] = useState('');
 
     const getData = useSelector((state) => state.allowList.getData);
 
-    const [paginatedData, setPaginatedData] = useState<{
-        currentPage: number;
-        data: { [key: string]: CreatorType };
-        total: number;
-        totalPage: number;
-    }>({
-        currentPage: 0,
-        data: {},
-        total: 0,
-        totalPage: 0,
-    });
+    const handleAddNewFeature = useCallback(
+        async (params: { name: string }) => {
+            if (
+                features.some(
+                    (v) =>
+                        v.name.trim().toLowerCase().replace(/\s/g, '') !==
+                        params.name.trim().toLowerCase().replace(/\s/g, '')
+                )
+            )
+                await addFeature(params);
+            else {
+                toastr.display({
+                    type: 'info',
+                    message: 'name already exists',
+                });
+            }
+        },
+        [features]
+    );
 
-    const handleAddNewEmails = useCallback(async (params: { emails: string[] }) => {
-        if (params.emails.length) {
-            await addMultipleAllowList(params.emails.map((email) => ({ email })));
-        } else {
-            toastr.display({
-                type: 'info',
-                message: 'emails/email already belong to the allowlist',
-            });
+    const onDeleteClick = async (params: FeatureItem) => {
+        const newEmails = features.filter((item) => item.name !== params.name);
+        if (activeFeature?.name === params.name) {
+            setActiveFeature(newEmails[0]);
         }
-    }, []);
-
-    const onDeleteClick = async (params: AllowItem) => {
-        const newEmails = emails.filter((item) => item.email !== params.email);
-        if (activeEmail?.email === params.email) {
-            setActiveEmail(newEmails[0]);
-        }
-        await deletAllowList(params._id);
-        setEmails((prev) => prev.filter((v) => v._id !== params._id));
+        await deleteFeature(params._id);
+        setFeatures((prev) => prev.filter((v) => v._id !== params._id));
     };
 
-    const handleUpdateEmail = async (params: AllowItem) => {
-        if (!emails.some((item) => item.email.trim() === params.email.trim())) {
-            setActiveEmail(undefined);
-            await updateAllowList(params);
-        } else {
-            toastr.display({
-                type: 'info',
-                message: 'emails/email already belong to the allowlist',
-            });
+    const handleUpdateFeature = async (params: FeatureItem) => {
+        if (
+            !features.some(
+                (item) =>
+                    item.name.trim().toLowerCase().replace(/\s/g, '') ===
+                        params.name.trim().toLowerCase().replace(/\s/g, '') && params._id !== item._id
+            )
+        ) {
+            setActiveFeature(undefined);
+            await updateFeature(params);
+            setFeatures((prev) => prev.map((v) => (v._id === params._id ? params : v)));
         }
     };
 
@@ -83,46 +79,22 @@ export default function AllowList() {
         setLeftSidebarOpen((prev) => !prev);
     }, []);
 
-    const emailsFiltered = useMemo(() => {
-        return search.length > 0 ? emails.filter((v) => v.email.toLowerCase().includes(search.toLowerCase())) : [];
-    }, [search, emails]);
+    const featuresFiltered = useMemo(() => {
+        return search.length > 0 ? features.filter((v) => v.name.toLowerCase().includes(search.toLowerCase())) : [];
+    }, [search, features]);
 
     useEffect(() => {
         (async () => {
-            const res = await findAllowList();
+            const res = await findFeatures();
             if (res.data?.length) {
-                setEmails(res.data.sort((a, b) => (a.email < b.email ? -1 : a.email > b.email ? 1 : 0)));
+                setFeatures(res.data);
             }
         })();
     }, [getData]);
 
-    useEffect(() => {
-        const fetchPaginatedData = async (page = 1, aggregatedData = {}) => {
-            const response = await dispatch(getCreatorsPaginatedThunk({ page, limit: 100 }));
-
-            const updatedData = {
-                ...aggregatedData,
-                ...response.data.reduce((acc, cur) => ({ ...acc, [cur._id]: cur }), {}),
-            };
-
-            setPaginatedData({
-                data: updatedData,
-                currentPage: response.page,
-                total: response.total,
-                totalPage: response.totalPage,
-            });
-
-            if (response.page < response.totalPage) {
-                fetchPaginatedData(page + 1, updatedData);
-            }
-        };
-
-        fetchPaginatedData();
-    }, [dispatch]);
-
     return (
-        <PageContainer title="Allow List">
-            <Breadcrumb title="Allow List" />
+        <PageContainer title="Features">
+            <Breadcrumb title="Features" />
 
             <AppCard>
                 <Drawer
@@ -139,11 +111,7 @@ export default function AllowList() {
                     }}
                     variant={lgUp ? 'permanent' : 'temporary'}
                 >
-                    <AddList
-                        creators={Object.values(paginatedData.data)}
-                        addedEmails={emails.map((v) => v.email)}
-                        handleAddNewEmails={handleAddNewEmails}
-                    />
+                    <AddList handleAddNewFeature={handleAddNewFeature} />
                 </Drawer>
                 <Box
                     sx={{
@@ -158,10 +126,10 @@ export default function AllowList() {
                 >
                     <Search onClick={toggleLeftSidebar} search={search} setSearch={setSearch} />
                     <List
-                        activeEmail={activeEmail}
-                        emails={search.length > 0 ? emailsFiltered : emails}
+                        activeFeature={activeFeature}
+                        features={search.length > 0 ? featuresFiltered : features}
                         onDeleteClick={onDeleteClick}
-                        onEmailClick={(allowItem) => setActiveEmail(allowItem)}
+                        onFeatureClick={(featureItem) => setActiveFeature(featureItem)}
                     />
                 </Box>
                 <Drawer
@@ -202,10 +170,9 @@ export default function AllowList() {
                         </Box>
                     )}
                     <Details
-                        creators={Object.values(paginatedData.data)}
-                        setActiveEmail={setActiveEmail}
-                        activeEmail={activeEmail}
-                        handleUpdateEmail={handleUpdateEmail}
+                        setActiveFeature={setActiveFeature}
+                        activeFeature={activeFeature}
+                        handleUpdateFeature={handleUpdateFeature}
                     />
                 </Drawer>
             </AppCard>

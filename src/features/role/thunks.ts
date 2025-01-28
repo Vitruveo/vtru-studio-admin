@@ -1,6 +1,7 @@
-import { fetchEventSource } from '@microsoft/fetch-event-source';
-import { createRole, deleteRole, updateRole } from './requests';
+import { createRole, deleteRole, getRolesPaginated, updateRole } from './requests';
 import {
+    GetRolesPaginatedParams,
+    GetRolesPaginatedResponse,
     RoleApiResCreate,
     RoleApiResDelete,
     RoleApiResUpdate,
@@ -9,13 +10,22 @@ import {
     RoleReqUpdate,
 } from './types';
 import { ReduxThunkAction } from '@/store';
-import { BASE_URL_API } from '@/constants/api';
 import { roleActionsCreators } from './slice';
 import { toastrActionsCreators } from '../toastr/slice';
 import { AxiosError } from 'axios';
 
+export function roleGetPaginatedThunk(
+    params: GetRolesPaginatedParams
+): ReduxThunkAction<Promise<GetRolesPaginatedResponse>> {
+    return async function () {
+        const response = await getRolesPaginated(params);
+
+        return response.data.data!;
+    };
+}
+
 export function roleCreateThunk(payload: RoleReqCreate): ReduxThunkAction<Promise<RoleApiResCreate | void>> {
-    return async function (dispatch, getState) {
+    return async function (dispatch, _getState) {
         try {
             const response = await createRole({
                 name: payload.name,
@@ -60,7 +70,7 @@ export function roleCreateThunk(payload: RoleReqCreate): ReduxThunkAction<Promis
 }
 
 export function roleUpdateThunk(payload: RoleReqUpdate): ReduxThunkAction<Promise<RoleApiResUpdate | void>> {
-    return async function (dispatch, getState) {
+    return async function (dispatch, _getState) {
         try {
             const response = await updateRole({
                 _id: payload._id,
@@ -102,7 +112,7 @@ export function roleUpdateThunk(payload: RoleReqUpdate): ReduxThunkAction<Promis
 }
 
 export function roleDeleteThunk(payload: RoleReqDelete): ReduxThunkAction<Promise<RoleApiResDelete | void>> {
-    return async function (dispatch, getState) {
+    return async function (dispatch, _getState) {
         try {
             const response = await deleteRole(payload._id);
 
@@ -119,47 +129,5 @@ export function roleDeleteThunk(payload: RoleReqDelete): ReduxThunkAction<Promis
                 );
             }
         }
-    };
-}
-
-export function roleGetThunk(): ReduxThunkAction<Promise<void>> {
-    return async function (dispatch, getState) {
-        const state = getState();
-        const token = state.auth.token;
-
-        const ctrl = new AbortController();
-
-        const url = `${BASE_URL_API}/roles`;
-        const headers = {
-            Accept: 'text/event-stream',
-            Authorization: `Bearer ${token}`,
-        };
-
-        const response = await fetch(url, { method: 'HEAD', headers });
-
-        if (response.status === 401) {
-            dispatch(
-                toastrActionsCreators.displayToastr({
-                    type: 'error',
-                    message: 'You are not authorized to view this page.',
-                })
-            );
-
-            dispatch(roleActionsCreators.resetRole());
-
-            return;
-        }
-
-        fetchEventSource(url, {
-            method: 'GET',
-            headers,
-            onmessage(message) {
-                dispatch(roleActionsCreators.setRole(JSON.parse(message.data)));
-            },
-            onerror() {
-                throw new Error('Error fetching event source');
-            },
-            signal: ctrl.signal,
-        });
     };
 }

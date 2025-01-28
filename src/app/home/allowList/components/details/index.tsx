@@ -4,29 +4,27 @@ import { useFormik } from 'formik';
 import Image from 'next/image';
 import Box from '@mui/material/Box';
 
-import IconButton from '@mui/material/IconButton';
-import Stack from '@mui/material/Stack';
-import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import { IconPencil, IconStar, IconTrash } from '@tabler/icons-react';
 
 import emailIcon from 'public/images/breadcrumb/emailSv.png';
 
 import { useDispatch } from '@/store/hooks';
-import { Button } from '@mui/material';
+
 import BlankCard from '@/app/home/components/shared/BlankCard';
 import Scrollbar from '@/app/home/components/custom-scroll/Scrollbar';
 import CustomFormLabel from '@/app/home/components/forms/theme-elements/CustomFormLabel';
-import CustomTextField from '@/app/home/components/forms/theme-elements/CustomTextField';
+
 import { AllowItem } from '@/features/allowList/types';
+import { CreatorType } from '@/features/creator';
 
 interface Props {
+    creators: CreatorType[];
     activeEmail?: AllowItem;
     setActiveEmail(params?: AllowItem): void;
     handleUpdateEmail(params: { email: string }): void;
 }
 
-export default function Details({ activeEmail, setActiveEmail, handleUpdateEmail }: Props) {
+export default function Details({ creators, activeEmail, setActiveEmail, handleUpdateEmail }: Props) {
     const dispatch = useDispatch();
 
     const [isEditing, setIsEditing] = useState(false);
@@ -41,6 +39,8 @@ export default function Details({ activeEmail, setActiveEmail, handleUpdateEmail
             setIsEditing(false);
         },
     });
+
+    const creator = creators.find((creatorItem) => creatorItem.emails.some((v) => v.email === activeEmail?.email));
 
     useEffect(() => {
         setFieldValue('email', activeEmail?.email);
@@ -65,46 +65,15 @@ export default function Details({ activeEmail, setActiveEmail, handleUpdateEmail
                                         <form onSubmit={handleSubmit}>
                                             <Box width={350} p={3}>
                                                 <Typography variant="h6" mb={0.5}>
-                                                    Editing email
+                                                    Creator
                                                 </Typography>
                                                 <Box>
-                                                    <CustomFormLabel htmlFor="name">Email</CustomFormLabel>
-                                                    <CustomTextField
-                                                        type="email"
-                                                        name="email"
-                                                        id="email"
-                                                        variant="outlined"
-                                                        size="small"
-                                                        fullWidth
-                                                        value={values.email}
-                                                        onChange={handleChange}
-                                                    />
-                                                    {errors?.email && <span>{errors.email}</span>}
+                                                    <CustomFormLabel htmlFor="name">Username</CustomFormLabel>
+                                                    <Box>{creator?.username || 'N/A'}</Box>
                                                 </Box>
-
-                                                <Box
-                                                    width="100%"
-                                                    marginTop={5}
-                                                    gap={1}
-                                                    display="flex"
-                                                    justifyContent="flex-end"
-                                                >
-                                                    <Button
-                                                        color="error"
-                                                        variant="outlined"
-                                                        size="small"
-                                                        onClick={() => setActiveEmail(undefined)}
-                                                    >
-                                                        Cancel
-                                                    </Button>
-                                                    <Button
-                                                        color="primary"
-                                                        variant="contained"
-                                                        size="small"
-                                                        type="submit"
-                                                    >
-                                                        Save
-                                                    </Button>
+                                                <Box>
+                                                    <CustomFormLabel htmlFor="name">Vault Address</CustomFormLabel>
+                                                    <Box>{creator?.vault.vaultAddress || 'N/A'}</Box>
                                                 </Box>
                                             </Box>
                                         </form>

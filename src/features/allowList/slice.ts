@@ -5,6 +5,7 @@ import { AllowItem, AllowListSliceState } from './types';
 const initialState: AllowListSliceState = {
     byId: {},
     allIds: [],
+    getData: true,
     status: '',
     error: '',
 };
@@ -13,6 +14,9 @@ export const allowListSlice = createSlice({
     name: 'role',
     initialState,
     reducers: {
+        changeGetData: (state) => {
+            state.getData = !state.getData;
+        },
         setAllowLists: (state, action: PayloadAction<AllowItem[]>) => {
             state.byId = action.payload.reduce<{ [key: string]: AllowItem }>((acc, cur) => {
                 acc[cur._id] = cur;

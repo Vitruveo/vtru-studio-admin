@@ -32,22 +32,25 @@ export default function Features() {
 
     const getData = useSelector((state) => state.allowList.getData);
 
-    const handleAddNewFeature = useCallback(async (params: { name: string }) => {
-        if (
-            features.some(
-                (v) =>
-                    v.name.trim().toLowerCase().replace(/\s/g, '') !==
-                    params.name.trim().toLowerCase().replace(/\s/g, '')
+    const handleAddNewFeature = useCallback(
+        async (params: { name: string }) => {
+            if (
+                features.some(
+                    (v) =>
+                        v.name.trim().toLowerCase().replace(/\s/g, '') !==
+                        params.name.trim().toLowerCase().replace(/\s/g, '')
+                )
             )
-        )
-            await addFeature(params);
-        else {
-            toastr.display({
-                type: 'info',
-                message: 'name already exists',
-            });
-        }
-    }, []);
+                await addFeature(params);
+            else {
+                toastr.display({
+                    type: 'info',
+                    message: 'name already exists',
+                });
+            }
+        },
+        [features]
+    );
 
     const onDeleteClick = async (params: FeatureItem) => {
         const newEmails = features.filter((item) => item.name !== params.name);

@@ -26,7 +26,6 @@ export default function AddList({ handleAddNewFeature }: Props) {
     const { handleSubmit, handleChange, resetForm, setFieldValue, values, errors } = useFormik({
         initialValues: {
             name: '',
-            emails: [],
         },
         onSubmit: async (payload) => {
             handleAddNewFeature({

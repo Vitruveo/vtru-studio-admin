@@ -1,25 +1,24 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
-import { Button, Modal, Theme, Typography, useMediaQuery } from '@mui/material';
+import { Button, Modal, Theme, Typography, debounce, useMediaQuery } from '@mui/material';
 
 // components
 import PageContainer from '@/app/home/components/container/PageContainer';
 import Breadcrumb from '@/app/home/layout/shared/breadcrumb/Breadcrumb';
-import ArtCardsSearch from '@/app/home/components/apps/artCards/ArtCardsSearch';
 import AppCard from '@/app/home/components/shared/AppCard';
 // features
-import { updateAssetArtCardsThunk } from '@/features/assets/thunks';
 import { toastrActionsCreators } from '@/features/toastr/slice';
 // hooks
 import { useDispatch } from '@/store/hooks';
-import { getStoresPaginatedThunk } from '@/features/stores/thunks';
+import { getStoresPaginatedThunk, updateStoreStatusThunk } from '@/features/stores/thunks';
 import { Stores } from '@/features/stores/types';
 import StoresList from '../../components/apps/stores/StoresList';
 import StoresDetails from '../../components/apps/stores/StoresDetails';
+import StoresSearch from '../../components/apps/stores/StoresSearch';
 
 const secdrawerWidth = 320;
 
@@ -45,9 +44,30 @@ const PendingModerationPage = () => {
         totalPage: 0,
     });
 
+    const debouncedSearch = useCallback(
+        debounce(async (searchTerm) => {
+            const response = await dispatch(
+                getStoresPaginatedThunk({ status: 'pending', search: searchTerm, page: 1, limit: 10 })
+            );
+            if (response.data) {
+                setPaginatedData({
+                    data: response.data,
+                    currentPage: response.page,
+                    total: response.total,
+                    totalPage: response.totalPage,
+                });
+            }
+        }, 500),
+        [dispatch]
+    );
+
     useEffect(() => {
         handleNextPage();
     }, []);
+
+    useEffect(() => {
+        if (search !== null) debouncedSearch(search);
+    }, [search, debouncedSearch]);
 
     const handleSelect = (id: string) => {
         const selectedStores = paginatedData.data.find((stores) => stores._id === id);
@@ -59,20 +79,19 @@ const PendingModerationPage = () => {
 
     const handleApprove = () => {
         if (selected) {
-            dispatch(updateAssetArtCardsThunk({ id: selected._id, status: 'approved' }));
+            dispatch(updateStoreStatusThunk({ id: selected._id, status: 'active' }));
             handleRefresh();
         } else {
-            dispatch(toastrActionsCreators.displayToastr({ message: 'No Asset selected', type: 'error' }));
+            dispatch(toastrActionsCreators.displayToastr({ message: 'No Store selected', type: 'error' }));
         }
     };
 
     const handleReject = () => {
         if (selected) {
-            dispatch(updateAssetArtCardsThunk({ id: selected._id, status: 'rejected' }));
-
+            dispatch(updateStoreStatusThunk({ id: selected._id, status: 'inactive' }));
             handleRefresh();
         } else {
-            dispatch(toastrActionsCreators.displayToastr({ message: 'No Asset selected', type: 'error' }));
+            dispatch(toastrActionsCreators.displayToastr({ message: 'No Store selected', type: 'error' }));
         }
 
         setConfirmRejectModal(false);
@@ -107,8 +126,8 @@ const PendingModerationPage = () => {
     };
 
     return (
-        <PageContainer title="Art Cards" description="this is requests">
-            <Breadcrumb title="Art Cards Application" subtitle="List pending requests" />
+        <PageContainer title="Stores" description="this is requests">
+            <Breadcrumb title="Stores Application" subtitle="List pending requests" />
             <AppCard>
                 <Box
                     sx={{
@@ -117,7 +136,7 @@ const PendingModerationPage = () => {
                         flexShrink: 0,
                     }}
                 >
-                    <ArtCardsSearch search={search} setSearch={setSearch} handleRefresh={handleRefresh} />
+                    <StoresSearch search={search} setSearch={setSearch} handleRefresh={handleRefresh} />
 
                     <StoresList
                         storesId={selected ? selected._id : ''}

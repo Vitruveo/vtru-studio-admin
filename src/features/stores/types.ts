@@ -93,3 +93,8 @@ export interface GetStoresPaginatedResponse {
     total: number;
     totalPage: number;
 }
+
+export interface UpdateStoreStatusParams {
+    id: string;
+    status: StoreStatus;
+}

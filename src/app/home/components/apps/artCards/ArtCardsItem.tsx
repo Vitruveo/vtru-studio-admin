@@ -1,17 +1,8 @@
 import React from 'react';
 
-import {
-    Avatar,
-    Box,
-    ListItemAvatar,
-    ListItemButton,
-    ListItemText,
-    ListItemIcon,
-    Stack,
-    Typography,
-} from '@mui/material';
+import { Avatar, Box, ListItemAvatar, ListItemButton, ListItemText, Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { IconCheck, IconHandOff, IconClock, IconUserCheck, IconUserOff } from '@tabler/icons-react';
+import { IconCheck, IconHandOff, IconClock } from '@tabler/icons-react';
 
 // features
 import { AssetType } from '@/app/home/types/apps/asset';

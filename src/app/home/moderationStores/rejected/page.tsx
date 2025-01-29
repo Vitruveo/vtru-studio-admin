@@ -4,26 +4,25 @@ import { useState, useEffect, useCallback } from 'react';
 
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
-import { Button, Modal, Theme, Typography, useMediaQuery } from '@mui/material';
-import { debounce } from '@mui/material/utils';
+import { Button, Modal, Theme, Typography, debounce, useMediaQuery } from '@mui/material';
 
 // components
 import PageContainer from '@/app/home/components/container/PageContainer';
 import Breadcrumb from '@/app/home/layout/shared/breadcrumb/Breadcrumb';
-import ArtCardsDetails from '@/app/home/components/apps/artCards/ArtCardsDetails';
-import ArtCardsList from '@/app/home/components/apps/artCards/ArtCardsList';
-import ArtCardsSearch from '@/app/home/components/apps/artCards/ArtCardsSearch';
 import AppCard from '@/app/home/components/shared/AppCard';
 // features
-import { getAssetArtCardsThunk, updateAssetArtCardsThunk } from '@/features/assets/thunks';
 import { toastrActionsCreators } from '@/features/toastr/slice';
-import { AssetType } from '../../types/apps/asset';
 // hooks
-import { useDispatch, useSelector } from '@/store/hooks';
+import { useDispatch } from '@/store/hooks';
+import { getStoresPaginatedThunk, updateStoreStatusThunk } from '@/features/stores/thunks';
+import { Stores } from '@/features/stores/types';
+import StoresList from '../../components/apps/stores/StoresList';
+import StoresDetails from '../../components/apps/stores/StoresDetails';
+import StoresSearch from '../../components/apps/stores/StoresSearch';
 
 const secdrawerWidth = 320;
 
-const RejectedModerationPage = () => {
+const ApprovedModerationPage = () => {
     const dispatch = useDispatch();
 
     const lgUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('lg'));
@@ -31,11 +30,11 @@ const RejectedModerationPage = () => {
 
     const [isRightSidebarOpen, setRightSidebarOpen] = useState(false);
     const [search, setSearch] = useState<string | null>(null);
-    const [selected, setSelected] = useState<AssetType | undefined>(undefined);
+    const [selected, setSelected] = useState<Stores | undefined>(undefined);
     const [confirmRejectModal, setConfirmRejectModal] = useState(false);
     const [paginatedData, setPaginatedData] = useState<{
         currentPage: number;
-        data: AssetType[];
+        data: Stores[];
         total: number;
         totalPage: number;
     }>({
@@ -44,12 +43,11 @@ const RejectedModerationPage = () => {
         total: 0,
         totalPage: 0,
     });
-    const status = useSelector((state) => state.requestConsign.status);
 
     const debouncedSearch = useCallback(
         debounce(async (searchTerm) => {
             const response = await dispatch(
-                getAssetArtCardsThunk({ status: 'rejected', search: searchTerm, page: 1, limit: 10 })
+                getStoresPaginatedThunk({ status: 'inactive', search: searchTerm, page: 1, limit: 10 })
             );
             if (response.data) {
                 setPaginatedData({
@@ -72,29 +70,28 @@ const RejectedModerationPage = () => {
     }, [search, debouncedSearch]);
 
     const handleSelect = (id: string) => {
-        const selectedRequestConsigns = paginatedData.data.find((requestConsign) => requestConsign._id === id);
+        const selectedStores = paginatedData.data.find((stores) => stores._id === id);
 
-        if (selectedRequestConsigns) {
-            setSelected(selectedRequestConsigns);
+        if (selectedStores) {
+            setSelected(selectedStores);
         }
     };
 
     const handleApprove = () => {
         if (selected) {
-            dispatch(updateAssetArtCardsThunk({ id: selected._id, status: 'approved' }));
+            dispatch(updateStoreStatusThunk({ id: selected._id, status: 'active' }));
             handleRefresh();
         } else {
-            dispatch(toastrActionsCreators.displayToastr({ message: 'No Asset selected', type: 'error' }));
+            dispatch(toastrActionsCreators.displayToastr({ message: 'No Store selected', type: 'error' }));
         }
     };
 
     const handleReject = () => {
         if (selected) {
-            dispatch(updateAssetArtCardsThunk({ id: selected._id, status: 'rejected' }));
-
+            dispatch(updateStoreStatusThunk({ id: selected._id, status: 'inactive' }));
             handleRefresh();
         } else {
-            dispatch(toastrActionsCreators.displayToastr({ message: 'No Asset selected', type: 'error' }));
+            dispatch(toastrActionsCreators.displayToastr({ message: 'No Store selected', type: 'error' }));
         }
 
         setConfirmRejectModal(false);
@@ -103,7 +100,7 @@ const RejectedModerationPage = () => {
     const handleRefresh = async () => {
         setSelected(undefined);
 
-        const response = await dispatch(getAssetArtCardsThunk({ status: 'rejected', page: 1, limit: 10 }));
+        const response = await dispatch(getStoresPaginatedThunk({ status: 'inactive', page: 1, limit: 10 }));
         if (response.data) {
             setPaginatedData({
                 data: response.data,
@@ -116,7 +113,7 @@ const RejectedModerationPage = () => {
 
     const handleNextPage = async () => {
         const response = await dispatch(
-            getAssetArtCardsThunk({ status: 'rejected', page: paginatedData.currentPage + 1, limit: 10 })
+            getStoresPaginatedThunk({ status: 'inactive', page: paginatedData.currentPage + 1, limit: 10 })
         );
         if (response.data.length) {
             setPaginatedData((prev) => ({
@@ -129,8 +126,8 @@ const RejectedModerationPage = () => {
     };
 
     return (
-        <PageContainer title="Art Cards" description="this is requests">
-            <Breadcrumb title="Art Cards Application" subtitle="List rejected requests" />
+        <PageContainer title="Stores" description="this is requests">
+            <Breadcrumb title="Stores Application" subtitle="List Rejected requests" />
             <AppCard>
                 <Box
                     sx={{
@@ -139,15 +136,14 @@ const RejectedModerationPage = () => {
                         flexShrink: 0,
                     }}
                 >
-                    <ArtCardsSearch search={search} setSearch={setSearch} handleRefresh={handleRefresh} />
+                    <StoresSearch search={search} setSearch={setSearch} handleRefresh={handleRefresh} />
 
-                    <ArtCardsList
-                        requestConsignId={selected ? selected._id : ''}
+                    <StoresList
+                        storesId={selected ? selected._id : ''}
                         data={paginatedData.data}
+                        hasMore={paginatedData.currentPage < paginatedData.totalPage}
                         onClick={({ _id }) => handleSelect(_id)}
                         nextPage={handleNextPage}
-                        hasMore={paginatedData.currentPage < paginatedData.totalPage}
-                        loading={status === 'loading'}
                     />
                 </Box>
 
@@ -164,12 +160,8 @@ const RejectedModerationPage = () => {
                     }}
                 >
                     {selected ? (
-                        <ArtCardsDetails
-                            username={selected.creator?.username ?? ''}
-                            emails={[]}
-                            title={selected.assetMetadata.context?.formData.title ?? ''}
-                            status={selected.licenses.artCards.status}
-                            preview={selected.formats?.preview.path ?? ''}
+                        <StoresDetails
+                            store={selected}
                             handleApprove={handleApprove}
                             handleReject={() => setConfirmRejectModal(true)}
                         />
@@ -202,7 +194,7 @@ const RejectedModerationPage = () => {
     );
 };
 
-export default RejectedModerationPage;
+export default ApprovedModerationPage;
 
 const style = {
     position: 'absolute',

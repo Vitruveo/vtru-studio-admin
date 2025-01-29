@@ -6,8 +6,9 @@ import Typography from '@mui/material/Typography';
 
 // Constants
 import { Stores } from '@/features/stores/types';
-import { Preview } from './Preview';
 import { STORE_STORAGE_URL } from '@/constants/asset';
+import Image from 'next/image';
+import { Review } from './review';
 
 interface Props {
     store: Stores;
@@ -17,12 +18,12 @@ interface Props {
 
 export default function StoresDetails({ store, handleApprove, handleReject }: Props) {
     return (
-        <>
-            <Box p={3} py={2} display={'flex'} alignItems="center">
+        <Box display={'flex'} flexDirection={'column'} p={2} gap={2}>
+            <Box display={'flex'} alignItems="center">
                 <Typography variant="h5">Store Details</Typography>
             </Box>
             <Divider />
-            <Box p={2}>
+            <Box>
                 <Stack gap={0} direction="row" justifyContent="space-between">
                     <Box display="flex" gap={1} alignItems={'center'}>
                         <Button
@@ -46,36 +47,37 @@ export default function StoresDetails({ store, handleApprove, handleReject }: Pr
                 </Stack>
             </Box>
 
-            <Box display="flex" gap={1} p={2}>
-                <Typography>Title: {store.organization.name}</Typography>
-                <Typography>Username: {store?.username}</Typography>
+            <Box display="flex" gap={1} py={3}>
+                <Image
+                    src={`${STORE_STORAGE_URL}/${store.organization.formats?.logo.square.path}`}
+                    width={200}
+                    height={200}
+                    alt={'logo'}
+                />
+                <Box>
+                    {/*TODO - Add email of creator */}
+                    <Typography>
+                        <strong>Store Owner:</strong> {store?.username}
+                    </Typography>
+                    <br />
+                    <Typography>
+                        <strong>Name:</strong> {store.organization.name}
+                    </Typography>
+                    <Typography>
+                        <strong>URL:</strong> https://{store.organization.url}.xibit.live
+                    </Typography>
+                    {store.organization?.description && (
+                        <Typography>
+                            <strong>Description:</strong> {store.organization.description}
+                        </Typography>
+                    )}
+                </Box>
             </Box>
 
-            <Box
-                p={2}
-                sx={{
-                    overflowY: 'auto',
-                    height: 'calc(100vh - 460px)',
-                    width: '100%',
-                }}
-            >
-                <Preview
-                    title={store.organization.url || 'Store Name'}
-                    description={store.organization.description || 'Store Description'}
-                    domain={
-                        store.organization.url
-                            ? `https://${store.organization.url}.xibit.live`
-                            : 'https://example.xibit.live'
-                    }
-                    banner={
-                        store.organization.formats?.banner?.path
-                            ? `${STORE_STORAGE_URL}/${store.organization.formats?.banner.path}`
-                            : null
-                    }
-                    logo={`${STORE_STORAGE_URL}/${store.organization.formats?.logo.square.path}`}
-                    logoHorizontal={`${STORE_STORAGE_URL}/${store.organization.formats?.logo.horizontal.path}`}
-                />
+            <Box>
+                <Typography variant="h3">Filters</Typography>
+                <Review values={store.artworks} />
             </Box>
-        </>
+        </Box>
     );
 }

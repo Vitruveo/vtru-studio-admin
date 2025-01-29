@@ -39,7 +39,8 @@ export default function Features() {
                     (v) =>
                         v.name.trim().toLowerCase().replace(/\s/g, '') !==
                         params.name.trim().toLowerCase().replace(/\s/g, '')
-                )
+                ) ||
+                !features.length
             )
                 await addFeature(params);
             else {

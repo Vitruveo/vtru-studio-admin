@@ -9,6 +9,7 @@ import { Stores } from '@/features/stores/types';
 import { STORE_STORAGE_URL } from '@/constants/asset';
 import Image from 'next/image';
 import { Review } from './review';
+import { hasTruthyObject } from '@/utils/truthyObject';
 
 interface Props {
     store: Stores;
@@ -78,7 +79,11 @@ export default function StoresDetails({ store, handleApprove, handleReject }: Pr
 
             <Box display={'flex'} flexDirection={'column'} gap={2}>
                 <Typography variant="h3">Filters</Typography>
-                <Review values={store.artworks} />
+                {hasTruthyObject(store.artworks) ? (
+                    <Review values={store.artworks} />
+                ) : (
+                    <Typography>No active filters</Typography>
+                )}
             </Box>
         </Box>
     );

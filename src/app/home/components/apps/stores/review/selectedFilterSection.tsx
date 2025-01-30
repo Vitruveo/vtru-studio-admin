@@ -60,14 +60,9 @@ export const SelectedFilter = ({ title, content }: SelectedFilterProps) => {
                             delete (valueCopy as any).maxPrice;
                         }
                         return (
-                            <Box
-                                key={key}
-                                display={'flex'}
-                                flexDirection={isColorPrecision || isColors ? 'row' : 'column'}
-                                marginBlock={1}
-                            >
+                            <Box key={key} display={'flex'} flexDirection={'row'} marginBlock={1} gap={1}>
                                 <Typography variant="subtitle2" fontWeight="bold">
-                                    {hasTruthyObject(valueCopy) || (isColorPrecision && hasColors) ? key : ''}
+                                    {hasTruthyObject(valueCopy) || (isColorPrecision && hasColors) ? key : ''}:
                                 </Typography>
                                 {isShortcut && <ShortcutFilter content={value as { [key: string]: boolean }} />}
                                 {isLicense && <LicensesFilter content={value as { [key: string]: string }} />}

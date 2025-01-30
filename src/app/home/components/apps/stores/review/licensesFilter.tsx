@@ -14,7 +14,7 @@ export const LicensesFilter = ({ content }: LicensesFilterProps) => {
                 .map(([key, value]) => (
                     <Box key={key} alignItems="center">
                         <Typography variant="body1">
-                            {key === 'minPrice' ? 'Minimum price' : 'Maximum price'}{' '}
+                            {key === 'minPrice' ? 'Minimum price: ' : 'Maximum price: '}
                             {formatCurrency({ value: Number(value) })}
                         </Typography>
                     </Box>

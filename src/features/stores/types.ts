@@ -5,6 +5,11 @@ export interface Stores {
     framework: Framework;
     status: StoreStatus;
     username: string;
+    emails: {
+        email: string;
+        codeHash: string | null;
+        checkedAt: string | null;
+    }[];
 }
 
 interface Media {

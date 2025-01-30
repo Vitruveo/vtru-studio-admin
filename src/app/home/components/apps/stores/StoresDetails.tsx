@@ -57,24 +57,26 @@ export default function StoresDetails({ store, handleApprove, handleReject }: Pr
                 <Box>
                     {/*TODO - Add email of creator */}
                     <Typography>
-                        <strong>Store Owner:</strong> {store?.username}
+                        <strong style={{ marginRight: '4px' }}>Store Owner:</strong> {store?.username} (
+                        {store.emails[0].email})
                     </Typography>
                     <br />
                     <Typography>
-                        <strong>Name:</strong> {store.organization.name}
+                        <strong style={{ marginRight: '4px' }}>Name:</strong> {store.organization.name}
                     </Typography>
                     <Typography>
-                        <strong>URL:</strong> https://{store.organization.url}.xibit.live
+                        <strong style={{ marginRight: '4px' }}>URL:</strong> https://{store.organization.url}.xibit.live
                     </Typography>
                     {store.organization?.description && (
                         <Typography>
-                            <strong>Description:</strong> {store.organization.description}
+                            <strong style={{ marginRight: '4px' }}>Description:</strong>
+                            {store.organization.description}
                         </Typography>
                     )}
                 </Box>
             </Box>
 
-            <Box>
+            <Box display={'flex'} flexDirection={'column'} gap={2}>
                 <Typography variant="h3">Filters</Typography>
                 <Review values={store.artworks} />
             </Box>

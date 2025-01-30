@@ -45,17 +45,17 @@ const options: Record<string, { [key: string]: { label: string; value: string }[
 
 export const MultiSelectFilter = ({ content }: MultiSelectFilterProps) => {
     if (!content.value.length) return null;
+    const isLast = (index: number) => index < content.value.length - 1;
 
     return (
         <Box display={'flex'} gap={1} flexWrap={'wrap'}>
             {content.value.map((item) => (
-                <Paper key={item} sx={{ padding: 1, display: 'flex' }}>
-                    <Typography variant="body1">
-                        {options[content.title][content.key].length
-                            ? options[content.title][content.key].find((option) => option.value === item)?.label
-                            : item}
-                    </Typography>
-                </Paper>
+                <Typography key={item} variant="body1">
+                    {options[content.title][content.key].length
+                        ? options[content.title][content.key].find((option) => option.value === item)?.label
+                        : item}
+                    {isLast(content.value.indexOf(item)) ? ', ' : ''}
+                </Typography>
             ))}
         </Box>
     );

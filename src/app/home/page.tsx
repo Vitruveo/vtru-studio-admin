@@ -6,7 +6,7 @@ import activeAssetsIcon from '../../../public/images/svgs/icon-dd-application.sv
 import userMaleIcon from '../../../public/images/svgs/icon-user-male.svg';
 import mailBoxIcon from '../../../public/images/svgs/icon-mailbox.svg';
 import { HomeCard, HomeCardProps } from './components/widgets/cards/home-card';
-import { useDispatch, useSelector } from '@/store/hooks';
+import { useSelector } from '@/store/hooks';
 
 export default function Dashboard() {
     const activeAssetsCount = useSelector((state) => state.asset.allIds.length);

@@ -31,7 +31,7 @@ import { toastrActionsCreators } from '../toastr/slice';
 export function updateAssetStatusByIdThunk(
     payload: UpdateAssetStatusByIdParams
 ): ReduxThunkAction<Promise<APIResponse>> {
-    return function (dispatch) {
+    return function(dispatch) {
         dispatch(
             assetActionsCreators.setStatus({
                 id: payload.id,
@@ -46,7 +46,7 @@ export function updateAssetStatusByIdThunk(
 export function getAssetsPaginatedThunk(
     params: GetAssetsPaginatedParams
 ): ReduxThunkAction<Promise<GetAssetsByCreatorIdResponse>> {
-    return async function (dispatch) {
+    return async function(_dispatch) {
         const response = await getAssetsPaginated(params);
 
         return response.data.data!;
@@ -55,7 +55,7 @@ export function getAssetsPaginatedThunk(
 export function getAssetArtCardsThunk(
     params: GetAssetsArtCardsParams
 ): ReduxThunkAction<Promise<GetAssetsArtCardsResponse>> {
-    return async function () {
+    return async function() {
         const response = await getAssetsArtCards(params);
 
         return response.data.data!;
@@ -63,13 +63,13 @@ export function getAssetArtCardsThunk(
 }
 
 export function updateAssetArtCardsThunk(params: UpdateAssetArtCardsParams): ReduxThunkAction {
-    return async function () {
+    return async function() {
         await updateAssetArtCards(params);
     };
 }
 
 export function updateManyAssetsStatusByIdsThunk(payload: UpdateManyAssetsStatusByIdsParams): ReduxThunkAction {
-    return async function (dispatch) {
+    return async function(dispatch) {
         try {
             await updateManyAssetsStatusByIds(payload);
             // dispatch(assetActionsCreators.setManyStatus(payload));
@@ -104,13 +104,13 @@ export function updateManyAssetsStatusByIdsThunk(payload: UpdateManyAssetsStatus
 }
 
 export function changeFilterThunk(payload: ChangeFilterParams): ReduxThunkAction {
-    return function (dispatch) {
+    return function(dispatch) {
         dispatch(assetActionsCreators.changeFilter(payload));
     };
 }
 
 export function getCreatorNameByAssetIdThunk(payload: GetCreatorNameByAssetIdParams): ReduxThunkAction {
-    return function (dispatch) {
+    return function(dispatch) {
         dispatch(assetActionsCreators.changeCreator(''));
 
         getCreatorNameByAssetId(payload).then((response) => {
@@ -122,19 +122,19 @@ export function getCreatorNameByAssetIdThunk(payload: GetCreatorNameByAssetIdPar
 }
 
 export function setCurrentPageThunk(payload: number): ReduxThunkAction {
-    return function (dispatch) {
+    return function(dispatch) {
         dispatch(assetActionsCreators.setCurrentPage(payload));
     };
 }
 
 export function setPageThunk(payload: number): ReduxThunkAction {
-    return function (dispatch) {
+    return function(dispatch) {
         dispatch(assetActionsCreators.setPage(payload));
     };
 }
 
 export function getAssetByIdThunk(id: string): ReduxThunkAction {
-    return async function (dispatch, getState) {
+    return async function(dispatch, getState) {
         const response = await getAssetById(id);
 
         if (response.data) dispatch(assetActionsCreators.setAsset(response.data));
@@ -143,18 +143,18 @@ export function getAssetByIdThunk(id: string): ReduxThunkAction {
 
 export const getAssetsByCreatorIdThunk =
     (creatorId: string, page?: number): ReduxThunkAction =>
-    async (dispatch) => {
-        const response = await getAssetsByCreatorId(creatorId, page);
+        async (dispatch) => {
+            const response = await getAssetsByCreatorId(creatorId, page);
 
-        if (response.data) {
-            dispatch(assetActionsCreators.setAssets(response.data.data));
-            dispatch(assetActionsCreators.setTotal(response.data.total));
-            dispatch(assetActionsCreators.setTotalPage(response.data.totalPage));
-        }
-    };
+            if (response.data) {
+                dispatch(assetActionsCreators.setAssets(response.data.data));
+                dispatch(assetActionsCreators.setTotal(response.data.total));
+                dispatch(assetActionsCreators.setTotalPage(response.data.totalPage));
+            }
+        };
 
 export const updateAssetsNudityThunk = (data: UpdateAssetsNudityParams): ReduxThunkAction => {
-    return async function (dispatch) {
+    return async function(dispatch) {
         try {
             await updateAssetsNudity(data);
             dispatch(

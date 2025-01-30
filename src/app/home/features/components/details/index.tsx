@@ -54,7 +54,7 @@ export default function Details({ activeFeature, setActiveFeature, handleUpdateF
         setFieldValue('released', activeFeature?.released);
         setFieldValue('isOnlyFor', activeFeature?.isOnlyFor);
         setFieldValue('onlyFor', activeFeature?.onlyFor);
-        setFieldValue('emails', activeFeature?.emails);
+        setFieldValue('emails', activeFeature?.emails || []);
     }, [activeFeature]);
 
     const handleChangeReleased = () => {
@@ -168,7 +168,7 @@ export default function Details({ activeFeature, setActiveFeature, handleUpdateF
                                                 {values.isOnlyFor && values.onlyFor === 'specificUsers' && (
                                                     <>
                                                         <Box marginTop={1} overflow="auto" maxHeight={100}>
-                                                            {values?.emails.sort().map((email) => (
+                                                            {values?.emails?.sort()?.map((email) => (
                                                                 <Box
                                                                     display="flex"
                                                                     justifyContent="space-between"

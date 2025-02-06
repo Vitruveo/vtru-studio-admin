@@ -169,7 +169,7 @@ const PendingModerationPage = () => {
                             emails={[]}
                             title={selected.assetMetadata.context?.formData.title ?? ''}
                             status={selected.licenses.artCards.status}
-                            preview={selected.formats?.preview.path ?? ''}
+                            preview={selected.formats?.preview?.path ?? ''}
                             handleApprove={handleApprove}
                             handleReject={() => setConfirmRejectModal(true)}
                         />

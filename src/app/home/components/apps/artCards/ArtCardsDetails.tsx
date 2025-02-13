@@ -7,6 +7,7 @@ import Image from 'next/image';
 
 // Constants
 import { ASSET_STORAGE_URL } from '@/constants/asset';
+import { isVideoMedia } from '@/utils/assets';
 
 interface Props {
     username: string;
@@ -74,7 +75,13 @@ export default function ArtCardsDetails({
                     width: '100%',
                 }}
             >
-                <Image src={`${ASSET_STORAGE_URL}/${preview}`} width={500} height={500} alt={title} />
+                {!preview ? (
+                    <Typography variant="h6">Artwork not found</Typography>
+                ) : isVideoMedia(preview) ? (
+                    <Typography variant="h6">This is a video</Typography>
+                ) : (
+                    <Image src={`${ASSET_STORAGE_URL}/${preview}`} width={500} height={500} alt={title} />
+                )}
             </Box>
         </>
     );

@@ -97,6 +97,32 @@ const Menuitems: MenuitemsType[] = [
     },
     {
         id: uniqueId(),
+        title: 'Stores',
+        icon: IconAperture,
+        permission: 'moderator',
+        children: [
+            {
+                id: uniqueId(),
+                title: 'Pending',
+                icon: IconClock,
+                href: '/home/moderationStores/pending',
+            },
+            {
+                id: uniqueId(),
+                title: 'Approved',
+                icon: IconCheck,
+                href: '/home/moderationStores/approved',
+            },
+            {
+                id: uniqueId(),
+                title: 'Rejected',
+                icon: IconHandOff,
+                href: '/home/moderationStores/rejected',
+            },
+        ],
+    },
+    {
+        id: uniqueId(),
         title: 'ArtCards',
         icon: IconAperture,
         permission: 'moderator',

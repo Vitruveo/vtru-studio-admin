@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { apiService } from '@/services/api';
-import { apiBatchService } from '@/services/apiBatch';
+import { api3Service } from '@/services/api3';
 import { APIResponse } from '../common/types';
-import { BASE_URL_BATCH } from '@/constants/api';
+import { BASE_URL_API3 } from '@/constants/api';
 import {
     GetRequestConsigns,
     RequestConsign,
@@ -29,11 +29,11 @@ export async function updateStatusRequestConsign({
 }
 
 export async function consign(id: string) {
-    return apiBatchService.post(`/consign/${id}`, {});
+    return api3Service.post(`/consign/${id}`, {});
 }
 
 export async function eventsByTransaction(transaction: string) {
-    return axios.get(`${BASE_URL_BATCH}/events/${transaction}`);
+    return axios.get(`${BASE_URL_API3}/events/${transaction}`);
 }
 
 export async function updateRequestConsignComments({ id, comment }: RequestConsignAddComment) {

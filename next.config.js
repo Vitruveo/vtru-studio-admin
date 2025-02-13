@@ -6,6 +6,9 @@ const nextConfig = {
             'vitruveo-studio-dev-assets.s3.amazonaws.com',
             'vitruveo-studio-qa-assets.s3.amazonaws.com',
             'vitruveo-studio-production-assets.s3.amazonaws.com',
+            'vitruveo-studio-dev-stores.s3.amazonaws.com',
+            'vitruveo-studio-qa-stores.s3.amazonaws.com',
+            'vitruveo-studio-production-stores.s3.amazonaws.com',
         ],
     },
     async redirects() {

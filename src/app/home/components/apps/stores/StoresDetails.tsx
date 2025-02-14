@@ -49,31 +49,62 @@ export default function StoresDetails({ store, handleApprove, handleReject }: Pr
             </Box>
 
             <Box display="flex" gap={1} py={3}>
-                <Image
-                    src={`${STORE_STORAGE_URL}/${store.organization.formats?.logo.square.path}`}
-                    width={200}
-                    height={200}
-                    alt={'logo'}
-                />
-                <Box>
-                    {/*TODO - Add email of creator */}
-                    <Typography>
-                        <strong style={{ marginRight: '4px' }}>Store Owner:</strong> {store?.username} (
-                        {store.emails[0].email})
-                    </Typography>
-                    <br />
-                    <Typography>
-                        <strong style={{ marginRight: '4px' }}>Name:</strong> {store.organization.name}
-                    </Typography>
-                    <Typography>
-                        <strong style={{ marginRight: '4px' }}>URL:</strong> https://{store.organization.url}.xibit.live
-                    </Typography>
-                    {store.organization?.description && (
-                        <Typography>
-                            <strong style={{ marginRight: '4px' }}>Description:</strong>
-                            {store.organization.description}
-                        </Typography>
-                    )}
+                <Box display={'flex'} flexDirection={'column'} gap={1}>
+                    <Box display={'flex'} gap={1}>
+                        <Box display={'flex'} flexDirection={'column'} gap={0.5}>
+                            <Typography variant="h6">Logo Square</Typography>
+                            <Image
+                                src={`${STORE_STORAGE_URL}/${store.organization.formats?.logo.square.path}`}
+                                width={200}
+                                height={200}
+                                alt={'logo-square'}
+                            />
+                        </Box>
+                        <Box mt={2}>
+                            <Typography>
+                                <strong style={{ marginRight: '3px' }}>Store Owner:</strong> {store?.username} (
+                                {store.emails[0].email})
+                            </Typography>
+                            <br />
+                            <Typography>
+                                <strong style={{ marginRight: '3px' }}>Name:</strong> {store.organization.name}
+                            </Typography>
+                            <Typography>
+                                <strong style={{ marginRight: '3px' }}>URL:</strong> https://{store.organization.url}
+                                .xibit.live
+                            </Typography>
+                            {store.organization?.description && (
+                                <Typography>
+                                    <strong style={{ marginRight: '3px' }}>Description:</strong>
+                                    {store.organization.description}
+                                </Typography>
+                            )}
+                        </Box>
+                    </Box>
+
+                    <Box display={'flex'} flexDirection={'row'} gap={1}>
+                        <Box display={'flex'} flexDirection={'column'} gap={0.5}>
+                            <Typography variant="h6">Logo Horizontal</Typography>
+                            <Image
+                                src={`${STORE_STORAGE_URL}/${store.organization.formats?.logo.horizontal.path}`}
+                                width={200}
+                                height={100}
+                                alt={'logo-horizontal'}
+                            />
+                        </Box>
+
+                        {store.organization.formats?.banner?.path && (
+                            <Box display={'flex'} flexDirection={'column'} gap={0.5}>
+                                <Typography variant="h6">Banner</Typography>
+                                <Image
+                                    src={`${STORE_STORAGE_URL}/${store.organization.formats?.banner?.path}`}
+                                    width={200}
+                                    height={100}
+                                    alt={'banner'}
+                                />
+                            </Box>
+                        )}
+                    </Box>
                 </Box>
             </Box>
 

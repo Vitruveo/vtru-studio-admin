@@ -48,7 +48,7 @@ export default function StoresDetails({ store, handleApprove, handleReject }: Pr
                 </Stack>
             </Box>
 
-            <Box display="flex" gap={1} py={3}>
+            <Box display="flex" flexDirection={'column'} gap={2} py={3}>
                 <Box mt={2}>
                     <Typography>
                         <strong style={{ marginRight: '3px' }}>Store Owner:</strong> {store?.username} (

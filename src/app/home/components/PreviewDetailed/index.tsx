@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Box, Button, Grid, Pagination, Select, Typography } from '@mui/material';
 import { IconMenu2 } from '@tabler/icons-react';
-import { AppearanceAndContent } from '@/features/stores/types';
+import { AppearanceContent } from '@/features/stores/types';
 import AssetMock from './assetMock';
 import FilterMock from './filterMock';
 import './style.css';
@@ -13,7 +13,7 @@ interface Props {
     banner: string | null;
     logo: string | null;
     logoHorizontal: string | null;
-    values?: AppearanceAndContent;
+    values?: AppearanceContent;
 }
 
 export const PreviewDetailed = (rest: Props) => {

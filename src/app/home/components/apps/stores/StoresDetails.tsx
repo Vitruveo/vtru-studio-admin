@@ -80,7 +80,7 @@ export default function StoresDetails({ store, handleApprove, handleReject }: Pr
                     }
                     logo={`${STORE_STORAGE_URL}/${store.organization.formats?.logo?.square.path}`}
                     logoHorizontal={`${STORE_STORAGE_URL}/${store.organization.formats?.logo?.horizontal.path}`}
-                    values={store?.appearanceAndContent}
+                    values={store?.appearanceContent}
                 />
             </Box>
 

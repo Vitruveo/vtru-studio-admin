@@ -4,6 +4,7 @@ export interface Stores {
     artworks: Artworks;
     framework: Framework;
     status: StoreStatus;
+    appearanceAndContent?: AppearanceAndContent;
     username: string;
     emails: {
         email: string;
@@ -70,6 +71,21 @@ export interface Artworks {
 }
 
 export type StoreStatus = 'draft' | 'pending' | 'active' | 'inactive';
+
+export interface AppearanceAndContent {
+    hideElements: {
+        header: boolean;
+        filters: boolean;
+        artworkSpotlight: boolean;
+        artistSpotlight: boolean;
+        recentlySold: boolean;
+        order: boolean;
+        pageNavigation: boolean;
+        assets: boolean;
+        cardDetails: boolean;
+    };
+    highlightColor: string;
+}
 
 interface Framework {
     createdAt: Date;

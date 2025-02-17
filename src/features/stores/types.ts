@@ -4,7 +4,7 @@ export interface Stores {
     artworks: Artworks;
     framework: Framework;
     status: StoreStatus;
-    appearanceAndContent?: AppearanceAndContent;
+    appearanceContent?: AppearanceContent;
     username: string;
     emails: {
         email: string;
@@ -72,7 +72,7 @@ export interface Artworks {
 
 export type StoreStatus = 'draft' | 'pending' | 'active' | 'inactive';
 
-export interface AppearanceAndContent {
+export interface AppearanceContent {
     hideElements: {
         header: boolean;
         filters: boolean;

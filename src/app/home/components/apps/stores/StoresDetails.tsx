@@ -10,6 +10,9 @@ import { STORE_STORAGE_URL } from '@/constants/asset';
 import { Review } from './review';
 import { hasTruthyObject } from '@/utils/truthyObject';
 import { PreviewDetailed } from '../../PreviewDetailed';
+import { NODE_ENV } from '@/constants/api';
+
+const domain = NODE_ENV === 'production' ? '.xibit.live' : '.search.vtru.dev';
 
 interface Props {
     store: Stores;
@@ -58,9 +61,9 @@ export default function StoresDetails({ store, handleApprove, handleReject }: Pr
                     <Typography>
                         <strong style={{ marginRight: '3px' }}>Name:</strong> {store.organization.name}
                     </Typography>
-                    <Typography>
+                    <Typography component="a" href={`https://${store.organization.url}${domain}`} target="_blank">
                         <strong style={{ marginRight: '3px' }}>URL:</strong> https://{store.organization.url}
-                        .xibit.live
+                        {domain}
                     </Typography>
                     {store.organization?.description && (
                         <Typography>

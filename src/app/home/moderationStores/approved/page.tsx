@@ -47,7 +47,7 @@ const ApprovedModerationPage = () => {
     const debouncedSearch = useCallback(
         debounce(async (searchTerm) => {
             const response = await dispatch(
-                getStoresPaginatedThunk({ status: 'active', search: searchTerm, page: 1, limit: 10 })
+                getStoresPaginatedThunk({ status: 'active', search: searchTerm, page: 1, limit: 25 })
             );
             if (response.data) {
                 setPaginatedData({
@@ -100,7 +100,7 @@ const ApprovedModerationPage = () => {
     const handleRefresh = async () => {
         setSelected(undefined);
 
-        const response = await dispatch(getStoresPaginatedThunk({ status: 'active', page: 1, limit: 10 }));
+        const response = await dispatch(getStoresPaginatedThunk({ status: 'active', page: 1, limit: 25 }));
         if (response.data) {
             setPaginatedData({
                 data: response.data,
@@ -113,7 +113,7 @@ const ApprovedModerationPage = () => {
 
     const handleNextPage = async () => {
         const response = await dispatch(
-            getStoresPaginatedThunk({ status: 'active', page: paginatedData.currentPage + 1, limit: 10 })
+            getStoresPaginatedThunk({ status: 'active', page: paginatedData.currentPage + 1, limit: 25 })
         );
         if (response.data.length) {
             setPaginatedData((prev) => ({

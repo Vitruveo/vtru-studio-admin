@@ -7,9 +7,9 @@ import Typography from '@mui/material/Typography';
 // Constants
 import { Stores } from '@/features/stores/types';
 import { STORE_STORAGE_URL } from '@/constants/asset';
-import Image from 'next/image';
 import { Review } from './review';
 import { hasTruthyObject } from '@/utils/truthyObject';
+import { PreviewDetailed } from '../../PreviewDetailed';
 
 interface Props {
     store: Stores;
@@ -48,64 +48,40 @@ export default function StoresDetails({ store, handleApprove, handleReject }: Pr
                 </Stack>
             </Box>
 
-            <Box display="flex" gap={1} py={3}>
-                <Box display={'flex'} flexDirection={'column'} gap={1}>
-                    <Box display={'flex'} gap={1}>
-                        <Box display={'flex'} flexDirection={'column'} gap={0.5}>
-                            <Typography variant="h6">Logo Square</Typography>
-                            <Image
-                                src={`${STORE_STORAGE_URL}/${store.organization.formats?.logo.square.path}`}
-                                width={200}
-                                height={200}
-                                alt={'logo-square'}
-                            />
-                        </Box>
-                        <Box mt={2}>
-                            <Typography>
-                                <strong style={{ marginRight: '3px' }}>Store Owner:</strong> {store?.username} (
-                                {store.emails[0].email})
-                            </Typography>
-                            <br />
-                            <Typography>
-                                <strong style={{ marginRight: '3px' }}>Name:</strong> {store.organization.name}
-                            </Typography>
-                            <Typography>
-                                <strong style={{ marginRight: '3px' }}>URL:</strong> https://{store.organization.url}
-                                .xibit.live
-                            </Typography>
-                            {store.organization?.description && (
-                                <Typography>
-                                    <strong style={{ marginRight: '3px' }}>Description:</strong>
-                                    {store.organization.description}
-                                </Typography>
-                            )}
-                        </Box>
-                    </Box>
-
-                    <Box display={'flex'} flexDirection={'row'} gap={1}>
-                        <Box display={'flex'} flexDirection={'column'} gap={0.5}>
-                            <Typography variant="h6">Logo Horizontal</Typography>
-                            <Image
-                                src={`${STORE_STORAGE_URL}/${store.organization.formats?.logo.horizontal.path}`}
-                                width={200}
-                                height={100}
-                                alt={'logo-horizontal'}
-                            />
-                        </Box>
-
-                        {store.organization.formats?.banner?.path && (
-                            <Box display={'flex'} flexDirection={'column'} gap={0.5}>
-                                <Typography variant="h6">Banner</Typography>
-                                <Image
-                                    src={`${STORE_STORAGE_URL}/${store.organization.formats?.banner?.path}`}
-                                    width={200}
-                                    height={100}
-                                    alt={'banner'}
-                                />
-                            </Box>
-                        )}
-                    </Box>
+            <Box display="flex" flexDirection={'column'} gap={2} py={3}>
+                <Box mt={2}>
+                    <Typography>
+                        <strong style={{ marginRight: '3px' }}>Store Owner:</strong> {store?.username} (
+                        {store.emails[0].email})
+                    </Typography>
+                    <br />
+                    <Typography>
+                        <strong style={{ marginRight: '3px' }}>Name:</strong> {store.organization.name}
+                    </Typography>
+                    <Typography>
+                        <strong style={{ marginRight: '3px' }}>URL:</strong> https://{store.organization.url}
+                        .xibit.live
+                    </Typography>
+                    {store.organization?.description && (
+                        <Typography>
+                            <strong style={{ marginRight: '3px' }}>Description:</strong>
+                            {store.organization.description}
+                        </Typography>
+                    )}
                 </Box>
+                <PreviewDetailed
+                    title={store.organization.name}
+                    description={store.organization?.description}
+                    domain={`https://${store.organization.url}.xibit.live`}
+                    banner={
+                        store.organization.formats?.banner?.path
+                            ? `${STORE_STORAGE_URL}/${store.organization.formats?.banner?.path}`
+                            : null
+                    }
+                    logo={`${STORE_STORAGE_URL}/${store.organization.formats?.logo?.square.path}`}
+                    logoHorizontal={`${STORE_STORAGE_URL}/${store.organization.formats?.logo?.horizontal.path}`}
+                    values={store?.appearanceContent}
+                />
             </Box>
 
             <Box display={'flex'} flexDirection={'column'} gap={2}>

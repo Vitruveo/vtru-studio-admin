@@ -41,6 +41,9 @@ const options: Record<string, { [key: string]: { label: string; value: string }[
         nationality: countryData.map((country) => ({ value: country.code, label: country.label })),
         residence: countryData.map((country) => ({ value: country.code, label: country.label })),
     },
+    portfolio: {
+        wallets: [],
+    },
 };
 
 export const MultiSelectFilter = ({ content }: MultiSelectFilterProps) => {
@@ -49,14 +52,16 @@ export const MultiSelectFilter = ({ content }: MultiSelectFilterProps) => {
 
     return (
         <Box display={'flex'} gap={1} flexWrap={'wrap'}>
-            {content.value.map((item) => (
-                <Typography key={item} variant="body1">
-                    {options[content.title][content.key].length
-                        ? options[content.title][content.key].find((option) => option.value === item)?.label
-                        : item}
-                    {isLast(content.value.indexOf(item)) ? ', ' : ''}
-                </Typography>
-            ))}
+            {content.value.map((item) => {
+                return (
+                    <Typography key={item} variant="body1">
+                        {options[content.title][content.key].length
+                            ? options[content.title][content.key].find((option) => option.value === item)?.label
+                            : item}
+                        {isLast(content.value.indexOf(item)) ? ', ' : ''}
+                    </Typography>
+                );
+            })}
         </Box>
     );
 };

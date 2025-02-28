@@ -72,6 +72,16 @@ export default function StoresDetails({ store, handleApprove, handleReject }: Pr
                         </Typography>
                     )}
                 </Box>
+
+                <Box display={'flex'} flexDirection={'column'} gap={2}>
+                    <Typography variant="h3">Filters</Typography>
+                    {hasTruthyObject(store.artworks) ? (
+                        <Review values={store.artworks} />
+                    ) : (
+                        <Typography>No active filters</Typography>
+                    )}
+                </Box>
+
                 <PreviewDetailed
                     title={store.organization.name}
                     description={store.organization?.description}
@@ -85,15 +95,6 @@ export default function StoresDetails({ store, handleApprove, handleReject }: Pr
                     logoHorizontal={`${STORE_STORAGE_URL}/${store.organization.formats?.logo?.horizontal.path}`}
                     values={store?.appearanceContent}
                 />
-            </Box>
-
-            <Box display={'flex'} flexDirection={'column'} gap={2}>
-                <Typography variant="h3">Filters</Typography>
-                {hasTruthyObject(store.artworks) ? (
-                    <Review values={store.artworks} />
-                ) : (
-                    <Typography>No active filters</Typography>
-                )}
             </Box>
         </Box>
     );

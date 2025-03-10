@@ -14,7 +14,7 @@ import AppCard from '@/app/home/components/shared/AppCard';
 import { toastrActionsCreators } from '@/features/toastr/slice';
 // hooks
 import { useDispatch } from '@/store/hooks';
-import { getStoresPaginatedThunk, updateStoreStatusThunk } from '@/features/stores/thunks';
+import { getStoresPaginatedThunk, updateStoreStatusThunk, updateStoresSpotlightThunk } from '@/features/stores/thunks';
 import { Stores } from '@/features/stores/types';
 import StoresList from '../../components/apps/stores/StoresList';
 import StoresDetails from '../../components/apps/stores/StoresDetails';
@@ -97,6 +97,12 @@ const ApprovedModerationPage = () => {
         setConfirmRejectModal(false);
     };
 
+    const handleChangeSpotlight = (displaySpotlight: boolean) => {
+        if (selected) {
+            dispatch(updateStoresSpotlightThunk({ id: selected._id, spotlight: displaySpotlight }));
+        }
+    };
+
     const handleRefresh = async () => {
         setSelected(undefined);
 
@@ -164,6 +170,7 @@ const ApprovedModerationPage = () => {
                             store={selected}
                             handleApprove={handleApprove}
                             handleReject={() => setConfirmRejectModal(true)}
+                            handleChangeSpotlight={handleChangeSpotlight}
                         />
                     ) : null}
                 </Drawer>

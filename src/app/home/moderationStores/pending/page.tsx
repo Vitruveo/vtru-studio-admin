@@ -99,6 +99,7 @@ const PendingModerationPage = () => {
 
     const handleChangeSpotlight = (displaySpotlight: boolean) => {
         if (selected) {
+            setSelected({ ...selected, actions: { ...selected.actions, spotlight: displaySpotlight } });
             dispatch(updateStoresSpotlightThunk({ id: selected._id, spotlight: displaySpotlight }));
         }
     };

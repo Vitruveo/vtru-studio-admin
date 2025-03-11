@@ -76,7 +76,7 @@ export interface Artworks {
     };
 }
 
-export type StoreStatus = 'draft' | 'pending' | 'active' | 'inactive';
+export type StoreStatus = 'draft' | 'pending' | 'active' | 'inactive' | 'hidden';
 
 export interface AppearanceContent {
     hideElements: {

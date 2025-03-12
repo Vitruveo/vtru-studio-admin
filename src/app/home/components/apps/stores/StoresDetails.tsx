@@ -1,4 +1,4 @@
-import { Button } from '@mui/material';
+import { Button, Switch } from '@mui/material';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Stack from '@mui/material/Stack';
@@ -18,9 +18,10 @@ interface Props {
     store: Stores;
     handleApprove: () => void;
     handleReject: () => void;
+    handleChangeSpotlight: (value: boolean) => void;
 }
 
-export default function StoresDetails({ store, handleApprove, handleReject }: Props) {
+export default function StoresDetails({ store, handleApprove, handleReject, handleChangeSpotlight }: Props) {
     return (
         <Box display={'flex'} flexDirection={'column'} p={2} gap={2}>
             <Box display={'flex'} alignItems="center">
@@ -71,6 +72,17 @@ export default function StoresDetails({ store, handleApprove, handleReject }: Pr
                             {store.organization.description}
                         </Typography>
                     )}
+                </Box>
+
+                <Box display="flex" flexDirection={'column'} gap={2}>
+                    <Typography variant="h3">Spotlight</Typography>
+                    <Box>
+                        <Switch
+                            checked={store.actions?.spotlight || false}
+                            onChange={(e) => handleChangeSpotlight(e.target.checked)}
+                        />
+                        <span>Show on Spotlight</span>
+                    </Box>
                 </Box>
 
                 <Box display={'flex'} flexDirection={'column'} gap={2}>

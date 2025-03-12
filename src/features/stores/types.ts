@@ -11,6 +11,12 @@ export interface Stores {
         codeHash: string | null;
         checkedAt: string | null;
     }[];
+    moderation?: {
+        owner: string;
+        createdAt: string;
+    };
+    hash?: string;
+    actions: Actions;
 }
 
 interface Media {
@@ -70,7 +76,7 @@ export interface Artworks {
     };
 }
 
-export type StoreStatus = 'draft' | 'pending' | 'active' | 'inactive';
+export type StoreStatus = 'draft' | 'pending' | 'active' | 'inactive' | 'hidden';
 
 export interface AppearanceContent {
     hideElements: {
@@ -93,12 +99,19 @@ interface Framework {
     createdBy: string;
     updatedBy: string;
 }
+
 interface Organization {
     url: string | null;
     name: string;
     description: string | null;
     markup: number;
     formats: Formats | null;
+}
+
+interface Actions {
+    countClone: number;
+    spotlight?: boolean;
+    displaySpotlight?: boolean;
 }
 
 export interface GetStoresPaginatedParams {
@@ -118,4 +131,9 @@ export interface GetStoresPaginatedResponse {
 export interface UpdateStoreStatusParams {
     id: string;
     status: StoreStatus;
+}
+
+export interface UpdateStoresSpotlightParams {
+    id: string;
+    spotlight: boolean;
 }

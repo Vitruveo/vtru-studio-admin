@@ -100,6 +100,14 @@ const ApprovedModerationPage = () => {
     const handleChangeSpotlight = (displaySpotlight: boolean) => {
         if (selected) {
             setSelected({ ...selected, actions: { ...selected.actions, spotlight: displaySpotlight } });
+            setPaginatedData((prev) => ({
+                ...prev,
+                data: prev.data.map((stores) =>
+                    stores._id === selected._id
+                        ? { ...stores, actions: { ...stores.actions, spotlight: displaySpotlight } }
+                        : stores
+                ),
+            }));
             dispatch(updateStoresSpotlightThunk({ id: selected._id, spotlight: displaySpotlight }));
         }
     };

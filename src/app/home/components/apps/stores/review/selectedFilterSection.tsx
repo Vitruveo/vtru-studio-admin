@@ -5,6 +5,7 @@ import { LicensesFilter } from './licensesFilter';
 import { ColorFilter, ColorPrecisionFilter } from './colorFilter';
 import { MultiSelectFilter } from './multiSelectFilter';
 import { useEffect, useState } from 'react';
+import { subTitlesReviewOptions } from './options';
 
 interface SelectedFilterProps {
     title: string;
@@ -22,6 +23,7 @@ export const SelectedFilter = ({ title, content }: SelectedFilterProps) => {
 
     const contentCopy = { ...content };
     delete contentCopy.precision;
+    delete contentCopy.onlyInStore;
 
     const renderTitle = (): string => {
         if (!hasTruthyObject(contentCopy)) {
@@ -49,6 +51,8 @@ export const SelectedFilter = ({ title, content }: SelectedFilterProps) => {
                     .filter(([_key, value]) => (Array.isArray(value) ? value.length : !!value))
                     .map((element) => {
                         const [key, value] = element;
+                        if (key === 'onlyInStore') return null;
+
                         const isShortcut = key === 'shortcuts';
                         const isLicense = key === 'licenses';
                         const isColorPrecision = key === 'precision';
@@ -59,10 +63,23 @@ export const SelectedFilter = ({ title, content }: SelectedFilterProps) => {
                             delete (valueCopy as any).minPrice;
                             delete (valueCopy as any).maxPrice;
                         }
+
+                        const renderSubTitle = (): string => {
+                            if (hasTruthyObject(valueCopy) || (isColorPrecision && hasColors)) {
+                                return subTitlesReviewOptions.find((option) => option.name === key)?.label || key;
+                            }
+                            return '';
+                        };
+
                         return (
-                            <Box key={key} display={'flex'} flexDirection={'row'} marginBlock={1} gap={1}>
+                            <Box
+                                key={key}
+                                display={'flex'}
+                                flexDirection={isColorPrecision || isColors ? 'row' : 'column'}
+                                marginBlock={1}
+                            >
                                 <Typography variant="subtitle2" fontWeight="bold">
-                                    {hasTruthyObject(valueCopy) || (isColorPrecision && hasColors) ? key : ''}:
+                                    {renderSubTitle()}
                                 </Typography>
                                 {isShortcut && <ShortcutFilter content={value as { [key: string]: boolean }} />}
                                 {isLicense && <LicensesFilter content={value as { [key: string]: string }} />}

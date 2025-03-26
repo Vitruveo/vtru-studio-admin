@@ -399,3 +399,27 @@ export const shortcutsOptions = [
     { name: 'includeSold', label: 'Include Sold' },
     { name: 'hasBTS', label: 'Has BTS' },
 ];
+
+export const subTitlesReviewOptions = [
+    { name: 'shortcuts', label: 'Filters' },
+    { name: 'licenses', label: 'Artwork Price' },
+    { name: 'culture', label: 'Culture' },
+    { name: 'mood', label: 'Mood' },
+    { name: 'orientation', label: 'Orientation' },
+    { name: 'colors', label: 'Colors' },
+    { name: 'precision', label: 'Precision' },
+    { name: 'objectType', label: 'Object Type' },
+    { name: 'tags', label: 'Tags' },
+    { name: 'collections', label: 'Collections' },
+    { name: 'aiGeneration', label: 'AI generation' },
+    { name: 'arEnabled', label: 'AR enabled' },
+    { name: 'nudity', label: 'Nudity' },
+    { name: 'category', label: 'Category' },
+    { name: 'medium', label: 'Medium' },
+    { name: 'style', label: 'Style' },
+    { name: 'subject', label: 'Subject' },
+    { name: 'name', label: 'Name' },
+    { name: 'nationality', label: 'Nationality' },
+    { name: 'residence', label: 'Residence' },
+    { name: 'wallets', label: 'Wallets' },
+];

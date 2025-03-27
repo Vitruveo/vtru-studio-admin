@@ -1,4 +1,4 @@
-import { Box, Paper, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import {
     cultureOptions,
     moodOptions,
@@ -49,6 +49,10 @@ const options: Record<string, { [key: string]: { label: string; value: string }[
         arts: [],
         artists: [],
     },
+    include: {
+        arts: [],
+        artists: [],
+    },
 };
 
 export const MultiSelectFilter = ({ content }: MultiSelectFilterProps) => {
@@ -58,7 +62,7 @@ export const MultiSelectFilter = ({ content }: MultiSelectFilterProps) => {
         if (options[content.title][content.key].length) {
             return options[content.title][content.key].find((option) => option.value === item)?.label || '';
         }
-        if (content.title === 'exclude') {
+        if (content.title === 'exclude' || content.title === 'include') {
             return (item as any).label;
         }
         return formatWallet(item as string) || '';

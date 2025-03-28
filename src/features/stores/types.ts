@@ -74,6 +74,18 @@ export interface Artworks {
         nationality?: [string, string][];
         residence?: [string, string][];
     };
+    portfolio: {
+        wallets?: string[];
+    };
+    exclude: {
+        arts?: { value: string; label: string }[];
+        artists?: { value: string; label: string }[];
+    };
+    include: {
+        arts?: { value: string; label: string }[];
+        artists?: { value: string; label: string }[];
+    };
+    searchOption?: string;
 }
 
 export type StoreStatus = 'draft' | 'pending' | 'active' | 'inactive' | 'hidden';

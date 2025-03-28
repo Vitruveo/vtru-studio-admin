@@ -1,4 +1,4 @@
-import { Box, Paper, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import {
     cultureOptions,
     moodOptions,
@@ -12,9 +12,10 @@ import {
     styleOptions,
 } from './options';
 import { countryData } from '@/utils/countryData';
+import { formatWallet } from '@/utils/formatWallet';
 
-interface MultiSelectFilterProps {
-    content: { title: string; key: string; value: string[] };
+export interface MultiSelectFilterProps {
+    content: { title: string; key: string; value: string[] | { value: string; label: string }[] };
 }
 
 const options: Record<string, { [key: string]: { label: string; value: string }[] }> = {
@@ -44,21 +45,38 @@ const options: Record<string, { [key: string]: { label: string; value: string }[
     portfolio: {
         wallets: [],
     },
+    exclude: {
+        arts: [],
+        artists: [],
+    },
+    include: {
+        arts: [],
+        artists: [],
+    },
+    searchOption: {
+        searchOption: [],
+    },
 };
 
 export const MultiSelectFilter = ({ content }: MultiSelectFilterProps) => {
     if (!content.value.length) return null;
-    const isLast = (index: number) => index < content.value.length - 1;
+
+    const getItemTitle = (item: string | { value: string; label: string }): string => {
+        if (options[content.title][content.key].length) {
+            return options[content.title][content.key].find((option) => option.value === item)?.label || '';
+        }
+        if (content.title === 'exclude' || content.title === 'include') {
+            return (item as any).label;
+        }
+        return formatWallet(item as string) || '';
+    };
 
     return (
         <Box display={'flex'} gap={1} flexWrap={'wrap'}>
-            {content.value.map((item) => {
+            {content.value.map((item, index) => {
                 return (
-                    <Typography key={item} variant="body1">
-                        {options[content.title][content.key].length
-                            ? options[content.title][content.key].find((option) => option.value === item)?.label
-                            : item}
-                        {isLast(content.value.indexOf(item)) ? ', ' : ''}
+                    <Typography key={index} variant="body1">
+                        {getItemTitle(item)}
                     </Typography>
                 );
             })}

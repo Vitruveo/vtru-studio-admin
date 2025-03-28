@@ -85,6 +85,7 @@ export interface Artworks {
         arts?: { value: string; label: string }[];
         artists?: { value: string; label: string }[];
     };
+    searchOption?: string;
 }
 
 export type StoreStatus = 'draft' | 'pending' | 'active' | 'inactive' | 'hidden';

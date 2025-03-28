@@ -14,7 +14,7 @@ import {
 import { countryData } from '@/utils/countryData';
 import { formatWallet } from '@/utils/formatWallet';
 
-interface MultiSelectFilterProps {
+export interface MultiSelectFilterProps {
     content: { title: string; key: string; value: string[] | { value: string; label: string }[] };
 }
 
@@ -52,6 +52,9 @@ const options: Record<string, { [key: string]: { label: string; value: string }[
     include: {
         arts: [],
         artists: [],
+    },
+    searchOption: {
+        searchOption: [],
     },
 };
 

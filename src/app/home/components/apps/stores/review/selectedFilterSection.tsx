@@ -3,7 +3,7 @@ import { Box, Grid, Typography } from '@mui/material';
 import { ShortcutFilter } from './shortcutFilter';
 import { LicensesFilter } from './licensesFilter';
 import { ColorFilter, ColorPrecisionFilter } from './colorFilter';
-import { MultiSelectFilter } from './multiSelectFilter';
+import { MultiSelectFilter, MultiSelectFilterProps } from './multiSelectFilter';
 import { useEffect, useState } from 'react';
 import { subTitlesReviewOptions } from './options';
 
@@ -37,6 +37,7 @@ export const SelectedFilter = ({ title, content }: SelectedFilterProps) => {
         ) {
             return '';
         }
+        if (title === 'searchOption') return 'search option';
 
         return title;
     };
@@ -88,7 +89,13 @@ export const SelectedFilter = ({ title, content }: SelectedFilterProps) => {
                                 )}
                                 {isColors && <ColorFilter content={value as string[]} />}
                                 {!isShortcut && !isLicense && !isColorPrecision && !isColors && (
-                                    <MultiSelectFilter content={{ title, key, value: value as string[] }} />
+                                    <MultiSelectFilter
+                                        content={{
+                                            title,
+                                            key,
+                                            value: value as MultiSelectFilterProps['content']['value'],
+                                        }}
+                                    />
                                 )}
                             </Box>
                         );

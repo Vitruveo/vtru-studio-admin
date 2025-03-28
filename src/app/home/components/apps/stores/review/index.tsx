@@ -10,7 +10,9 @@ export const Review = ({ values }: Props) => {
         <Box>
             <Grid container spacing={4}>
                 {Object.entries(values).map((element) => {
-                    const [key, value] = element;
+                    const [key, rawValue] = element;
+                    let value = rawValue;
+                    if (typeof value !== 'object') value = { [`${key}`]: [value] };
                     return <SelectedFilter key={key} title={key} content={value} />;
                 })}
             </Grid>
